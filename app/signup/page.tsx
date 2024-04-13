@@ -1,5 +1,6 @@
 "use client"
 import { Spinner } from "@nextui-org/spinner";
+import { toast, ToastContainer } from "react-toastify";
 import LoadingEffect from "@/components/loading";
 import React, { useCallback, useState } from "react";
 import { auth } from "@/firebase/config";
@@ -19,24 +20,72 @@ const Signup: React.FC = () => {
 
     const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        if(!email && !password && !userName) {
+            toast.error("All fields are required", {
+                position: "top-center",
+                autoClose: 1000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+            });
+            return "All fields are required";
+        }
         setShowSpinner(true);
         try {
             const res = await createUserWithEmailAndPassword(email, password);
             console.log(res);
             setLoading(false);
             if (res) {
+                toast.success("Registration success", {
+                    position: "top-center",
+                    autoClose: 1000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                });
                 setLoading(true);
                 setTimeout(() => {
                     router.push("/");
                 }, 2000);
             }
+            else {
+                setShowSpinner(false);
+                toast.error("Registration failed", {
+                    position: "top-center",
+                    autoClose: 1000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                });
+            }
         } catch (error: any) {
             setLoading(false);
+            toast.error("Registration failed", {
+                position: "top-center",
+                autoClose: 1000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+            });
             console.error("Internal server error", error);
         }
     }, [email, password, createUserWithEmailAndPassword, loading]);
+
     return (
         <>
+            <ToastContainer />
             {!loading &&
                 <div className="flex">
                     <div className="max-h-full max-w-2xl shadow-xl shadow-gray-400">
