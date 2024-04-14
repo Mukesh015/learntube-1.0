@@ -17,11 +17,6 @@ const userSchema = new mongoose.Schema<UserDocument>(
             required: true,
             unique: true
         },
-        phoneNumber:{
-            type: Number,
-            required: true,
-            unique: true
-        },
         username: {
             type: String,
             required: true
@@ -30,12 +25,15 @@ const userSchema = new mongoose.Schema<UserDocument>(
             type: String,
             required: true
         },
-        avatar: String,
+        avatar: {
+            type: String,
+            required: false
+        },
         history: [mongoose.Schema.Types.Mixed], // Adjust type according to your requirements
         analytics: [
             {
-                date: { type: Date,},
-                watchTime: { type: Number,}
+                date: { type: Date, },
+                watchTime: { type: Number, }
             }
         ]
     }
@@ -43,4 +41,4 @@ const userSchema = new mongoose.Schema<UserDocument>(
 
 const UserModel: Model<UserDocument> = mongoose.model<UserDocument>("Users", userSchema);
 
-export { UserModel,UserDocument };
+export { UserModel, UserDocument };

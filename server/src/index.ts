@@ -40,12 +40,9 @@ async function init() {
     });
 
     await gqlServer.start();
-    app.get('/', (req: Request, res: Response) => {
-        res.json({ message: "Server is up and running" });
-    });
 
     app.use("/graphql", expressMiddleware(gqlServer));
-    app.use("/", UserRouter);
+    app.use("/api", UserRouter);
 
     try {
         await mongoose.connect(DB);
