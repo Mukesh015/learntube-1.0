@@ -2,9 +2,19 @@ import express, { Request, Response } from 'express';
 import { UserModel, UserDocument } from "../models/user";
 import { isPasswordComplex } from '../middlewares/user';
 import bcrypt from 'bcrypt';
+import * as cloudinary from 'cloudinary';
+import dotenv from "dotenv";
+dotenv.config({ path: "../../.env" });
+
+//Not working
+cloudinary.v2.config({
+    cloud_name: 'dq61sabcs',
+    api_key: '672851774136482',
+    api_secret: '14MCM4lcbqDO1B0nv9Na6GwWK2M',
+});
 
 export async function register(req: Request, res: Response) {
-    const { email, avatar, username, password } = req.body;
+    const { email, username, password } = req.body;
     const complex: any = await isPasswordComplex(password);
     if (!complex) {
         return res.status(400).json({
@@ -13,6 +23,11 @@ export async function register(req: Request, res: Response) {
     }
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
+        let avatar = null;
+        if (req.file && req.file.path) {
+            const result = await cloudinary.v2.uploader.upload(req.file.path);
+            avatar = result.url;
+        }
         const newUser: UserDocument = new UserModel({
             username: username,
             email: email,

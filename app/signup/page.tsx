@@ -11,77 +11,95 @@ const Signup: React.FC = () => {
     const [userName, setUserName] = useState<string>("");
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
-    const [avatar, setAvatar] = useState<string>("");
+    const [avatar, setAvatar] = useState<File | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [showSpinner, setShowSpinner] = useState<boolean>(false);
 
     const router = useRouter();
     const [createUserWithEmailAndPassword] = useCreateUserWithEmailAndPassword(auth);
 
+    const handleUploadAvatar = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const fileInput = e.target;
+        const file = fileInput.files && fileInput.files[0];
+        if (file) {
+            setAvatar(file);
+        }
+    }
     const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if(!email && !password && !userName) {
-            toast.error("All fields are required", {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "light",
-            });
-            return "All fields are required";
+        const signupFormData = new FormData();
+        signupFormData.append('username', userName);
+        signupFormData.append('email', email);
+        signupFormData.append('password', password);
+        if (avatar) {
+            signupFormData.append('avatar', avatar);
         }
-        setShowSpinner(true);
-        try {
-            const res = await createUserWithEmailAndPassword(email, password);
-            console.log(res);
-            setLoading(false);
-            if (res) {
-                toast.success("Registration success", {
-                    position: "top-center",
-                    autoClose: 1000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "light",
-                });
-                setLoading(true);
-                setTimeout(() => {
-                    router.push("/");
-                }, 2000);
-            }
-            else {
-                setShowSpinner(false);
-                toast.error("Registration failed", {
-                    position: "top-center",
-                    autoClose: 1000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "light",
-                });
-            }
-        } catch (error: any) {
-            setLoading(false);
-            toast.error("Registration failed", {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "light",
-            });
-            console.error("Internal server error", error);
-        }
-    }, [email, password, createUserWithEmailAndPassword, loading]);
+        const res = await fetch("http://localhost:9063/api/register", {
+            method: "POST",
+            body: signupFormData
+        })
+        // if (!email && !password && !userName) {
+        //     toast.error("All fields are required", {
+        //         position: "top-center",
+        //         autoClose: 1000,
+        //         hideProgressBar: false,
+        //         closeOnClick: true,
+        //         pauseOnHover: true,
+        //         draggable: true,
+        //         progress: undefined,
+        //         theme: "light",
+        //     });
+        //     return "All fields are required";
+        // }
+        // setShowSpinner(true);
+        // try {
+        //     const res = await createUserWithEmailAndPassword(email, password);
+        //     console.log(res);
+        //     setLoading(false);
+        //     if (res) {
+        //         toast.success("Registration success", {
+        //             position: "top-center",
+        //             autoClose: 1000,
+        //             hideProgressBar: false,
+        //             closeOnClick: true,
+        //             pauseOnHover: true,
+        //             draggable: true,
+        //             progress: undefined,
+        //             theme: "light",
+        //         });
+        //         setLoading(true);
+        //         setTimeout(() => {
+        //             router.push("/");
+        //         }, 2000);
+        //     }
+        //     else {
+        //         setShowSpinner(false);
+        //         toast.error("Registration failed", {
+        //             position: "top-center",
+        //             autoClose: 1000,
+        //             hideProgressBar: false,
+        //             closeOnClick: true,
+        //             pauseOnHover: true,
+        //             draggable: true,
+        //             progress: undefined,
+        //             theme: "light",
+        //         });
+        //     }
+        // } catch (error: any) {
+        //     setLoading(false);
+        //     toast.error("Registration failed", {
+        //         position: "top-center",
+        //         autoClose: 1000,
+        //         hideProgressBar: false,
+        //         closeOnClick: true,
+        //         pauseOnHover: true,
+        //         draggable: true,
+        //         progress: undefined,
+        //         theme: "light",
+        //     });
+        //     console.error("Internal server error", error);
+        // }
+    }, [email, password, userName, avatar, createUserWithEmailAndPassword, loading]);
 
     return (
         <>
@@ -276,7 +294,12 @@ const Signup: React.FC = () => {
 
                                                     <div className="relative z-0 w-full mb-5 group">
                                                         <div className="mx-auto max-w-xs">
-                                                            <input id="avatar" type="file" className="mt-2 block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-teal-500 file:py-1 file:px-2 file:text-sm file:font-semibold file:text-white hover:file:bg-teal-700 focus:outline-none disabled:pointer-events-none disabled:opacity-60" />
+                                                            <input
+                                                                onChange={handleUploadAvatar}
+                                                                id="avatar"
+                                                                type="file"
+                                                                className="mt-2 block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-teal-500 file:py-1 file:px-2 file:text-sm file:font-semibold file:text-white hover:file:bg-teal-700 focus:outline-none disabled:pointer-events-none disabled:opacity-60"
+                                                            />
                                                         </div>
                                                     </div>
                                                     <div className="flex items-center">

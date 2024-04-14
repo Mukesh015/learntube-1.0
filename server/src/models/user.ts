@@ -4,7 +4,6 @@ interface UserDocument extends Document {
     email: string;
     username: string;
     password: string;
-    phoneNumber: Number;
     avatar?: string;
     history: any[]; // Adjust type according to your requirements
     analytics: { date: Date; watchTime: number }[]; // Assuming analytics store datewise watchtime

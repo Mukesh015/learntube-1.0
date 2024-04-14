@@ -20,7 +20,6 @@ const Navbar: React.FC = () => {
     const [userName, setuserName] = useState<string>("");
     const [email, setEmail] = useState<string>("");
     const [avatar, setavatar] = useState<string>("");
-    const [password, setpassword] = useState<string>("");
     const [headerText, setHeaderText] = useState<string>("");
     const [newInfo, setnewInfo] = useState<string>("");
     const [toUpdate, settoUpdate] = useState<string>("");
@@ -33,7 +32,7 @@ const Navbar: React.FC = () => {
 
     const { isOpen, onOpen, onClose } = useDisclosure();
 
-    const handleUpdateProfile: React.FC = useCallback(async () => {
+    const handleUpdateProfile = useCallback(async () => {
         if (!newInfo) {
             console.log("Input field cannot be empty");
             return "Blank input";
@@ -209,14 +208,15 @@ const Navbar: React.FC = () => {
                     </li>
                     <li>
                         <Tooltip color="warning" delay={700} showArrow={true} content="Toggle theme">
-                            <Switch
-                                defaultSelected
-                                size="lg"
-                                color="success"
-                                startContent={<SunIcon />}
-                                endContent={<MoonIcon />}
-                            ></Switch>
-
+                            <button>
+                                <Switch
+                                    defaultSelected
+                                    size="lg"
+                                    color="success"
+                                    startContent={<SunIcon />}
+                                    endContent={<MoonIcon />}
+                                ></Switch>
+                            </button>
                         </Tooltip>
 
                     </li>
@@ -286,7 +286,7 @@ const Navbar: React.FC = () => {
                         </Dropdown>
                     </li>
                 </ul>
-            </nav>
+            </nav >
             <Modal
                 backdrop="opaque"
                 size="3xl"
