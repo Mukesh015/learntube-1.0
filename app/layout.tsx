@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { Providers } from "@/components/providers";
+import { UiProviders } from "@/components/providers";
 import "react-toastify/dist/ReactToastify.css";
 import NextTopLoader from "nextjs-toploader";
 
@@ -21,9 +21,9 @@ export default function RootLayout({
     <html lang="en" className='dark'>
       <body className={inter.className}>
         <NextTopLoader />
-        <Providers>
+        <UiProviders>
           {children}
-        </Providers>
+        </UiProviders>
       </body>
     </html>
   );

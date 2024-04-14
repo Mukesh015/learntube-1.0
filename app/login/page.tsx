@@ -11,7 +11,6 @@ import {
     useSignInWithEmailAndPassword,
 } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase/config";
-import { promises } from "dns";
 
 const Login: React.FC = () => {
     const [email, setEmail] = useState<string>("");
@@ -26,19 +25,6 @@ const Login: React.FC = () => {
 
     const handleLogin = useCallback(
         async (provider: string) => {
-            if (!email && !password) {
-                toast.warning("All fields are required", {
-                    position: "top-center",
-                    autoClose: 1000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "light",
-                });
-                return "All fields are required";
-            }
             try {
                 if (provider === "google") {
                     setGoogleLoading(true);
@@ -73,6 +59,19 @@ const Login: React.FC = () => {
                         });
                     }
                 } else if (provider === "email") {
+                    if (!email && !password) {
+                        toast.warning("All fields are required", {
+                            position: "top-center",
+                            autoClose: 1000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                            theme: "light",
+                        });
+                        return "All fields are required";
+                    }
                     setShowSpinnerLoginButton(true);
                     const res = await signInWithEmailAndPassword(email, password);
                     setShowSpinnerLoginButton(false);

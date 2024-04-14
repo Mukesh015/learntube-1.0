@@ -243,10 +243,10 @@ const Sidebar: React.FC = () => {
                     <li className="border border-slate-700 m-3"></li>
                 </ul>
                 <ul id="Subscriptions" className="mt-4 space-y-1.5">
-                    <li className=" flex ml-3 font-semibold pb-2" id="projects-accordion">
+                    <li className="py-2 px-2.5 hover:scale-110 rounded-lg flex ml-3 font-semibold pb-2 transition ease-in-out delay-150 hover:-translate-y-1 duration-150 hs-accordion hover:bg-gray-700">
                         My Subscriptions
                         <svg
-                            className="ml-8 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-150 hs-accordion hover:bg-gray-700 rounded-full"
+                            className="ml-2 rounded-full"
                             xmlns="http://www.w3.org/2000/svg"
                             height="24px"
                             viewBox="0 0 24 24"
