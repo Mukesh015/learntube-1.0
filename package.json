@@ -2,6 +2,10 @@
   "name": "learntube-1.0",
   "version": "0.1.0",
   "private": true,
+  "main": "index.js",
+  "repository": "https://github.com/Mukesh015/learntube-1.0.git",
+  "author": "Mukesh Kr. Gupta <rg37090@gmail.com>",
+  "license": "MIT",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
