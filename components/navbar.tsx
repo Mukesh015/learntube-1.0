@@ -6,6 +6,7 @@ import {
     useUpdateProfile,
     useUpdatePassword,
 } from "react-firebase-hooks/auth";
+import { useRouter } from "next/navigation";
 import { Tooltip } from "@nextui-org/tooltip";
 import { Button } from "@nextui-org/button";
 import { Switch } from "@nextui-org/react";
@@ -25,6 +26,7 @@ const Navbar: React.FC = () => {
     const [toUpdate, settoUpdate] = useState<string>("");
     const [spinnerButton, setspinnerButton] = useState<boolean>(false);
 
+    const router = useRouter();
     const [user] = useAuthState(auth);
     const [signOut] = useSignOut(auth);
     const [updateProfile] = useUpdateProfile(auth);
@@ -261,28 +263,37 @@ const Navbar: React.FC = () => {
                                     />
                                 )}
                             </DropdownTrigger>
-                            <DropdownMenu aria-label="Profile Actions" variant="flat">
-                                <DropdownItem key="profile" className="h-14 gap-2">
-                                    <p className="font-semibold">Signed in as: {userName}</p>
-                                    <p className="font-semibold">{email}</p>
-                                </DropdownItem>
-                                <DropdownItem onPress={() => handleModelOpen("nameChange")} key="userName">
-                                    Change username
-                                </DropdownItem>
-                                <DropdownItem onPress={() => handleModelOpen("passwordChange")} key="password">
-                                    Change password
-                                </DropdownItem>
-                                <DropdownItem onPress={() => handleModelOpen("avatarChange")} key="avatar">
-                                    Change avatar
-                                </DropdownItem>
-                                <DropdownItem key="team_settings">Switch account</DropdownItem>
-                                <DropdownItem key="analytics">
-                                    Analytics
-                                </DropdownItem>
-                                <DropdownItem onPress={() => handleLogout()} key="logout" color="danger">
-                                    Log Out
-                                </DropdownItem>
-                            </DropdownMenu>
+                            {user ? (
+                                <DropdownMenu aria-label="Profile Actions" variant="flat">
+                                    <DropdownItem key="profile" className="h-14 gap-2">
+                                        <p className="font-semibold">Signed in as: {userName}</p>
+                                        <p className="font-semibold">{email}</p>
+                                    </DropdownItem>
+                                    <DropdownItem onPress={() => handleModelOpen("nameChange")} key="userName">
+                                        Change username
+                                    </DropdownItem>
+                                    <DropdownItem onPress={() => handleModelOpen("passwordChange")} key="password">
+                                        Change password
+                                    </DropdownItem>
+                                    <DropdownItem onPress={() => handleModelOpen("avatarChange")} key="avatar">
+                                        Change avatar
+                                    </DropdownItem>
+                                    <DropdownItem key="team_settings">Switch account</DropdownItem>
+                                    <DropdownItem onPress={() => handleLogout()} key="logout" color="danger">
+                                        Log Out
+                                    </DropdownItem>
+                                </DropdownMenu>
+                            ) : (
+                                <DropdownMenu aria-label="Profile Actions" variant="flat">
+                                    <DropdownItem key="profile" className="h-14 gap-2">
+                                        <p className="font-semibold">You are not signed in</p>
+                                        <p className="font-semibold text-gray-500 text-small">for better experience please click on below button</p>
+                                    </DropdownItem>
+                                    <DropdownItem onPress={(e) => { router.push("/login") }} className="text-center font-extrabold" key="login" color="primary">
+                                        Login
+                                    </DropdownItem>
+                                </DropdownMenu>
+                            )}
                         </Dropdown>
                     </li>
                 </ul>
