@@ -1,6 +1,5 @@
 import express, { Request, Response } from 'express';
 import { UserModel, UserDocument } from "../models/user";
-import { isPasswordComplex } from '../middlewares/user';
 import bcrypt from 'bcrypt';
 import * as cloudinary from 'cloudinary';
 import dotenv from "dotenv";
@@ -15,12 +14,6 @@ cloudinary.v2.config({
 
 export async function register(req: Request, res: Response) {
     const { email, username, password } = req.body;
-    const complex: any = await isPasswordComplex(password);
-    if (!complex) {
-        return res.status(400).json({
-            message: "Password must be at least 8 characters long and contain at least one number and one uppercase letter and a special character"
-        });
-    }
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
         let avatar = null;

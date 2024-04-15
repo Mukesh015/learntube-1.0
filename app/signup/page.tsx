@@ -18,6 +18,31 @@ const Signup: React.FC = () => {
     const router = useRouter();
     const [createUserWithEmailAndPassword] = useCreateUserWithEmailAndPassword(auth);
 
+    const isPasswordComplex = async (password: string) => {
+        const minLength = 8;
+        let uppercaseCount = 0;
+        let numericCount = 0;
+        let specialCharCount = 0;
+
+        for (let char of password) {
+            if (/[A-Z]/.test(char)) {
+                uppercaseCount++;
+            } else if (/[0-9]/.test(char)) {
+                numericCount++;
+            } else if (/[^A-Za-z0-9]/.test(char)) {
+                specialCharCount++;
+            }
+        }
+
+        return (
+            password.length >= minLength &&
+            uppercaseCount > 0 &&
+            numericCount > 0 &&
+            specialCharCount > 0
+        );
+    }
+
+
     const handleUploadAvatar = (e: React.ChangeEvent<HTMLInputElement>) => {
         const fileInput = e.target;
         const file = fileInput.files && fileInput.files[0];
@@ -27,78 +52,97 @@ const Signup: React.FC = () => {
     }
     const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const signupFormData = new FormData();
-        signupFormData.append('username', userName);
-        signupFormData.append('email', email);
-        signupFormData.append('password', password);
-        if (avatar) {
-            signupFormData.append('avatar', avatar);
+        if (!email && !password && !userName) {
+            toast.error("All fields are required", {
+                position: "top-center",
+                autoClose: 1000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+            });
+            return "All fields are required";
         }
-        const res = await fetch("http://localhost:9063/api/register", {
-            method: "POST",
-            body: signupFormData
-        })
-        // if (!email && !password && !userName) {
-        //     toast.error("All fields are required", {
-        //         position: "top-center",
-        //         autoClose: 1000,
-        //         hideProgressBar: false,
-        //         closeOnClick: true,
-        //         pauseOnHover: true,
-        //         draggable: true,
-        //         progress: undefined,
-        //         theme: "light",
-        //     });
-        //     return "All fields are required";
-        // }
-        // setShowSpinner(true);
-        // try {
-        //     const res = await createUserWithEmailAndPassword(email, password);
-        //     console.log(res);
-        //     setLoading(false);
-        //     if (res) {
-        //         toast.success("Registration success", {
-        //             position: "top-center",
-        //             autoClose: 1000,
-        //             hideProgressBar: false,
-        //             closeOnClick: true,
-        //             pauseOnHover: true,
-        //             draggable: true,
-        //             progress: undefined,
-        //             theme: "light",
-        //         });
-        //         setLoading(true);
-        //         setTimeout(() => {
-        //             router.push("/");
-        //         }, 2000);
-        //     }
-        //     else {
-        //         setShowSpinner(false);
-        //         toast.error("Registration failed", {
-        //             position: "top-center",
-        //             autoClose: 1000,
-        //             hideProgressBar: false,
-        //             closeOnClick: true,
-        //             pauseOnHover: true,
-        //             draggable: true,
-        //             progress: undefined,
-        //             theme: "light",
-        //         });
-        //     }
-        // } catch (error: any) {
-        //     setLoading(false);
-        //     toast.error("Registration failed", {
-        //         position: "top-center",
-        //         autoClose: 1000,
-        //         hideProgressBar: false,
-        //         closeOnClick: true,
-        //         pauseOnHover: true,
-        //         draggable: true,
-        //         progress: undefined,
-        //         theme: "light",
-        //     });
-        //     console.error("Internal server error", error);
-        // }
+        const result = await isPasswordComplex(password)
+        if (!result) {
+            toast.error("Password must contain at least one uppercase letter, one number and one special character", {
+                position: "top-center",
+                autoClose: 1000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+            });
+            return "Password must contain at least one uppercase letter, one number and one special character";
+        }
+        setShowSpinner(true);
+        try {
+            const signupFormData = new FormData();
+            signupFormData.append('username', userName);
+            signupFormData.append('email', email);
+            signupFormData.append('password', password);
+            if (avatar) {
+                signupFormData.append('avatar', avatar);
+            }
+            const res = await createUserWithEmailAndPassword(email, password);
+            setLoading(false);
+            if (res) {
+                try {
+                    const response = await fetch("http://localhost:9063/api/register", {
+                        method: "POST",
+                        body: signupFormData
+                    })
+                    console.log(response);
+                    if (response.ok) {
+                        toast.success("Registration success", {
+                            position: "top-center",
+                            autoClose: 1000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                            theme: "light",
+                        });
+                        setLoading(true);
+                        setTimeout(() => {
+                            router.push("/");
+                        }, 2000);
+                    } else {
+                        setShowSpinner(false);
+                        toast.error("Registration failed", {
+                            position: "top-center",
+                            autoClose: 1000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                            theme: "light",
+                        });
+                    }
+                } catch (error: any) {
+                    console.log("Internal server error", error);
+                }
+            }
+        } catch (error: any) {
+            setLoading(false);
+            toast.error("Registration failed", {
+                position: "top-center",
+                autoClose: 1000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+            });
+            console.error("Internal server error", error);
+        }
     }, [email, password, userName, avatar, createUserWithEmailAndPassword, loading]);
 
     return (
