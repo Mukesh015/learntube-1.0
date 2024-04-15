@@ -37,15 +37,15 @@ export async function register(req: Request, res: Response) {
 }
 
 
-type CloudinaryImageUploadResult = { res: string }; // Type for Cloudinary upload response
+type CloudinaryImageUploadResult = { res: string }; 
 
 async function cloudinaryImageUploadMethod(file: string): Promise<CloudinaryImageUploadResult> {
   return new Promise((resolve, reject) => {
     cloudinary.v2.uploader.upload(file, (err: Error, res: any) => {
       if (err) {
-        reject(err); // Reject with the actual error object
+        reject(err); 
       } else {
-        resolve({ res: res.url }); // Resolve with the secure URL
+        resolve({ res: res.url }); 
       }
     });
   });
@@ -53,6 +53,7 @@ async function cloudinaryImageUploadMethod(file: string): Promise<CloudinaryImag
 
 export async function createChannel(req: Request, res: Response) {
     const { email, channelName, firstName, gender, contactNumber, city, state, country, pinCode, recoveryEmail, occupation } = req.body;
+    console.log(email, channelName, firstName, gender, contactNumber, city, state)
     let channelLogo: string | null = null;
     let coverPhoto: string | null = null;
   
@@ -96,7 +97,6 @@ export async function createChannel(req: Request, res: Response) {
     }
   }
   
-
 
 async function getUserByUsername(email: string): Promise<UserDocument | null> {
     try {
