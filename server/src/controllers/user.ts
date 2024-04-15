@@ -3,17 +3,17 @@ import { UserModel, UserDocument } from "../models/user";
 import bcrypt from 'bcrypt';
 import * as cloudinary from 'cloudinary';
 import dotenv from "dotenv";
-dotenv.config({ path: "../../.env" });
+dotenv.config({ path: "./.env" });
 
-//Not working
 cloudinary.v2.config({
-    cloud_name: 'dq61sabcs',
-    api_key: '672851774136482',
-    api_secret: '14MCM4lcbqDO1B0nv9Na6GwWK2M',
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.API_KEY,
+    api_secret: process.env.API_SECRET,
 });
 
 export async function register(req: Request, res: Response) {
     const { email, username, password } = req.body;
+    console.log(email, username, password);
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
         let avatar = null;
@@ -34,6 +34,78 @@ export async function register(req: Request, res: Response) {
         return res.status(500).json({ message: "Internal server error", error: error });
     }
 }
+
+
+export async function createChannel(req: Request, res: Response) {
+    const { username, channelName } = req.body;
+    let channelLogo: string | null = null;
+    try {
+        const user: UserDocument | null = await UserModel.findOne({ username });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        if (req.file && req.file.path) {
+            const result = await cloudinary.v2.uploader.upload(req.file.path);
+            channelLogo = result.url;
+        } else {
+            return res.status(400).json({ message: 'Channel Logo is required' });
+        }
+
+        user.isCreator = true;
+        user.channelName = channelName;
+        user.channelLogo = channelLogo;
+        await user.save();
+
+        res.status(200).json({ message: 'User updated successfully' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+}
+
+
+
+async function getUserByUsername(username: string): Promise<UserDocument | null> {
+    try {
+        const user: UserDocument | null = await UserModel.findOne({ username });
+        return user;
+    } catch (error) {
+        console.error('Error fetching user:', error);
+        return null;
+    }
+}
+
+export async function getUserDetails(req: Request, res: Response) {
+    const {usernameToFind} = req.body;
+     console.log(usernameToFind)
+    try {
+        const user = await getUserByUsername(usernameToFind);
+        if (user) {
+            const userDetailsArray = [
+                {
+                    email: user.email,
+                    username: user.username,
+                    password: user.password,
+                    avatar: user.avatar,
+                    isCreator: user.isCreator,
+                    channelName: user.channelName,
+                    channelLogo: user.channelLogo,
+                    history: user.history,
+                    analytics: user.analytics
+                }
+            ];
+            res.status(200).send(userDetailsArray);
+        } else {
+            res.status(404).json({ message: 'User not found' });
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+}
+
+
 
 export async function handleuservalidation(req: Request, res: Response) {
     const { email, username, avatar } = req.body;

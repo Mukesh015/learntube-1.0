@@ -5,8 +5,11 @@ interface UserDocument extends Document {
     username: string;
     password: string;
     avatar?: string;
-    history: any[]; // Adjust type according to your requirements
-    analytics: { date: Date; watchTime: number }[]; // Assuming analytics store datewise watchtime
+    isCreator: boolean;
+    channelName?: string;
+    channelLogo?: string;
+    history: any[]; 
+    analytics: { date: Date; watchTime: number }[];
 }
 
 const userSchema = new mongoose.Schema<UserDocument>(
@@ -28,7 +31,19 @@ const userSchema = new mongoose.Schema<UserDocument>(
             type: String,
             required: false
         },
-        history: [mongoose.Schema.Types.Mixed], // Adjust type according to your requirements
+        isCreator: {
+            type: Boolean,
+            default: false
+        },
+        channelName:{
+            type: String,
+            required: false
+        },
+        channelLogo:{
+            type: String,
+            required: false
+        },
+        history: [mongoose.Schema.Types.Mixed],
         analytics: [
             {
                 date: { type: Date, },
