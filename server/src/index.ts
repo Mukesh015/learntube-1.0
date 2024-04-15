@@ -8,7 +8,7 @@ import bodyParser from 'body-parser';
 import axios from 'axios';
 import UserRouter from './routes/static';
 import dotenv from "dotenv";
-
+import creategraphqlServer from "./graphql";
 dotenv.config({ path: "./.env" });
 
 async function init() {
@@ -26,42 +26,7 @@ async function init() {
     app.use(bodyParser.json());
     app.use(cookieParser());
 
-    const gqlServer = new ApolloServer({
-        typeDefs: `
-            type Query {
-                hello: String!
-                say(args: String): String!
-                isCreator(usernameToFind: String!): Boolean!
-            }
-        `,
-        resolvers: {
-            Query: {
-                hello: () => 'Hello World!',
-                say: (_: any, { args }: any) => `Hello ${args}! how are you`,
-                isCreator: async (_: any, { usernameToFind }: { usernameToFind: string }) => {
-                    try {
-                        const response = await axios.post('http://localhost:9063/api/getuserdetails', {
-                            usernameToFind: usernameToFind
-                        });
-                        const userData = response.data;
-                        if (userData && userData.length > 0) {
-            
-                            return userData[0].isCreator;
-                        } else {
-                            throw new Error('User not found');
-                        }
-                    } catch (error) {
-                        console.error('Error fetching isCreator:', error);
-                        throw new Error('Error fetching isCreator');
-                    }
-                }
-            }
-        }
-    });
-    
-
-    await gqlServer.start();
-    app.use("/graphql", expressMiddleware(gqlServer));
+    app.use("/graphql", expressMiddleware(await creategraphqlServer(), ));
     app.use("/api", UserRouter);
     try {
         await mongoose.connect(DB);
