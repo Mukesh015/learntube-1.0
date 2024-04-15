@@ -10,7 +10,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 UserRouter.post('/register', upload.single("avatar"), register);
-UserRouter.post('/createchannel', upload.single("logo"), createChannel);
+UserRouter.post('/createchannel', upload.array('image',2), createChannel);
 UserRouter.post('/getuserdetails',  getUserDetails);
 
 

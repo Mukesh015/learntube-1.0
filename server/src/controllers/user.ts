@@ -3,6 +3,7 @@ import { UserModel, UserDocument } from "../models/user";
 import bcrypt from 'bcrypt';
 import * as cloudinary from 'cloudinary';
 import dotenv from "dotenv";
+
 dotenv.config({ path: "./.env" });
 
 cloudinary.v2.config({
@@ -36,32 +37,65 @@ export async function register(req: Request, res: Response) {
 }
 
 
-export async function createChannel(req: Request, res: Response) {
-    const { email, channelName } = req.body;
-    let channelLogo: string | null = null;
-    try {
-        const user: UserDocument | null = await UserModel.findOne({ email });
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-        if (req.file && req.file.path) {
-            const result = await cloudinary.v2.uploader.upload(req.file.path);
-            channelLogo = result.url;
-        } else {
-            return res.status(400).json({ message: 'Channel Logo is required' });
-        }
-        user.isCreator = true;
-        user.channelName = channelName;
-        user.channelLogo = channelLogo;
-        await user.save();
+type CloudinaryImageUploadResult = { res: string }; // Type for Cloudinary upload response
 
-        res.status(200).json({ message: 'User updated successfully' });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: 'Server error' });
-    }
+async function cloudinaryImageUploadMethod(file: string): Promise<CloudinaryImageUploadResult> {
+  return new Promise((resolve, reject) => {
+    cloudinary.v2.uploader.upload(file, (err: Error, res: any) => {
+      if (err) {
+        reject(err); // Reject with the actual error object
+      } else {
+        resolve({ res: res.url }); // Resolve with the secure URL
+      }
+    });
+  });
 }
 
+export async function createChannel(req: Request, res: Response) {
+    const { email, channelName, firstName, gender, contactNumber, city, state, country, pinCode, recoveryEmail, occupation } = req.body;
+    let channelLogo: string | null = null;
+    let coverPhoto: string | null = null;
+  
+    try {
+      const user: UserDocument | null = await UserModel.findOne({ email });
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      const urls: string[] = [];
+      const files: Express.Multer.File[] = req.files as Express.Multer.File[];
+      for (const file of files) {
+        const { path } = file;
+        try {
+          const newPath = await cloudinaryImageUploadMethod(path);
+          urls.push(newPath.res);
+        } catch (err) {
+          console.error(err);
+          return res.status(500).json({ message: 'Error uploading image' });
+        }
+      }
+  
+      channelLogo = urls[0];
+      coverPhoto = urls[1];
+  
+      user.isCreator = true;
+      user.channelName = channelName;
+      user.channelLogo = channelLogo;
+      user.coverPhoto = coverPhoto;
+      user.firstname = firstName;
+      user.gender = gender;
+      user.recoveryEmail = recoveryEmail;
+      user.occupation = occupation;
+      user.address = [{ country, state, city, pincode: pinCode, phone: contactNumber }];
+      await user.save();
+  
+      res.status(200).json({ message: 'User updated successfully' });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Server error' });
+    }
+  }
+  
 
 
 async function getUserByUsername(email: string): Promise<UserDocument | null> {
