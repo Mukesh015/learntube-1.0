@@ -1,6 +1,8 @@
 "use client"
 import React, { useCallback, useState } from 'react';
 import { RadioGroup, Radio } from "@nextui-org/react";
+import { Select, SelectItem } from "@nextui-org/react";
+import { Input } from "@nextui-org/react";
 import { Button } from "@nextui-org/react";
 import { toast, ToastContainer } from "react-toastify";
 
@@ -22,6 +24,15 @@ const CreatorRegisterForm: React.FC = () => {
     const [logo, setLogo] = useState<File | null>(null);
     const [cover, setCover] = useState<File | null>(null);
 
+    const platforms = [
+        { label: "Facebook", value: "Facebook" },
+        { label: "Instagram", value: "Instagram" },
+        { label: "Github", value: "Github" },
+        { label: "LinkedIn", value: "LinkedIn" },
+        { label: "Twitter", value: "Twitter" },
+        { label: "Discord", value: "Discord" }
+    ];
+
 
     const handlePersonalInfoForm = useCallback(async () => {
         setPersonalInfoNext(true);
@@ -38,15 +49,15 @@ const CreatorRegisterForm: React.FC = () => {
             creatorForm.append('channelName', channelName);
             creatorForm.append('firstName', firstName);
             creatorForm.append('gender', gender);
-            creatorForm.append('contactNumber', contactNumber);
             creatorForm.append('city', city);
             creatorForm.append('state', state);
             creatorForm.append('country', country);
-            creatorForm.append('pinCode', pinCode);
             creatorForm.append('recoveryEmail', recoveryEmail);
             creatorForm.append('occupation', occupation);
-
-
+            if(pinCode && contactNumber){
+                creatorForm.append('contactNumber', contactNumber);
+                creatorForm.append('pinCode', pinCode);
+            }
             if (logo && cover) {
                 creatorForm.append('image', logo);
                 creatorForm.append('image', cover);
@@ -284,6 +295,19 @@ const CreatorRegisterForm: React.FC = () => {
                                         htmlFor="floatingInput"
                                         className="pointer-events-none absolute left-0 top-0 origin-[0_0] border border-solid border-transparent px-3 py-4 text-neutral-500 transition-[opacity,_transform] duration-200 ease-linear peer-focus:-translate-y-2 peer-focus:translate-x-[0.15rem] peer-focus:scale-[0.85] peer-focus:text-primary peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:translate-x-[0.15rem] peer-[:not(:placeholder-shown)]:scale-[0.85] motion-reduce:transition-none dark:text-neutral-400 dark:peer-focus:text-primary"
                                     >Add recovery email</label>
+                                </div>
+                                <div className="relative mb-3">
+                                    <input
+                                        required
+                                        type="name"
+                                        className="peer m-0 block h-[58px] w-full rounded border border-solid border-secondary-500 bg-transparent bg-clip-padding px-3 py-4 text-base font-normal leading-tight text-neutral-700 transition duration-200 ease-linear placeholder:text-transparent focus:border-primary focus:pb-[0.625rem] focus:pt-[1.625rem] focus:text-neutral-700 focus:outline-none peer-focus:text-primary dark:border-neutral-400 dark:text-white dark:autofill:shadow-autofill dark:focus:border-primary dark:peer-focus:text-primary [&:not(:placeholder-shown)]:pb-[0.625rem] [&:not(:placeholder-shown)]:pt-[1.625rem]"
+                                        id="floatingInput"
+                                        placeholder="Enter your first name"
+                                    />
+                                    <label
+                                        htmlFor="floatingInput"
+                                        className="pointer-events-none absolute left-0 top-0 origin-[0_0] border border-solid border-transparent px-3 py-4 text-neutral-500 transition-[opacity,_transform] duration-200 ease-linear peer-focus:-translate-y-2 peer-focus:translate-x-[0.15rem] peer-focus:scale-[0.85] peer-focus:text-primary peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:translate-x-[0.15rem] peer-[:not(:placeholder-shown)]:scale-[0.85] motion-reduce:transition-none dark:text-neutral-400 dark:peer-focus:text-primary"
+                                    >Channel description</label>
                                 </div>
                                 <div className="relative mb-3">
                                     <input
