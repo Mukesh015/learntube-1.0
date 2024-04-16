@@ -2,11 +2,22 @@
 import React, { useCallback, useState } from 'react';
 import { RadioGroup, Radio } from "@nextui-org/react";
 import { Button } from "@nextui-org/react";
+import { Select, SelectItem } from "@nextui-org/react";
+import { Input } from "@nextui-org/react";
 
 const CreatorRegisterForm: React.FC = () => {
 
     const [personalInfoNext, setPersonalInfoNext] = useState<boolean>(false);
     const [otpForm, setOtpForm] = useState<boolean>(false);
+
+    const platforms = [
+        { label: "Facebook", value: "Facebook" },
+        { label: "Instagram", value: "Instagram" },
+        { label: "Github", value: "Github" },
+        { label: "LinkedIn", value: "LinkedIn" },
+        { label: "Twitter", value: "Twitter" },
+        { label: "Discord", value: "Discord" }
+    ];
 
     const handlePersonalInfoForm = useCallback(async () => {
         setPersonalInfoNext(true);
@@ -180,19 +191,6 @@ const CreatorRegisterForm: React.FC = () => {
                                     <label
                                         htmlFor="floatingInput"
                                         className="pointer-events-none absolute left-0 top-0 origin-[0_0] border border-solid border-transparent px-3 py-4 text-neutral-500 transition-[opacity,_transform] duration-200 ease-linear peer-focus:-translate-y-2 peer-focus:translate-x-[0.15rem] peer-focus:scale-[0.85] peer-focus:text-primary peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:translate-x-[0.15rem] peer-[:not(:placeholder-shown)]:scale-[0.85] motion-reduce:transition-none dark:text-neutral-400 dark:peer-focus:text-primary"
-                                    >Channel admin name</label>
-                                </div>
-                                <div className="relative mb-3">
-                                    <input
-                                        required
-                                        type="name"
-                                        className="peer m-0 block h-[58px] w-full rounded border border-solid border-secondary-500 bg-transparent bg-clip-padding px-3 py-4 text-base font-normal leading-tight text-neutral-700 transition duration-200 ease-linear placeholder:text-transparent focus:border-primary focus:pb-[0.625rem] focus:pt-[1.625rem] focus:text-neutral-700 focus:outline-none peer-focus:text-primary dark:border-neutral-400 dark:text-white dark:autofill:shadow-autofill dark:focus:border-primary dark:peer-focus:text-primary [&:not(:placeholder-shown)]:pb-[0.625rem] [&:not(:placeholder-shown)]:pt-[1.625rem]"
-                                        id="floatingInput"
-                                        placeholder="Enter your first name"
-                                    />
-                                    <label
-                                        htmlFor="floatingInput"
-                                        className="pointer-events-none absolute left-0 top-0 origin-[0_0] border border-solid border-transparent px-3 py-4 text-neutral-500 transition-[opacity,_transform] duration-200 ease-linear peer-focus:-translate-y-2 peer-focus:translate-x-[0.15rem] peer-focus:scale-[0.85] peer-focus:text-primary peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:translate-x-[0.15rem] peer-[:not(:placeholder-shown)]:scale-[0.85] motion-reduce:transition-none dark:text-neutral-400 dark:peer-focus:text-primary"
                                     >Add recovery email</label>
                                 </div>
                                 <div className="relative mb-3">
@@ -208,6 +206,51 @@ const CreatorRegisterForm: React.FC = () => {
                                         className="pointer-events-none absolute left-0 top-0 origin-[0_0] border border-solid border-transparent px-3 py-4 text-neutral-500 transition-[opacity,_transform] duration-200 ease-linear peer-focus:-translate-y-2 peer-focus:translate-x-[0.15rem] peer-focus:scale-[0.85] peer-focus:text-primary peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:translate-x-[0.15rem] peer-[:not(:placeholder-shown)]:scale-[0.85] motion-reduce:transition-none dark:text-neutral-400 dark:peer-focus:text-primary"
                                     >Occupation</label>
                                 </div>
+                                <div className="relative mb-3">
+                                    <input
+                                        required
+                                        type="name"
+                                        className="peer m-0 block h-[58px] w-full rounded border border-solid border-secondary-500 bg-transparent bg-clip-padding px-3 py-4 text-base font-normal leading-tight text-neutral-700 transition duration-200 ease-linear placeholder:text-transparent focus:border-primary focus:pb-[0.625rem] focus:pt-[1.625rem] focus:text-neutral-700 focus:outline-none peer-focus:text-primary dark:border-neutral-400 dark:text-white dark:autofill:shadow-autofill dark:focus:border-primary dark:peer-focus:text-primary [&:not(:placeholder-shown)]:pb-[0.625rem] [&:not(:placeholder-shown)]:pt-[1.625rem]"
+                                        id="floatingInput"
+                                        placeholder="Enter your first name"
+                                    />
+                                    <label
+                                        htmlFor="floatingInput"
+                                        className="pointer-events-none absolute left-0 top-0 origin-[0_0] border border-solid border-transparent px-3 py-4 text-neutral-500 transition-[opacity,_transform] duration-200 ease-linear peer-focus:-translate-y-2 peer-focus:translate-x-[0.15rem] peer-focus:scale-[0.85] peer-focus:text-primary peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:translate-x-[0.15rem] peer-[:not(:placeholder-shown)]:scale-[0.85] motion-reduce:transition-none dark:text-neutral-400 dark:peer-focus:text-primary"
+                                    >Channel description</label>
+                                </div>
+                                <div className="relative mb-3">
+                                    <input
+                                        required
+                                        type="name"
+                                        className="peer m-0 block h-[58px] w-full rounded border border-solid border-secondary-500 bg-transparent bg-clip-padding px-3 py-4 text-base font-normal leading-tight text-neutral-700 transition duration-200 ease-linear placeholder:text-transparent focus:border-primary focus:pb-[0.625rem] focus:pt-[1.625rem] focus:text-neutral-700 focus:outline-none peer-focus:text-primary dark:border-neutral-400 dark:text-white dark:autofill:shadow-autofill dark:focus:border-primary dark:peer-focus:text-primary [&:not(:placeholder-shown)]:pb-[0.625rem] [&:not(:placeholder-shown)]:pt-[1.625rem]"
+                                        id="floatingInput"
+                                        placeholder="Enter your first name"
+                                    />
+                                    <label
+                                        htmlFor="floatingInput"
+                                        className="pointer-events-none absolute left-0 top-0 origin-[0_0] border border-solid border-transparent px-3 py-4 text-neutral-500 transition-[opacity,_transform] duration-200 ease-linear peer-focus:-translate-y-2 peer-focus:translate-x-[0.15rem] peer-focus:scale-[0.85] peer-focus:text-primary peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:translate-x-[0.15rem] peer-[:not(:placeholder-shown)]:scale-[0.85] motion-reduce:transition-none dark:text-neutral-400 dark:peer-focus:text-primary"
+                                    >Any website link</label>
+                                </div>
+                                <div className="w-full flex flex-col gap-4 mb-5">
+                                    <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
+                                        <Select
+                                            variant="bordered"
+                                            label="Select an platform"
+                                            className="max-w-xs"
+                                        >
+                                            {platforms.map((platforms) => (
+                                                <SelectItem key={platforms.value} value={platforms.value}>
+                                                    {platforms.label}
+                                                </SelectItem>
+                                            ))}
+                                        </Select>
+                                        <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
+                                            <Input type="email" variant="bordered" label="Link" />
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div className="relative ml-3 flex mb-3">
                                     <div className="max-w-xs">
                                         <label className="mb-1 block dark:text-neutral-400 text-sm font-medium text-neutral-500">Upload channel logo</label>
@@ -218,7 +261,7 @@ const CreatorRegisterForm: React.FC = () => {
                                         <input id="example1" type="file" className="mt-2 block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-teal-500 file:py-2 file:px-4 file:text-sm file:font-semibold text-neutral-500 hover:file:bg-teal-700 focus:outline-none disabled:pointer-events-none disabled:opacity-60" />
                                     </div>
                                 </div>
-                                <Button onPress={(e) => handleChannelInfoForm()} className='mt-36 ml-48 flex' color="danger">
+                                <Button onPress={(e) => handleChannelInfoForm()} className='mt-10 ml-48 flex' color="danger">
                                     Next
                                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M22 12l-4-4v3H3v2h15v3l4-4z" /></svg>
                                 </Button>

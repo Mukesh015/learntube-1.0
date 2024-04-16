@@ -1,6 +1,12 @@
+"use client"
 import React from 'react';
+import { Tabs, Tab, Chip } from "@nextui-org/react";
+import { Accordion, AccordionItem } from "@nextui-org/react";
 
 const CardGrid: React.FC = () => {
+    const defaultContent =
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
+
     return (
         <>
             <div id='cards' className="w-full px-6 py-6 mx-auto">
@@ -117,62 +123,129 @@ const CardGrid: React.FC = () => {
                     </div>
                 </div>
             </div>
-            <div className='bg-gray-700 ml-5 mr-5 rounded-xl'>
-                <h1 className='text-center justify-center text-teal-500 text-xl font-semibold p-3'>Personal Informations</h1>
-                <div className='flex ml-10 mb-5'>
-                    <div className='w-96 mt-5'>
-                        <p className='font-semibold'>Your name :</p>
-                        <span className='text-gray-400'>Mukesh Gupta</span>
-                    </div>
-                    <div className='w-96 mt-5'>
-                        <p className='font-semibold'>Email address :</p>
-                        <span className='text-gray-400'>mukesh@gmail.com</span>
-                    </div>
-                    <div className='w-96 mt-5'>
-                        <p className='font-semibold'>Phone number :</p>
-                        <span className='text-gray-400'>7851523698</span>
-                    </div>
-                    <div className='w-96 mt-5'>
-                        <p className='font-semibold'>Gender :</p>
-                        <span className='text-gray-400'>Male</span>
-                    </div>
-                </div>
-                <div className='flex ml-10 mb-5'>
-                    <div className='w-96'>
-                        <p className='font-semibold'>Address :</p>
-                        <span className='text-gray-400'>Kamrarmath, bankura</span>
-                    </div>
-                    <div className='w-96'>
-                        <p className='font-semibold'>City :</p>
-                        <span className='text-gray-400'>Bankura</span>
-                    </div>
-                    <div className='w-96'>
-                        <p className='font-semibold'>State :</p>
-                        <span className='text-gray-400'>West Bengal</span>
-                    </div>
-                    <div className='w-96'>
-                        <p className='font-semibold'>Country :</p>
-                        <span className='text-gray-400'>India</span>
-                    </div>
-                </div>
-                <div className='flex ml-10 pb-5'>
-                    <div className='w-96'>
-                        <p className='font-semibold'>Pin code :</p>
-                        <span className='text-gray-400'>722101</span>
-                    </div>
-                    <div className='w-96'>
-                        <p className='font-semibold'>Occupation</p>
-                        <span className='text-gray-400'>S/W Engeneer</span>
-                    </div>
-                    <div className='w-96'>
-                        <p className='font-semibold'>Recovery email :</p>
-                        <span className='text-gray-400'>mukesh@gmail.com</span>
-                    </div>
-                    <div className='w-96'>
-                        <p className='font-semibold'>Channel name :</p>
-                        <span className='text-gray-400'>learntube</span>
-                    </div>
-                </div>
+            <div className='ml-5 mr-5'>
+                <Accordion variant="shadow">
+                    <AccordionItem key="1" aria-label="Accordion 1" title="Personal informations">
+                        <div className='bg-gray-700 ml-5 mr-5 rounded-xl'>
+                            <div className='flex ml-10 mb-5'>
+                                <div className='w-96 mt-5'>
+                                    <p className='font-semibold'>Your name :</p>
+                                    <span className='text-gray-400'>Mukesh Gupta</span>
+                                </div>
+                                <div className='w-96 mt-5'>
+                                    <p className='font-semibold'>Email address :</p>
+                                    <span className='text-gray-400'>mukesh@gmail.com</span>
+                                </div>
+                                <div className='w-96 mt-5'>
+                                    <p className='font-semibold'>Phone number :</p>
+                                    <span className='text-gray-400'>7851523698</span>
+                                </div>
+                                <div className='w-96 mt-5'>
+                                    <p className='font-semibold'>Gender :</p>
+                                    <span className='text-gray-400'>Male</span>
+                                </div>
+                            </div>
+                            <div className='flex ml-10 mb-5'>
+                                <div className='w-96'>
+                                    <p className='font-semibold'>Address :</p>
+                                    <span className='text-gray-400'>Kamrarmath, bankura</span>
+                                </div>
+                                <div className='w-96'>
+                                    <p className='font-semibold'>City :</p>
+                                    <span className='text-gray-400'>Bankura</span>
+                                </div>
+                                <div className='w-96'>
+                                    <p className='font-semibold'>State :</p>
+                                    <span className='text-gray-400'>West Bengal</span>
+                                </div>
+                                <div className='w-96'>
+                                    <p className='font-semibold'>Country :</p>
+                                    <span className='text-gray-400'>India</span>
+                                </div>
+                            </div>
+                            <div className='flex ml-10 pb-5'>
+                                <div className='w-96'>
+                                    <p className='font-semibold'>Pin code :</p>
+                                    <span className='text-gray-400'>722101</span>
+                                </div>
+                                <div className='w-96'>
+                                    <p className='font-semibold'>Occupation</p>
+                                    <span className='text-gray-400'>S/W Engeneer</span>
+                                </div>
+                                <div className='w-96'>
+                                    <p className='font-semibold'>Recovery email :</p>
+                                    <span className='text-gray-400'>mukesh@gmail.com</span>
+                                </div>
+                                <div className='w-96'>
+                                    <p className='font-semibold'>Channel name :</p>
+                                    <span className='text-gray-400'>learntube</span>
+                                </div>
+                            </div>
+                        </div>
+                    </AccordionItem>
+                </Accordion>
+            </div>
+            <div className='ml-5 mr-5 mt-5'>
+                <Accordion variant="shadow">
+                    <AccordionItem key="1" aria-label="Accordion 1" title="Personal informations">
+                        <div className='bg-gray-700 ml-5 mr-5 rounded-xl'>
+                            <div className='flex ml-10 mb-5'>
+                                <div className='w-96 mt-5'>
+                                    <p className='font-semibold'>Channel name :</p>
+                                    <span className='text-gray-400'>Gaming aura</span>
+                                </div>
+                                <div className='w-96 mt-5'>
+                                    <p className='font-semibold'>Email address :</p>
+                                    <span className='text-gray-400'>mukesh@gmail.com</span>
+                                </div>
+                                <div className='w-96 mt-5'>
+                                    <p className='font-semibold'>Phone number :</p>
+                                    <span className='text-gray-400'>7851523698</span>
+                                </div>
+                                <div className='w-96 mt-5'>
+                                    <p className='font-semibold'>Gender :</p>
+                                    <span className='text-gray-400'>Male</span>
+                                </div>
+                            </div>
+                            <div className='flex ml-10 mb-5'>
+                                <div className='w-96'>
+                                    <p className='font-semibold'>Address :</p>
+                                    <span className='text-gray-400'>Kamrarmath, bankura</span>
+                                </div>
+                                <div className='w-96'>
+                                    <p className='font-semibold'>City :</p>
+                                    <span className='text-gray-400'>Bankura</span>
+                                </div>
+                                <div className='w-96'>
+                                    <p className='font-semibold'>State :</p>
+                                    <span className='text-gray-400'>West Bengal</span>
+                                </div>
+                                <div className='w-96'>
+                                    <p className='font-semibold'>Country :</p>
+                                    <span className='text-gray-400'>India</span>
+                                </div>
+                            </div>
+                            <div className='flex ml-10 pb-5'>
+                                <div className='w-96'>
+                                    <p className='font-semibold'>Pin code :</p>
+                                    <span className='text-gray-400'>722101</span>
+                                </div>
+                                <div className='w-96'>
+                                    <p className='font-semibold'>Occupation</p>
+                                    <span className='text-gray-400'>S/W Engeneer</span>
+                                </div>
+                                <div className='w-96'>
+                                    <p className='font-semibold'>Recovery email :</p>
+                                    <span className='text-gray-400'>mukesh@gmail.com</span>
+                                </div>
+                                <div className='w-96'>
+                                    <p className='font-semibold'>Channel name :</p>
+                                    <span className='text-gray-400'>learntube</span>
+                                </div>
+                            </div>
+                        </div>
+                    </AccordionItem>
+                </Accordion>
             </div>
             <div className='mt-5 flex'>
                 <div className='w-36 ml-10 mt-28'>
@@ -181,6 +254,177 @@ const CardGrid: React.FC = () => {
                 <div className='ml-36'>
                     <img style={{ width: "1000px" }} className='h-60 rounded-md absolute' src="https://cdn.create.vista.com/downloads/b2940106-cf8e-44dd-9ced-f2804030bd66_1024.jpeg" alt="" />
                     <img className='opacity-95 rounded-full h-40 absolute ml-96 mt-36' src="https://img.freepik.com/free-vector/bird-colorful-logo-gradient-vector_343694-1365.jpg?size=338&ext=jpg&ga=GA1.1.1700460183.1713207600&semt=sph" alt="" />
+                </div>
+            </div>
+            <div className='mt-48 justify-center item-center text-center' style={{ maxWidth: "600px", marginLeft: "480px" }}>
+                <p>@gamergift.com - 81 laks subscribers - 200 videos</p>
+                <p className='text-sm text-gray-500 mt-3'>Hi there! My name is Piyush Garg and I'm a software engineer with over 5 years of experience in the industry. I love all things tech and coding, and on my channel, read more</p>
+            </div>
+            <div className='mt-10'>
+                <div className="flex w-full flex-col">
+                    <Tabs
+                        className='ml-80 mr-96'
+                        aria-label="Options"
+                        color="primary"
+                        variant="underlined"
+                        classNames={{
+                            tabList: "gap-6 w-full relative rounded-none p-0 border-b border-divider",
+                            cursor: "w-full bg-[#22d3ee]",
+                            tab: "max-w-fit px-0 h-12",
+                            tabContent: "group-data-[selected=true]:text-[#06b6d4]"
+                        }}
+                    >
+                        <Tab
+                            key="Home"
+                            title={
+                                <div className="flex items-center space-x-2">
+                                    <span>Home</span>
+                                </div>
+                            }
+                        />
+                        <Tab
+                            key="Courses"
+                            title={
+                                <div className="flex items-center space-x-2">
+                                    <span>Courses</span>
+                                </div>
+                            }
+                        />
+                        <Tab
+                            key="videos"
+                            title={
+                                <div className="flex items-center space-x-2">
+                                    <span>Videos</span>
+                                </div>
+                            }
+                        />
+                        <Tab
+                            key="Playlists"
+                            title={
+                                <div className="flex items-center space-x-2">
+                                    <span>Playlists</span>
+                                </div>
+                            }
+                        />
+                        <Tab
+                            key="Community"
+                            title={
+                                <div className="flex items-center space-x-2">
+                                    <span>Community</span>
+                                </div>
+                            }
+                        />
+                        <Tab
+                            key="Search"
+                            title={
+                                <div className="flex items-center space-x-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" /></svg>
+                                    <span>Search</span>
+                                </div>
+                            }
+                        />
+                    </Tabs>
+                </div>
+            </div>
+            <div
+                id="description-container"
+                className="gap-12 grid grid-cols-3 hover m-20"
+            >
+                <div id="video-content">
+                    {/* video content here*/}
+                    <img
+                        className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-150 rounded-md"
+                        height={350}
+                        width={350}
+                        src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg"
+                        alt=""
+                    />
+                    <div className="mt-3 justify-center">
+                        <h1 className=''>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptate, soluta!</h1> {/* video title here*/}
+                        <p className="text-gray-500">
+                            20k views - 4 hours ago {/*Content details/analitics*/}
+                        </p>
+                    </div>
+                </div>
+                <div id="video-content">
+                    {/* video content here*/}
+                    <img
+                        className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-150 rounded-md"
+                        height={350}
+                        width={350}
+                        src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg"
+                        alt=""
+                    />
+                    <div className="mt-3 justify-center">
+                        <h1 className=''>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptate, soluta!</h1> {/* video title here*/}
+                        <p className="text-gray-500">
+                            20k views - 4 hours ago {/*Content details/analitics*/}
+                        </p>
+                    </div>
+                </div>
+                <div id="video-content">
+                    {/* video content here*/}
+                    <img
+                        className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-150 rounded-md"
+                        height={350}
+                        width={350}
+                        src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg"
+                        alt=""
+                    />
+                    <div className="mt-3 justify-center">
+                        <h1 className=''>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptate, soluta!</h1> {/* video title here*/}
+                        <p className="text-gray-500">
+                            20k views - 4 hours ago {/*Content details/analitics*/}
+                        </p>
+                    </div>
+                </div>
+                <div id="video-content">
+                    {/* video content here*/}
+                    <img
+                        className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-150 rounded-md"
+                        height={350}
+                        width={350}
+                        src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg"
+                        alt=""
+                    />
+                    <div className="mt-3 justify-center">
+                        <h1 className=''>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptate, soluta!</h1> {/* video title here*/}
+                        <p className="text-gray-500">
+                            20k views - 4 hours ago {/*Content details/analitics*/}
+                        </p>
+                    </div>
+                </div>
+                <div id="video-content">
+                    {/* video content here*/}
+                    <img
+                        className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-150 rounded-md"
+                        height={350}
+                        width={350}
+                        src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg"
+                        alt=""
+                    />
+                    <div className="mt-3 justify-center">
+                        <h1 className=''>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptate, soluta!</h1> {/* video title here*/}
+                        <p className="text-gray-500">
+                            20k views - 4 hours ago {/*Content details/analitics*/}
+                        </p>
+                    </div>
+                </div>
+                <div id="video-content">
+                    {/* video content here*/}
+                    <img
+                        className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-150 rounded-md"
+                        height={350}
+                        width={350}
+                        src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg"
+                        alt=""
+                    />
+                    <div className="mt-3 justify-center">
+                        <h1 className=''>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptate, soluta!</h1> {/* video title here*/}
+                        <p className="text-gray-500">
+                            20k views - 4 hours ago {/*Content details/analitics*/}
+                        </p>
+                    </div>
                 </div>
             </div>
         </>
