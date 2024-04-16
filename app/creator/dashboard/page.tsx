@@ -187,60 +187,36 @@ const CardGrid: React.FC = () => {
             </div>
             <div className='ml-5 mr-5 mt-5'>
                 <Accordion variant="shadow">
-                    <AccordionItem key="1" aria-label="Accordion 1" title="Personal informations">
+                    <AccordionItem key="1" aria-label="Accordion 1" title="Channel information">
                         <div className='bg-gray-700 ml-5 mr-5 rounded-xl'>
-                            <div className='flex ml-10 mb-5'>
-                                <div className='w-96 mt-5'>
-                                    <p className='font-semibold'>Channel name :</p>
-                                    <span className='text-gray-400'>Gaming aura</span>
+                            <div className='flex ml-10 mb-5 gap-28'>
+                                <div className='mt-5 flex'>
+                                    <p className='font-semibold'>Channel name:</p>
+                                    <span className='text-gray-400 ml-1'>Gaming aura</span>
                                 </div>
-                                <div className='w-96 mt-5'>
-                                    <p className='font-semibold'>Email address :</p>
-                                    <span className='text-gray-400'>mukesh@gmail.com</span>
+                                <div className='mt-5 flex'>
+                                    <p className='font-semibold'>Recovery email address:</p>
+                                    <span className='text-gray-400 ml-1'>mukesh@gmail.com</span>
                                 </div>
-                                <div className='w-96 mt-5'>
-                                    <p className='font-semibold'>Phone number :</p>
-                                    <span className='text-gray-400'>7851523698</span>
+                                <div className='mt-5 flex'>
+                                    <p className='font-semibold ml-1'>Status:</p>
+                                    <span className='text-gray-400'>Active</span>
                                 </div>
-                                <div className='w-96 mt-5'>
-                                    <p className='font-semibold'>Gender :</p>
-                                    <span className='text-gray-400'>Male</span>
-                                </div>
-                            </div>
-                            <div className='flex ml-10 mb-5'>
-                                <div className='w-96'>
-                                    <p className='font-semibold'>Address :</p>
-                                    <span className='text-gray-400'>Kamrarmath, bankura</span>
-                                </div>
-                                <div className='w-96'>
-                                    <p className='font-semibold'>City :</p>
-                                    <span className='text-gray-400'>Bankura</span>
-                                </div>
-                                <div className='w-96'>
-                                    <p className='font-semibold'>State :</p>
-                                    <span className='text-gray-400'>West Bengal</span>
-                                </div>
-                                <div className='w-96'>
-                                    <p className='font-semibold'>Country :</p>
-                                    <span className='text-gray-400'>India</span>
+                                <div className='mt-5 flex'>
+                                    <p className='font-semibold ml-1'>Created:</p>
+                                    <span className='text-gray-400'>10/10/2024</span>
                                 </div>
                             </div>
-                            <div className='flex ml-10 pb-5'>
-                                <div className='w-96'>
-                                    <p className='font-semibold'>Pin code :</p>
-                                    <span className='text-gray-400'>722101</span>
+
+
+                            <div className='ml-10 pb-10'>
+                                <div>
+                                    <p className='font-semibold'>Channel description:</p>
+                                    <span className='text-gray-300 '>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quam exercitationem culpa delectus illo rem repellat quasi modi veritatis non minima! Lorem ipsum dolor sit amet consectetur adipisicing elit. Harum illo dolores ipsam officia odio! Impedit iste quas porro rem numquam.</span>
                                 </div>
-                                <div className='w-96'>
-                                    <p className='font-semibold'>Occupation</p>
-                                    <span className='text-gray-400'>S/W Engeneer</span>
-                                </div>
-                                <div className='w-96'>
-                                    <p className='font-semibold'>Recovery email :</p>
-                                    <span className='text-gray-400'>mukesh@gmail.com</span>
-                                </div>
-                                <div className='w-96'>
-                                    <p className='font-semibold'>Channel name :</p>
-                                    <span className='text-gray-400'>learntube</span>
+                                <div className='mt-5 '>
+                                    <p className='font-semibold'>Provided links:</p>
+                                    <span className='text-gray-300'>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Assumenda delectus obcaecati, possimus doloremque illum esse magnam expedita praesentium dicta asperiores. Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptate enim doloremque nobis quos. Natus, aperiam? Debitis ratione nostrum rerum? Asperiores.</span>
                                 </div>
                             </div>
                         </div>
