@@ -5,7 +5,7 @@ import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4'
 import cors from "cors";
 import bodyParser from 'body-parser';
-import axios from 'axios';
+import VideoRouter from './routes/video';
 import UserRouter from './routes/static';
 import dotenv from "dotenv";
 import creategraphqlServer from "./graphql";
@@ -28,6 +28,7 @@ async function init() {
 
     app.use("/graphql", expressMiddleware(await creategraphqlServer(), ));
     app.use("/api", UserRouter);
+    app.use("/video", VideoRouter);
     try {
         await mongoose.connect(DB);
         console.log("DB connected");
