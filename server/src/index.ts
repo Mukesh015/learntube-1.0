@@ -5,9 +5,10 @@ import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4'
 import cors from "cors";
 import bodyParser from 'body-parser';
+import axios from 'axios';
 import UserRouter from './routes/static';
 import dotenv from "dotenv";
-
+import creategraphqlServer from "./graphql";
 dotenv.config({ path: "./.env" });
 
 async function init() {
@@ -25,25 +26,8 @@ async function init() {
     app.use(bodyParser.json());
     app.use(cookieParser());
 
-    const gqlServer = new ApolloServer({
-        typeDefs: `
-        type Query {
-            hello: String!
-            say(args: String): String!
-        }`,
-        resolvers: {
-            Query: {
-                hello: () => 'Hello World!',
-                say: (_: any, { args }: any) => `Hello ${args}! how are you`
-            }
-        }
-    });
-
-    await gqlServer.start();
-
-    app.use("/graphql", expressMiddleware(gqlServer));
+    app.use("/graphql", expressMiddleware(await creategraphqlServer(), ));
     app.use("/api", UserRouter);
-
     try {
         await mongoose.connect(DB);
         console.log("DB connected");

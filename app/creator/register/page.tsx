@@ -2,22 +2,26 @@
 import React, { useCallback, useState } from 'react';
 import { RadioGroup, Radio } from "@nextui-org/react";
 import { Button } from "@nextui-org/react";
-import { Select, SelectItem } from "@nextui-org/react";
-import { Input } from "@nextui-org/react";
+import { toast, ToastContainer } from "react-toastify";
 
 const CreatorRegisterForm: React.FC = () => {
 
     const [personalInfoNext, setPersonalInfoNext] = useState<boolean>(false);
     const [otpForm, setOtpForm] = useState<boolean>(false);
+    const [email, setEmail] = useState<string>("");
+    const [channelName, setChannelName] = useState<string>("");
+    const [firstName, setFirstName] = useState<string>("");
+    const [gender, setGender] = useState<string>("");
+    const [contactNumber, setContactNumber] = useState<string>();
+    const [city, setCity] = useState<string>("");
+    const [state, setState] = useState<string>("");
+    const [country, setCountry] = useState<string>("");
+    const [pinCode, setPincode] = useState<string>();
+    const [recoveryEmail, setRecoveryEmail] = useState<string>("");
+    const [occupation, setOccupation] = useState<string>("");
+    const [logo, setLogo] = useState<File | null>(null);
+    const [cover, setCover] = useState<File | null>(null);
 
-    const platforms = [
-        { label: "Facebook", value: "Facebook" },
-        { label: "Instagram", value: "Instagram" },
-        { label: "Github", value: "Github" },
-        { label: "LinkedIn", value: "LinkedIn" },
-        { label: "Twitter", value: "Twitter" },
-        { label: "Discord", value: "Discord" }
-    ];
 
     const handlePersonalInfoForm = useCallback(async () => {
         setPersonalInfoNext(true);
@@ -28,11 +32,82 @@ const CreatorRegisterForm: React.FC = () => {
     }, [setOtpForm]);
 
     const handleOtpForm = useCallback(async () => {
-        console.log("otp form submited");
-    }, [])
+        try {
+            const creatorForm = new FormData();
+            creatorForm.append('email', email);
+            creatorForm.append('channelName', channelName);
+            creatorForm.append('firstName', firstName);
+            creatorForm.append('gender', gender);
+            creatorForm.append('contactNumber', contactNumber);
+            creatorForm.append('city', city);
+            creatorForm.append('state', state);
+            creatorForm.append('country', country);
+            creatorForm.append('pinCode', pinCode);
+            creatorForm.append('recoveryEmail', recoveryEmail);
+            creatorForm.append('occupation', occupation);
 
+
+            if (logo && cover) {
+                creatorForm.append('image', logo);
+                creatorForm.append('image', cover);
+            }
+            console.log(contactNumber,pinCode);
+            try {
+                const response = await fetch("http://localhost:9063/api/createchannel", {
+                    method: "POST",
+                    body: creatorForm
+                })
+                console.log(response);
+                if (response.ok) {
+                    toast.success("Registration success", {
+                        position: "top-center",
+                        autoClose: 1000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "light",
+                    });
+
+                } else {
+                    toast.error("Registration failed", {
+                        position: "top-center",
+                        autoClose: 1000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "light",
+                    });
+                }
+            }
+            catch (error: any) {
+                console.log("Internal server error", error);
+            }
+        }
+        catch (error: any) {
+            console.log("Internal server error", error);
+        }
+    }, [])
+    const handleLogo = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const fileInput = e.target;
+        const file = fileInput.files && fileInput.files[0];
+        if (file) {
+            setLogo(file);
+        }
+    }
+    const handleCover = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const fileInput = e.target;
+        const file = fileInput.files && fileInput.files[0];
+        if (file) {
+            setCover(file);
+        }
+    }
     return (
         <>
+        <ToastContainer />
             {otpForm ? (
                 <div className='flex'>
                     <div className='ml-10' style={{ maxWidth: "600px" }}>
@@ -174,6 +249,8 @@ const CreatorRegisterForm: React.FC = () => {
                                         className="peer m-0 block h-[58px] w-full rounded border border-solid border-secondary-500 bg-transparent bg-clip-padding px-3 py-4 text-base font-normal leading-tight text-neutral-700 transition duration-200 ease-linear placeholder:text-transparent focus:border-primary focus:pb-[0.625rem] focus:pt-[1.625rem] focus:text-neutral-700 focus:outline-none peer-focus:text-primary dark:border-neutral-400 dark:text-white dark:autofill:shadow-autofill dark:focus:border-primary dark:peer-focus:text-primary [&:not(:placeholder-shown)]:pb-[0.625rem] [&:not(:placeholder-shown)]:pt-[1.625rem]"
                                         id="floatingInput"
                                         placeholder="Enter your first name"
+                                        value={channelName}
+                                        onChange={(e) => setChannelName(e.target.value)}
                                     />
                                     <label
                                         htmlFor="floatingInput"
@@ -191,6 +268,21 @@ const CreatorRegisterForm: React.FC = () => {
                                     <label
                                         htmlFor="floatingInput"
                                         className="pointer-events-none absolute left-0 top-0 origin-[0_0] border border-solid border-transparent px-3 py-4 text-neutral-500 transition-[opacity,_transform] duration-200 ease-linear peer-focus:-translate-y-2 peer-focus:translate-x-[0.15rem] peer-focus:scale-[0.85] peer-focus:text-primary peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:translate-x-[0.15rem] peer-[:not(:placeholder-shown)]:scale-[0.85] motion-reduce:transition-none dark:text-neutral-400 dark:peer-focus:text-primary"
+                                    >Channel admin name</label>
+                                </div>
+                                <div className="relative mb-3">
+                                    <input
+                                        required
+                                        type="name"
+                                        className="peer m-0 block h-[58px] w-full rounded border border-solid border-secondary-500 bg-transparent bg-clip-padding px-3 py-4 text-base font-normal leading-tight text-neutral-700 transition duration-200 ease-linear placeholder:text-transparent focus:border-primary focus:pb-[0.625rem] focus:pt-[1.625rem] focus:text-neutral-700 focus:outline-none peer-focus:text-primary dark:border-neutral-400 dark:text-white dark:autofill:shadow-autofill dark:focus:border-primary dark:peer-focus:text-primary [&:not(:placeholder-shown)]:pb-[0.625rem] [&:not(:placeholder-shown)]:pt-[1.625rem]"
+                                        id="floatingInput"
+                                        placeholder="Enter your first name"
+                                        value={recoveryEmail}
+                                        onChange={(e) => setRecoveryEmail(e.target.value)}
+                                    />
+                                    <label
+                                        htmlFor="floatingInput"
+                                        className="pointer-events-none absolute left-0 top-0 origin-[0_0] border border-solid border-transparent px-3 py-4 text-neutral-500 transition-[opacity,_transform] duration-200 ease-linear peer-focus:-translate-y-2 peer-focus:translate-x-[0.15rem] peer-focus:scale-[0.85] peer-focus:text-primary peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:translate-x-[0.15rem] peer-[:not(:placeholder-shown)]:scale-[0.85] motion-reduce:transition-none dark:text-neutral-400 dark:peer-focus:text-primary"
                                     >Add recovery email</label>
                                 </div>
                                 <div className="relative mb-3">
@@ -200,32 +292,8 @@ const CreatorRegisterForm: React.FC = () => {
                                         className="peer m-0 block h-[58px] w-full rounded border border-solid border-secondary-500 bg-transparent bg-clip-padding px-3 py-4 text-base font-normal leading-tight text-neutral-700 transition duration-200 ease-linear placeholder:text-transparent focus:border-primary focus:pb-[0.625rem] focus:pt-[1.625rem] focus:text-neutral-700 focus:outline-none peer-focus:text-primary dark:border-neutral-400 dark:text-white dark:autofill:shadow-autofill dark:focus:border-primary dark:peer-focus:text-primary [&:not(:placeholder-shown)]:pb-[0.625rem] [&:not(:placeholder-shown)]:pt-[1.625rem]"
                                         id="floatingInput"
                                         placeholder="Enter your first name"
-                                    />
-                                    <label
-                                        htmlFor="floatingInput"
-                                        className="pointer-events-none absolute left-0 top-0 origin-[0_0] border border-solid border-transparent px-3 py-4 text-neutral-500 transition-[opacity,_transform] duration-200 ease-linear peer-focus:-translate-y-2 peer-focus:translate-x-[0.15rem] peer-focus:scale-[0.85] peer-focus:text-primary peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:translate-x-[0.15rem] peer-[:not(:placeholder-shown)]:scale-[0.85] motion-reduce:transition-none dark:text-neutral-400 dark:peer-focus:text-primary"
-                                    >Occupation</label>
-                                </div>
-                                <div className="relative mb-3">
-                                    <input
-                                        required
-                                        type="name"
-                                        className="peer m-0 block h-[58px] w-full rounded border border-solid border-secondary-500 bg-transparent bg-clip-padding px-3 py-4 text-base font-normal leading-tight text-neutral-700 transition duration-200 ease-linear placeholder:text-transparent focus:border-primary focus:pb-[0.625rem] focus:pt-[1.625rem] focus:text-neutral-700 focus:outline-none peer-focus:text-primary dark:border-neutral-400 dark:text-white dark:autofill:shadow-autofill dark:focus:border-primary dark:peer-focus:text-primary [&:not(:placeholder-shown)]:pb-[0.625rem] [&:not(:placeholder-shown)]:pt-[1.625rem]"
-                                        id="floatingInput"
-                                        placeholder="Enter your first name"
-                                    />
-                                    <label
-                                        htmlFor="floatingInput"
-                                        className="pointer-events-none absolute left-0 top-0 origin-[0_0] border border-solid border-transparent px-3 py-4 text-neutral-500 transition-[opacity,_transform] duration-200 ease-linear peer-focus:-translate-y-2 peer-focus:translate-x-[0.15rem] peer-focus:scale-[0.85] peer-focus:text-primary peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:translate-x-[0.15rem] peer-[:not(:placeholder-shown)]:scale-[0.85] motion-reduce:transition-none dark:text-neutral-400 dark:peer-focus:text-primary"
-                                    >Channel description</label>
-                                </div>
-                                <div className="relative mb-3">
-                                    <input
-                                        required
-                                        type="name"
-                                        className="peer m-0 block h-[58px] w-full rounded border border-solid border-secondary-500 bg-transparent bg-clip-padding px-3 py-4 text-base font-normal leading-tight text-neutral-700 transition duration-200 ease-linear placeholder:text-transparent focus:border-primary focus:pb-[0.625rem] focus:pt-[1.625rem] focus:text-neutral-700 focus:outline-none peer-focus:text-primary dark:border-neutral-400 dark:text-white dark:autofill:shadow-autofill dark:focus:border-primary dark:peer-focus:text-primary [&:not(:placeholder-shown)]:pb-[0.625rem] [&:not(:placeholder-shown)]:pt-[1.625rem]"
-                                        id="floatingInput"
-                                        placeholder="Enter your first name"
+                                        value={occupation}
+                                        onChange={(e) => setOccupation(e.target.value)}
                                     />
                                     <label
                                         htmlFor="floatingInput"
@@ -254,11 +322,20 @@ const CreatorRegisterForm: React.FC = () => {
                                 <div className="relative ml-3 flex mb-3">
                                     <div className="max-w-xs">
                                         <label className="mb-1 block dark:text-neutral-400 text-sm font-medium text-neutral-500">Upload channel logo</label>
-                                        <input id="example1" type="file" className="mt-2 block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-teal-500 file:py-2 file:px-4 file:text-sm file:font-semibold text-neutral-500 hover:file:bg-teal-700 focus:outline-none disabled:pointer-events-none disabled:opacity-60" />
+                                        <input
+                                            id="example1"
+                                            type="file"
+                                            className="mt-2 block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-teal-500 file:py-2 file:px-4 file:text-sm file:font-semibold text-neutral-500 hover:file:bg-teal-700 focus:outline-none disabled:pointer-events-none disabled:opacity-60"
+                                            onChange={handleLogo}
+                                        />
                                     </div>
                                     <div className="max-w-xs">
                                         <label className="mb-1 block dark:text-neutral-400 text-sm font-medium text-neutral-500">Upload cover photo</label>
-                                        <input id="example1" type="file" className="mt-2 block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-teal-500 file:py-2 file:px-4 file:text-sm file:font-semibold text-neutral-500 hover:file:bg-teal-700 focus:outline-none disabled:pointer-events-none disabled:opacity-60" />
+                                        <input id="example1"
+                                            type="file"
+                                            className="mt-2 block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-teal-500 file:py-2 file:px-4 file:text-sm file:font-semibold text-neutral-500 hover:file:bg-teal-700 focus:outline-none disabled:pointer-events-none disabled:opacity-60"
+                                            onChange={handleCover}
+                                        />
                                     </div>
                                 </div>
                                 <Button onPress={(e) => handleChannelInfoForm()} className='mt-10 ml-48 flex' color="danger">
@@ -275,6 +352,8 @@ const CreatorRegisterForm: React.FC = () => {
                                         className="peer m-0 block h-[58px] w-full rounded border border-solid border-secondary-500 bg-transparent bg-clip-padding px-3 py-4 text-base font-normal leading-tight text-neutral-700 transition duration-200 ease-linear placeholder:text-transparent focus:border-primary focus:pb-[0.625rem] focus:pt-[1.625rem] focus:text-neutral-700 focus:outline-none peer-focus:text-primary dark:border-neutral-400 dark:text-white dark:autofill:shadow-autofill dark:focus:border-primary dark:peer-focus:text-primary [&:not(:placeholder-shown)]:pb-[0.625rem] [&:not(:placeholder-shown)]:pt-[1.625rem]"
                                         id="floatingInput"
                                         placeholder="Enter your first name"
+                                        onChange={(e) => setFirstName(e.target.value)}
+                                        value={firstName}
                                     />
                                     <label
                                         htmlFor="floatingInput"
@@ -284,7 +363,8 @@ const CreatorRegisterForm: React.FC = () => {
                                 <div className="relative mb-3">
                                     <input
                                         required
-
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        value={email}
                                         type="email"
                                         className="peer m-0 block h-[58px] w-full rounded border border-solid border-secondary-500 bg-transparent bg-clip-padding px-3 py-4 text-base font-normal leading-tight text-neutral-700 transition duration-200 ease-linear placeholder:text-transparent focus:border-primary focus:pb-[0.625rem] focus:pt-[1.625rem] focus:text-neutral-700 focus:outline-none peer-focus:text-primary dark:border-neutral-400 dark:text-white dark:autofill:shadow-autofill dark:focus:border-primary dark:peer-focus:text-primary [&:not(:placeholder-shown)]:pb-[0.625rem] [&:not(:placeholder-shown)]:pt-[1.625rem]"
                                         id="floatingInput"
@@ -299,9 +379,11 @@ const CreatorRegisterForm: React.FC = () => {
                                     <RadioGroup
                                         orientation="horizontal"
                                         label="Select your gender"
+                                        value={gender}
+                                        onChange={(e) => setGender(e.target.value)}
                                     >
-                                        <Radio value="buenos-aires">Male</Radio>
-                                        <Radio value="sydney">Female</Radio>
+                                        <Radio value="Male">Male</Radio>
+                                        <Radio value="Female">Female</Radio>
 
                                     </RadioGroup>
                                 </div>
@@ -312,6 +394,8 @@ const CreatorRegisterForm: React.FC = () => {
                                         className="peer m-0 block h-[58px] w-full rounded border border-solid border-secondary-500 bg-transparent bg-clip-padding px-3 py-4 text-base font-normal leading-tight text-neutral-700 transition duration-200 ease-linear placeholder:text-transparent focus:border-primary focus:pb-[0.625rem] focus:pt-[1.625rem] focus:text-neutral-700 focus:outline-none peer-focus:text-primary dark:border-neutral-400 dark:text-white dark:autofill:shadow-autofill dark:focus:border-primary dark:peer-focus:text-primary [&:not(:placeholder-shown)]:pb-[0.625rem] [&:not(:placeholder-shown)]:pt-[1.625rem]"
                                         id="floatingInput"
                                         placeholder="Enter your last name"
+                                        value={contactNumber}
+                                        onChange={(e) => setContactNumber(e.target.value)}
                                     />
                                     <label
                                         htmlFor="floatingInput"
@@ -325,6 +409,7 @@ const CreatorRegisterForm: React.FC = () => {
                                         className="peer m-0 block h-[58px] w-full rounded border border-solid border-secondary-500 bg-transparent bg-clip-padding px-3 py-4 text-base font-normal leading-tight text-neutral-700 transition duration-200 ease-linear placeholder:text-transparent focus:border-primary focus:pb-[0.625rem] focus:pt-[1.625rem] focus:text-neutral-700 focus:outline-none peer-focus:text-primary dark:border-neutral-400 dark:text-white dark:autofill:shadow-autofill dark:focus:border-primary dark:peer-focus:text-primary [&:not(:placeholder-shown)]:pb-[0.625rem] [&:not(:placeholder-shown)]:pt-[1.625rem]"
                                         id="floatingInput"
                                         placeholder="Enter your adddress"
+
                                     />
                                     <label
                                         htmlFor="floatingInput"
@@ -339,6 +424,8 @@ const CreatorRegisterForm: React.FC = () => {
                                             className="peer m-0 block h-[58px] w-full rounded border border-solid border-secondary-500 bg-transparent bg-clip-padding px-3 py-4 text-base font-normal leading-tight text-neutral-700 transition duration-200 ease-linear placeholder:text-transparent focus:border-primary focus:pb-[0.625rem] focus:pt-[1.625rem] focus:text-neutral-700 focus:outline-none peer-focus:text-primary dark:border-neutral-400 dark:text-white dark:autofill:shadow-autofill dark:focus:border-primary dark:peer-focus:text-primary [&:not(:placeholder-shown)]:pb-[0.625rem] [&:not(:placeholder-shown)]:pt-[1.625rem]"
                                             id="floatingInput"
                                             placeholder="Enter your adddress"
+                                            value={city}
+                                            onChange={(e) => setCity(e.target.value)}
                                         />
                                         <label
                                             htmlFor="floatingInput"
@@ -352,6 +439,8 @@ const CreatorRegisterForm: React.FC = () => {
                                             className="peer m-0 block h-[58px] w-full rounded border border-solid border-secondary-500 bg-transparent bg-clip-padding px-3 py-4 text-base font-normal leading-tight text-neutral-700 transition duration-200 ease-linear placeholder:text-transparent focus:border-primary focus:pb-[0.625rem] focus:pt-[1.625rem] focus:text-neutral-700 focus:outline-none peer-focus:text-primary dark:border-neutral-400 dark:text-white dark:autofill:shadow-autofill dark:focus:border-primary dark:peer-focus:text-primary [&:not(:placeholder-shown)]:pb-[0.625rem] [&:not(:placeholder-shown)]:pt-[1.625rem]"
                                             id="floatingInput"
                                             placeholder="Enter your adddress"
+                                            value={pinCode}
+                                            onChange={(e) => setPincode(e.target.value)}
                                         />
                                         <label
                                             htmlFor="floatingInput"
@@ -366,6 +455,8 @@ const CreatorRegisterForm: React.FC = () => {
                                         className="peer m-0 block h-[58px] w-full rounded border border-solid border-secondary-500 bg-transparent bg-clip-padding px-3 py-4 text-base font-normal leading-tight text-neutral-700 transition duration-200 ease-linear placeholder:text-transparent focus:border-primary focus:pb-[0.625rem] focus:pt-[1.625rem] focus:text-neutral-700 focus:outline-none peer-focus:text-primary dark:border-neutral-400 dark:text-white dark:autofill:shadow-autofill dark:focus:border-primary dark:peer-focus:text-primary [&:not(:placeholder-shown)]:pb-[0.625rem] [&:not(:placeholder-shown)]:pt-[1.625rem]"
                                         id="floatingInput"
                                         placeholder="Enter your adddress"
+                                        value={state}
+                                        onChange={(e) => setState(e.target.value)}
                                     />
                                     <label
                                         htmlFor="floatingInput"
@@ -379,6 +470,8 @@ const CreatorRegisterForm: React.FC = () => {
                                         className="peer m-0 block h-[58px] w-full rounded border border-solid border-secondary-500 bg-transparent bg-clip-padding px-3 py-4 text-base font-normal leading-tight text-neutral-700 transition duration-200 ease-linear placeholder:text-transparent focus:border-primary focus:pb-[0.625rem] focus:pt-[1.625rem] focus:text-neutral-700 focus:outline-none peer-focus:text-primary dark:border-neutral-400 dark:text-white dark:autofill:shadow-autofill dark:focus:border-primary dark:peer-focus:text-primary [&:not(:placeholder-shown)]:pb-[0.625rem] [&:not(:placeholder-shown)]:pt-[1.625rem]"
                                         id="floatingInput"
                                         placeholder="Enter your adddress"
+                                        value={country}
+                                        onChange={(e) => setCountry(e.target.value)}
                                     />
                                     <label
                                         htmlFor="floatingInput"
