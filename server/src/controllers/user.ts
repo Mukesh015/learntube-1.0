@@ -53,7 +53,8 @@ async function cloudinaryImageUploadMethod(file: string): Promise<CloudinaryImag
 
 export async function createChannel(req: Request, res: Response) {
     const { email, channelName, firstName, gender, contactNumber, city, state, country, pinCode, recoveryEmail, occupation } = req.body;
-    console.log(email, channelName, firstName, gender, contactNumber, city, state)
+    const contactnumber=parseInt(contactNumber)
+    const pincode=parseInt(pinCode)
     let channelLogo: string | null = null;
     let coverPhoto: string | null = null;
   
@@ -87,7 +88,7 @@ export async function createChannel(req: Request, res: Response) {
       user.gender = gender;
       user.recoveryEmail = recoveryEmail;
       user.occupation = occupation;
-      user.address = [{ country, state, city, pincode: pinCode, phone: contactNumber }];
+      user.address = [{ country, state, city, pincode: pincode, phone: contactnumber }];
       await user.save();
   
       res.status(200).json({ message: 'User updated successfully' });

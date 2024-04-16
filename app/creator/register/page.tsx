@@ -12,11 +12,11 @@ const CreatorRegisterForm: React.FC = () => {
     const [channelName, setChannelName] = useState<string>("");
     const [firstName, setFirstName] = useState<string>("");
     const [gender, setGender] = useState<string>("");
-    const [contactNumber, setContactNumber] = useState<number>();
+    const [contactNumber, setContactNumber] = useState<string>();
     const [city, setCity] = useState<string>("");
     const [state, setState] = useState<string>("");
     const [country, setCountry] = useState<string>("");
-    const [pinCode, setPincode] = useState<number>();
+    const [pinCode, setPincode] = useState<string>();
     const [recoveryEmail, setRecoveryEmail] = useState<string>("");
     const [occupation, setOccupation] = useState<string>("");
     const [logo, setLogo] = useState<File | null>(null);
@@ -38,11 +38,11 @@ const CreatorRegisterForm: React.FC = () => {
             creatorForm.append('channelName', channelName);
             creatorForm.append('firstName', firstName);
             creatorForm.append('gender', gender);
-            // creatorForm.append('contactNumber', contactNumber);
+            creatorForm.append('contactNumber', contactNumber);
             creatorForm.append('city', city);
             creatorForm.append('state', state);
             creatorForm.append('country', country);
-            // creatorForm.append('pinCode', pinCode);
+            creatorForm.append('pinCode', pinCode);
             creatorForm.append('recoveryEmail', recoveryEmail);
             creatorForm.append('occupation', occupation);
 
@@ -51,7 +51,7 @@ const CreatorRegisterForm: React.FC = () => {
                 creatorForm.append('image', logo);
                 creatorForm.append('image', cover);
             }
-
+            console.log(contactNumber,pinCode);
             try {
                 const response = await fetch("http://localhost:9063/api/createchannel", {
                     method: "POST",
@@ -363,8 +363,8 @@ const CreatorRegisterForm: React.FC = () => {
                                         value={gender}
                                         onChange={(e) => setGender(e.target.value)}
                                     >
-                                        <Radio value="buenos-aires">Male</Radio>
-                                        <Radio value="sydney">Female</Radio>
+                                        <Radio value="Male">Male</Radio>
+                                        <Radio value="Female">Female</Radio>
 
                                     </RadioGroup>
                                 </div>
@@ -376,7 +376,7 @@ const CreatorRegisterForm: React.FC = () => {
                                         id="floatingInput"
                                         placeholder="Enter your last name"
                                         value={contactNumber}
-                                        onChange={(e) => setContactNumber(parseInt(e.target.value))}
+                                        onChange={(e) => setContactNumber(e.target.value)}
                                     />
                                     <label
                                         htmlFor="floatingInput"
@@ -421,7 +421,7 @@ const CreatorRegisterForm: React.FC = () => {
                                             id="floatingInput"
                                             placeholder="Enter your adddress"
                                             value={pinCode}
-                                            onChange={(e) => setPincode(parseInt(e.target.value))}
+                                            onChange={(e) => setPincode(e.target.value)}
                                         />
                                         <label
                                             htmlFor="floatingInput"
