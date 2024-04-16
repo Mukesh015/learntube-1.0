@@ -30,8 +30,8 @@ async function cloudinaryImageUploadMethod(file: string): Promise<CloudinaryImag
 
 export async function uploadVideo(req: Request, res: Response) {
     try {
-        const { email, courseName, courseDescription, courseFess, videoTitle, videoDescription, videoTags } = req.body;
-        let videoUrl: string | null = null;
+        const { email, courseName, courseDescription, free,paid, videoTitle, videoDescription, videoTags } = req.body;
+    
         let videoThumbUrl: string | null = null;
         let courseThumbUrl: string | null = null;
         const urls: string[] = [];
@@ -47,9 +47,8 @@ export async function uploadVideo(req: Request, res: Response) {
           }
         }
     
-        videoUrl = urls[0];
-        videoThumbUrl= urls[1];
-        courseThumbUrl = urls[2];
+        videoThumbUrl= urls[0];
+        courseThumbUrl = urls[1];
         let user: VideoDocument | null = await VideoModel.findOne({ email });
 
         if (!user) {
@@ -63,7 +62,7 @@ export async function uploadVideo(req: Request, res: Response) {
 
         if (course) {
             course.videos.push({
-                videoUrl: videoUrl,
+                videoUrl: '',
                 videoTitle,
                 videoDescription,
                 videoThumbnail: videoThumbUrl,
@@ -79,7 +78,7 @@ export async function uploadVideo(req: Request, res: Response) {
                 courseName,
                 courseThumbUrl:courseThumbUrl ,
                 courseDescription,
-                courseFess,
+                courseFess:{free,paid},
                 videos: [{
                     videoUrl: '',
                     videoTitle,
