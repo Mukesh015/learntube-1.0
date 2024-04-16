@@ -193,29 +193,47 @@ const CardGrid: React.FC = () => {
                                 <div className='mt-5 flex'>
                                     <p className='font-semibold'>Channel name:</p>
                                     <span className='text-gray-400 ml-1'>Gaming aura</span>
+                                    <li className='ml-1 p-1 list-none hover:bg-slate-200 justify-center item-center  rounded-full'>
+                                        <svg className='hover:fill-blue-500' xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 0 24 24" width="18px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M14.06 9.02l.92.92L5.92 19H5v-.92l9.06-9.06M17.66 3c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29zm-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z" /></svg>
+                                    </li>
+
                                 </div>
                                 <div className='mt-5 flex'>
                                     <p className='font-semibold'>Recovery email address:</p>
                                     <span className='text-gray-400 ml-1'>mukesh@gmail.com</span>
+                                    <li className='ml-1 p-1 list-none hover:bg-slate-200 justify-center item-center  rounded-full'>
+                                        <svg className='hover:fill-blue-500' xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 0 24 24" width="18px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M14.06 9.02l.92.92L5.92 19H5v-.92l9.06-9.06M17.66 3c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29zm-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z" /></svg>
+                                    </li>
                                 </div>
                                 <div className='mt-5 flex'>
-                                    <p className='font-semibold ml-1'>Status:</p>
-                                    <span className='text-gray-400'>Active</span>
+                                    <p className='font-semibold'>Status:</p>
+                                    <span className='text-gray-400  ml-1'>Active</span>
                                 </div>
                                 <div className='mt-5 flex'>
-                                    <p className='font-semibold ml-1'>Created:</p>
-                                    <span className='text-gray-400'>10/10/2024</span>
+                                    <p className='font-semibold'>Created:</p>
+                                    <span className='text-gray-400  ml-1'>10/10/2024</span>
                                 </div>
                             </div>
 
 
                             <div className='ml-10 pb-10'>
                                 <div>
-                                    <p className='font-semibold'>Channel description:</p>
+                                    <div className='flex'>
+                                        <p className='font-semibold'>Channel description:</p>
+                                        <li className='ml-1 p-1 list-none hover:bg-slate-200 justify-center item-center  rounded-full'>
+                                            <svg className='hover:fill-blue-500' xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 0 24 24" width="18px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M14.06 9.02l.92.92L5.92 19H5v-.92l9.06-9.06M17.66 3c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29zm-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z" /></svg>
+                                        </li>
+                                    </div>
+
                                     <span className='text-gray-300 '>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quam exercitationem culpa delectus illo rem repellat quasi modi veritatis non minima! Lorem ipsum dolor sit amet consectetur adipisicing elit. Harum illo dolores ipsam officia odio! Impedit iste quas porro rem numquam.</span>
                                 </div>
                                 <div className='mt-5 '>
-                                    <p className='font-semibold'>Provided links:</p>
+                                    <div className='flex'>
+                                        <p className='font-semibold'>Provided links:</p>
+                                        <li className='ml-1 p-1 list-none hover:bg-slate-200 justify-center item-center  rounded-full'>
+                                            <svg className='hover:fill-blue-500' xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 0 24 24" width="18px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M14.06 9.02l.92.92L5.92 19H5v-.92l9.06-9.06M17.66 3c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29zm-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z" /></svg>
+                                        </li>
+                                    </div>
                                     <span className='text-gray-300'>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Assumenda delectus obcaecati, possimus doloremque illum esse magnam expedita praesentium dicta asperiores. Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptate enim doloremque nobis quos. Natus, aperiam? Debitis ratione nostrum rerum? Asperiores.</span>
                                 </div>
                             </div>
@@ -235,6 +253,9 @@ const CardGrid: React.FC = () => {
             <div className='mt-48 justify-center item-center text-center' style={{ maxWidth: "600px", marginLeft: "480px" }}>
                 <p>@gamergift.com - 81 laks subscribers - 200 videos</p>
                 <p className='text-sm text-gray-500 mt-3'>Hi there! My name is Piyush Garg and I'm a software engineer with over 5 years of experience in the industry. I love all things tech and coding, and on my channel, read more</p>
+            </div>
+            <div className='mt-5 justify-center item-center text-center' style={{ maxWidth: "600px", marginLeft: "480px" }}>
+                links
             </div>
             <div className='mt-10'>
                 <div className="flex w-full flex-col">
