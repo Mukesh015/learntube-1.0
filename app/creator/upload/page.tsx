@@ -1,12 +1,12 @@
 "use client"
-
-import React, { useState } from "react";
+import { uploadThumbnail, uploadVideo } from "@/firebase/config";
+import React, { useCallback, useState } from "react";
 import { Input } from "@nextui-org/react";
 import { RadioGroup, Radio } from "@nextui-org/react";
 import { Select, SelectItem } from "@nextui-org/react";
 import { Textarea } from "@nextui-org/react";
 import { Button } from "@nextui-org/react";
-
+import { Progress } from "@nextui-org/react";
 
 const VideoUploadForm: React.FC = () => {
 
@@ -15,6 +15,7 @@ const VideoUploadForm: React.FC = () => {
     const [showUploadForm, setShowUploadForm] = useState<boolean>(false);
     const [videoFile, setVideoFile] = useState<File | null>(null);
     const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+    const [value, setValue] = React.useState(0);
 
 
     const courseList = [
@@ -26,15 +27,6 @@ const VideoUploadForm: React.FC = () => {
         { label: "Giraffe", value: "giraffe", description: "The tallest land animal" }
     ];
 
-    const handleVideoFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files && event.target.files[0];
-        setVideoFile(file);
-    };
-
-    const handlethumbnailFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files && event.target.files[0];
-        setThumbnailFile(file);
-    };
 
     return (
         <>
@@ -122,7 +114,7 @@ const VideoUploadForm: React.FC = () => {
                                 <div className="max-w-md mx-auto rounded-lg overflow-hidden md:max-w-xl">
                                     <div className="md:flex">
                                         <div className="w-full p-3">
-                                            <div className="relative h-48 rounded-lg border-dashed border-2 border-orange-600 flex justify-center items-center">
+                                            <div className="relative h-36 rounded-lg border-dashed border-2 border-orange-600 flex justify-center items-center">
                                                 <div className="absolute">
                                                     <div className="flex flex-col items-center">
                                                         <i className="fa fa-folder-open fa-4x text-blue-700">
@@ -135,10 +127,19 @@ const VideoUploadForm: React.FC = () => {
                                                     type="file"
                                                     className="h-full w-full opacity-0"
                                                     name=""
-                                                    onChange={handlethumbnailFileChange}
                                                 />
                                             </div>
                                         </div>
+                                    </div>
+                                    <div className="ml-3">
+                                        <Progress
+                                            aria-label="Downloading..."
+                                            size="sm"
+                                            value={value}
+                                            color="success"
+                                            showValueLabel={true}
+                                            className="max-w-md"
+                                        />
                                     </div>
                                 </div>
                                 {thumbnailFile && (
@@ -151,7 +152,7 @@ const VideoUploadForm: React.FC = () => {
                                 <div className="max-w-md mx-auto rounded-lg overflow-hidden md:max-w-xl">
                                     <div className="md:flex">
                                         <div className="w-full p-3">
-                                            <div className="relative h-48 rounded-lg border-dashed border-2 border-orange-600 flex justify-center items-center">
+                                            <div className="relative h-36 rounded-lg border-dashed border-2 border-orange-600 flex justify-center items-center">
                                                 <div className="absolute">
                                                     <div className="flex flex-col items-center">
                                                         <i className="fa fa-folder-open fa-4x text-blue-700">
@@ -164,10 +165,19 @@ const VideoUploadForm: React.FC = () => {
                                                     type="file"
                                                     className="h-full w-full opacity-0"
                                                     name=""
-                                                    onChange={handleVideoFileChange}
                                                 />
                                             </div>
                                         </div>
+                                    </div>
+                                    <div className="ml-3">
+                                        <Progress
+                                            aria-label="Downloading..."
+                                            size="sm"
+                                            value={value}
+                                            color="success"
+                                            showValueLabel={true}
+                                            className="max-w-md"
+                                        />
                                     </div>
                                 </div>
                                 {videoFile && (
@@ -176,6 +186,9 @@ const VideoUploadForm: React.FC = () => {
                                     </div>
                                 )}
                             </div>
+                            <Button className='mt-5 ml-48 flex' color="danger">
+                                Submit
+                            </Button>
                         </div>
                     )}
 
