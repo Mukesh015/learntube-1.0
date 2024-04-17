@@ -10,7 +10,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 
-VideoRouter.post('/uploadvideo', upload.array('video',3), uploadVideo);
+VideoRouter.post('/uploadvideo', upload.array('video',2), uploadVideo);
 
 VideoRouter.post('/getvideodetails', getVideoDetails);
 

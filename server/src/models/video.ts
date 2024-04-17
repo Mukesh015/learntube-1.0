@@ -19,7 +19,7 @@ interface Video {
     videoDescription: string;
     videoThumbnail: string;
     videoPublishedAt: Date;
-    videoTags: string;
+    videoTags: [];
     videoViewCount: number;
     videoLikeCount: number;
     videoDislikeCount: number;
@@ -48,7 +48,7 @@ const videoSchema = new mongoose.Schema<VideoDocument>(
                         videoDescription: { type: String },
                         videoThumbnail: { type: String },
                         videoPublishedAt: { type: Date },
-                        videoTags: { type: String },
+                        videoTags: { type: Array<String> },
                         videoViewCount: { type: Number, default:0},
                         videoLikeCount: { type: Number, default:0},
                         videoDislikeCount: { type: Number, default:0},

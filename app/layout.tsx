@@ -4,16 +4,10 @@ import "./globals.css";
 import { UiProviders } from "@/components/providers";
 import "react-toastify/dist/ReactToastify.css";
 import NextTopLoader from "nextjs-toploader";
-import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
+import { ApolloProvider } from '@apollo/client';
+import { ApolloWrapper } from "@/app/apollo/client"
+
 const inter = Inter({ subsets: ["latin"] });
-
-const client = new ApolloClient({
-
-  uri: 'http://localhost:9063/graphql',
-
-  cache: new InMemoryCache(),
-
-});
 
 export const metadata: Metadata = {
   title: "LearnTube",
@@ -25,15 +19,16 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html lang="en" className='dark'>
       <body className={inter.className}>
         <NextTopLoader />
-        <ApolloProvider client={client}>
-        <UiProviders>
-          {children}
-        </UiProviders>
-        </ApolloProvider>
+        <ApolloWrapper>
+          <UiProviders>
+            {children}
+          </UiProviders>
+        </ApolloWrapper>
       </body>
     </html>
   );

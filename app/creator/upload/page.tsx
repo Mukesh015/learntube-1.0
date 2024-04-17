@@ -1,12 +1,15 @@
 "use client"
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Input } from "@nextui-org/react";
 import { RadioGroup, Radio } from "@nextui-org/react";
 import { Select, SelectItem } from "@nextui-org/react";
 import { Textarea } from "@nextui-org/react";
 import { Button } from "@nextui-org/react";
 import { useQuery, gql } from '@apollo/client';
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "@/firebase/config";
+import { uploadVideo } from "@/firebase/config";
 
 const GET_COURSENAME = gql`
 query Exam($email:String){
@@ -16,6 +19,7 @@ query Exam($email:String){
   }
   
 `
+
 const VideoUploadForm: React.FC = () => {
 
     const [isExistingCourse, setIsExistingCourse] = useState<boolean>(false);
@@ -23,29 +27,75 @@ const VideoUploadForm: React.FC = () => {
     const [showUploadForm, setShowUploadForm] = useState<boolean>(false);
     const [videoFile, setVideoFile] = useState<File | null>(null);
     const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
-    const { loading, error, data } = useQuery(GET_COURSENAME, {
-        variables: { email: 'adscx@gmail.com' },
-      });
-    console.log(data);
-    const courseList = [
-        { label: "Cat", value: "cat", description: "The second most popular pet in the world" },
-        { label: "Dog", value: "dog", description: "The most popular pet in the world" },
-        { label: "Elephant", value: "elephant", description: "The largest land animal" },
-        { label: "Lion", value: "lion", description: "The king of the jungle" },
-        { label: "Tiger", value: "tiger", description: "The largest cat species" },
-        { label: "Giraffe", value: "giraffe", description: "The tallest land animal" }
-    ];
+    const [courseThumbnailFile, setCourseThumbnailFile] = useState<File | null>(null);
 
+    const [email, setEmail] = useState<string>("");
+    const [price, setPrice] = useState<string>('');
+    const [videoDescription, setVideoDescription] = useState<string>('');
+    const [videoTitle, setVideoTitle] = useState<string>('');
+    const [courseName, setCourseName] = useState<string>('');
+    const [courseDescription, setCourseDescription] = useState<string>('');
+    const [videotags, setVideoTags] = useState<string[]>(['']);
+    const [courseList, setCourseList] = useState<{ label: string; value: string }[]>([]);
+
+    const { loading, error, data } = useQuery(GET_COURSENAME, {
+        variables: { email: email },
+    });
+
+    const handleSubmitForm = useCallback(async () => {
+        try {
+            const VideoUploadForm = new FormData();
+            VideoUploadForm.append('email', email);
+            VideoUploadForm.append('courseName', courseName);
+            VideoUploadForm.append('courseDescription', courseDescription);
+            VideoUploadForm.append(`${isPaidCourse}`, price);
+            VideoUploadForm.append('videoTitle', videoTitle);
+            VideoUploadForm.append('videoDescription', videoDescription);
+            VideoUploadForm.append('videoTags', videotags.join(','));
+            if (thumbnailFile && courseThumbnailFile) {
+                VideoUploadForm.append('video', thumbnailFile);
+                VideoUploadForm.append('video', courseThumbnailFile);
+            }
+
+        } catch (error) {
+            console.error('Error fetching isCreator:', error);
+            throw new Error('Error fetching isCreator');
+        }
+    }, []);
+    const [user] = useAuthState(auth);
+    const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const value = event.target.value;
+        const linesArray = value.split(',').map(line => line.trim());
+        setVideoTags(linesArray);
+    };
     const handleVideoFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files && event.target.files[0];
         setVideoFile(file);
     };
-
+    const upload = useCallback(async () => {
+        const result = await uploadVideo(videoFile);
+        console.log(result.ref.fullPath);
+      }, [videoFile]);
     const handlethumbnailFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files && event.target.files[0];
         setThumbnailFile(file);
     };
+    useEffect(() => {
+        if (user) {
 
+            setEmail(user.email || "");
+        } else {
+            console.log("User is not available");
+        }
+        if (data) {
+
+            const updatedCourseList = data.getCourseName.map(course => ({
+                label: course.courseNames,
+                value: course.courseNames,
+            }));
+            setCourseList(updatedCourseList);
+        }
+    }, [user, data]);
     return (
         <>
             <div className="flex">
@@ -62,8 +112,11 @@ const VideoUploadForm: React.FC = () => {
                 <div className='border shadow-lg shadow-orange-400 border-gray-700 p-7 rounded-lg absolute' style={{ marginTop: "40px", width: "550px", marginLeft: "800px" }}>
                     {!showUploadForm ? (
                         <div>
-                            <Input className="mb-5" type="text" variant="underlined" label="Video title" />
-                            <Input className="mb-5" type="email" variant="underlined" label="Video description" />
+                            <Input className="mb-5" type="text" variant="underlined" value={videoTitle}
+                                onChange={(e) => setVideoTitle(e.target.value)} label="Video title" />
+                            <Input className="mb-5" type="email" variant="underlined" label="Video description"
+                                value={videoDescription}
+                                onChange={(e) => setVideoDescription(e.target.value)} />
                             <RadioGroup
                                 className="mb-5"
 
@@ -80,6 +133,8 @@ const VideoUploadForm: React.FC = () => {
                                             variant="underlined"
                                             label="Select a course"
                                             className="max-w-xs"
+                                            value={courseName}
+                                            onChange={(e) => setCourseName(e.target.value)}
                                         >
                                             {courseList.map((course) => (
                                                 <SelectItem key={course.value} value={course.value}>
@@ -98,25 +153,32 @@ const VideoUploadForm: React.FC = () => {
                                 </div>
                             ) : (
                                 <div>
-                                    <Input className="mb-5" type="email" variant="underlined" label="Course name" />
+                                    <Input className="mb-5" type="email" value={courseName}
+                                        onChange={(e) => setCourseName(e.target.value)}
+                                        variant="underlined" label="Course name" />
                                     <RadioGroup
                                         className="mb-5"
 
                                         label="Is this a paid course"
                                         orientation="horizontal"
                                     >
-                                        <Radio onClick={(e) => setIsPaidCourse(true)} value="yes">Yes</Radio>
-                                        <Radio onClick={(e) => setIsPaidCourse(false)} value="no">No</Radio>
+                                        <Radio onClick={(e) => setIsPaidCourse(true)} value="paid">Yes</Radio>
+                                        <Radio onClick={(e) => setIsPaidCourse(false)} value="free">No</Radio>
                                     </RadioGroup>
                                     {isPaidCourse &&
-                                        <Input className="mb-5" type="number" variant="underlined" label="Course price" />
+                                        <Input className="mb-5"
+                                            value={price}
+                                            onChange={(e) => setPrice(e.target.value)}
+                                            type="text" variant="underlined" label="Course price" />
                                     }
                                     <Textarea
                                         variant="underlined"
                                         label="Tags"
                                         labelPlacement="outside"
-                                        placeholder="Enter your desired tags"
+                                        placeholder="Enter your desired tags, separated by commas"
                                         className="col-span-12 md:col-span-6 mb-6 md:mb-0"
+                                        value={videotags.join(', ')}
+                                        onChange={handleInputChange}
                                     />
                                 </div>
 
@@ -190,6 +252,8 @@ const VideoUploadForm: React.FC = () => {
                     )}
 
                 </div>
+                <Button onClick={handleSubmitForm}>Submit</Button>
+                <Button onClick={upload}>upload</Button>
             </div>
 
         </>
