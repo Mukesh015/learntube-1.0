@@ -1,5 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
+import { getStorage, ref, uploadBytes } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -14,4 +15,24 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-export { app, auth };
+const storage = getStorage(app, "gs://learntube-4326c.appspot.com");
+
+const uploadThumbnail = async (thumbnail) => {
+  const imgRef = ref(
+    storage,
+    `upload/thumbnail/${Date.now()}-${thumbnail.name}`
+  );
+  const uploadTask = await uploadBytes(imgRef, thumbnail);
+  return uploadTask;
+};
+
+const uploadVideo = async (video) => {
+  const imgRef = ref(
+    storage,
+    `upload/video/${Date.now()}-${video.name}`
+  );
+  const uploadTask = await uploadBytes(imgRef, video);
+  return uploadTask;
+};
+
+export { app, auth, uploadThumbnail,uploadVideo };

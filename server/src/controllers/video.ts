@@ -106,3 +106,38 @@ export async function uploadVideo(req: Request, res: Response) {
 }
 
 
+export async function getVideoDetails(req: Request, res: Response) {
+  const {email}=req.body;
+  console.log(email);
+  try {
+      const videos: VideoDocument[] = await VideoModel.find({email: email});
+
+
+      const videoDetails = videos.map(video => ({
+          email: video.email,
+          courses: video.courses.map(course => ({
+              courseName: course.courseName,
+              courseThumbUrl: course.courseThumbUrl,
+              courseDescription: course.courseDescription,
+              courseFess: course.courseFess,
+              videos: course.videos.map(video => ({
+                  videoUrl: video.videoUrl,
+                  videoTitle: video.videoTitle,
+                  videoDescription: video.videoDescription,
+                  videoThumbnail: video.videoThumbnail,
+                  videoPublishedAt: video.videoPublishedAt,
+                  videoTags: video.videoTags,
+                  videoViewCount: video.videoViewCount,
+                  videoLikeCount: video.videoLikeCount,
+                  videoDislikeCount: video.videoDislikeCount,
+                  videoComment: video.videoComment
+              }))
+          }))
+      }));
+
+      res.status(200).json({ videoDetails });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+}

@@ -1,5 +1,5 @@
 import express from 'express';
-import { uploadVideo} from '../controllers/video';
+import { uploadVideo,getVideoDetails} from '../controllers/video';
 import multer from 'multer';
 const VideoRouter = express.Router();
 
@@ -12,6 +12,7 @@ const upload = multer({ storage });
 
 VideoRouter.post('/uploadvideo', upload.array('video',3), uploadVideo);
 
+VideoRouter.post('/getvideodetails', getVideoDetails);
 
 
 export default VideoRouter;
