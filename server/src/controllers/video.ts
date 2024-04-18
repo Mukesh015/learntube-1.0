@@ -31,7 +31,6 @@ async function cloudinaryImageUploadMethod(file: string): Promise<CloudinaryImag
 export async function uploadVideo(req: Request, res: Response) {
   try {
     const { email, courseName, courseDescription, free, paid, videoTitle, videoDescription, videoTags, videoUrl } = req.body;
-    console.log(videoTags)
     let videoThumbUrl: string | null = null;
     let courseThumbUrl: string | null = null;
     const urls: string[] = [];

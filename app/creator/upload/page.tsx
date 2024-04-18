@@ -37,7 +37,7 @@ const VideoUploadForm: React.FC = () => {
     const [videoTitle, setVideoTitle] = useState<string>('');
     const [courseName, setCourseName] = useState<string>('');
     const [courseDescription, setCourseDescription] = useState<string>('');
-    const [videotags, setVideoTags] = useState<string[]>(['']);
+    const [videotags, setVideoTags] = useState<string>('');
     const [videourl, setVideoUrl] = useState<string>('');
     const [courseList, setCourseList] = useState<{ label: string; value: string }[]>([]);
 
@@ -55,7 +55,7 @@ const VideoUploadForm: React.FC = () => {
             VideoUploadForm.append('videoTitle', videoTitle);
             VideoUploadForm.append('videoDescription', videoDescription);
             VideoUploadForm.append('videoUrl', videourl);
-            VideoUploadForm.append('videoTags', videotags.join(','));
+            VideoUploadForm.append('videoTags', videotags);
             if (thumbnailFile && courseThumbnailFile) {
                 VideoUploadForm.append('video', thumbnailFile);
                 VideoUploadForm.append('video', courseThumbnailFile);
@@ -99,13 +99,8 @@ const VideoUploadForm: React.FC = () => {
             console.error('Error fetching isCreator:', error);
             throw new Error('Error fetching isCreator');
         }
-    }, []);
+    }, [email]);
 
-    const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const value = event.target.value;
-        const linesArray = value.split(',').map(line => line.trim());
-        setVideoTags(linesArray);
-    };
 
     const handleVideoFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files && event.target.files[0];
@@ -118,10 +113,10 @@ const VideoUploadForm: React.FC = () => {
     const upload = useCallback(async () => {
         const result = await uploadVideo(videoFile);
         const path = result.ref.fullPath
-        const link = getDownloadLink(path)
-        const linkString=(await link).toString()
-        setVideoUrl(linkString)
+        const linkPromise = getDownloadLink(path)
+        const link = await linkPromise; 
         console.log(link);
+        setVideoUrl(link)
         setAllFileUploaded(true)
     }, [videoFile]);
 
@@ -144,7 +139,7 @@ const VideoUploadForm: React.FC = () => {
             }));
             setCourseList(updatedCourseList);
         }
-    }, [user, data]);
+    }, [user, data,email]);
     return (
         <>
             <ToastContainer />
@@ -240,7 +235,13 @@ const VideoUploadForm: React.FC = () => {
                                         labelPlacement="outside"
                                         placeholder="Enter your desired tags, separated by commas"
                                         className="col-span-12 md:col-span-6 mb-6 md:mb-0"
-                                        onChange={() => handleInputChange}
+                                        value={videotags}
+                                        onChange={(event) => {
+                                            const value = event.target.value;
+                                            const tagsArray = value.split(',').map(tag => tag.trim());
+                                            const newValue = tagsArray.join(', ');
+                                            setVideoTags(newValue);
+                                          }}
                                     />
                                 </div>
 
