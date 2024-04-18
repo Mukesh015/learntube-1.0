@@ -16,7 +16,7 @@ interface UserDocument extends Document {
     channelId?: string;
     channelDescription?: string;
     website: { any: string, Facebook: string, Instagram: string, Twitter: string, Github: string, LinkedIn: string, Discord: string }
-    address: { country: string; state: string; city: string; pincode: number; phone: number };
+    address: { country: string; state: string; city: string; pincode: number; addressLine:string; phone: number };
     history: any[];
     analytics: { date: Date; watchTime: number }[];
 
@@ -98,6 +98,7 @@ const userSchema = new mongoose.Schema<UserDocument>(
             state: { type: String, },
             city: { type: String, },
             pincode: { type: Number, },
+            addressLine: { type: String, },
             phone: { type: Number, },
         },
         history: [mongoose.Schema.Types.Mixed],

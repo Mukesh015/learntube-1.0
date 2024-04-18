@@ -54,11 +54,11 @@ async function cloudinaryImageUploadMethod(file: string): Promise<CloudinaryImag
 export async function createChannel(req: Request, res: Response) {
 
   const { email, channelName, firstName, gender, contactNumber, city, state, country, pinCode,
-    recoveryEmail, occupation, channelDescription, any, Facebook, Instagram, Twitter, Github, LinkedIn, Discord } = req.body;
+    recoveryEmail, occupation, channelDescription, any, Facebook, Instagram, Twitter, Github, LinkedIn, Discord,addressLine } = req.body;
   const contactnumber = parseInt(contactNumber)
   const pincode = parseInt(pinCode)
   const channelId = `@${channelName}`
-  console.log(email)
+  console.log("email",email)
   let channelLogo: string | null = null;
   let coverPhoto: string | null = null;
 
@@ -67,7 +67,9 @@ export async function createChannel(req: Request, res: Response) {
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-
+    if(user.isCreator==true) {
+    return res.status(400).json({ message: 'User already has a channel' });
+    }
     const urls: string[] = [];
     const files: Express.Multer.File[] = req.files as Express.Multer.File[];
     for (const file of files) {
@@ -95,14 +97,14 @@ export async function createChannel(req: Request, res: Response) {
     user.channelDescription = channelDescription;
     user.occupation = occupation;
     user.website = { any, Facebook, Twitter, Instagram, Github, LinkedIn, Discord };
-    user.address = { country, state, city, pincode: pincode, phone: contactnumber };
+    user.address = { country, state, city, pincode: pincode,addressLine, phone: contactnumber };
 
     await user.save();
 
-    res.status(200).json({ message: 'User updated successfully' });
+    res.status(200).json({ message: 'Channel created successfully' });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: err });
   }
 }
 

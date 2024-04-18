@@ -20,6 +20,9 @@ const CreatorRegisterForm: React.FC = () => {
     const [city, setCity] = useState<string>("");
     const [state, setState] = useState<string>("");
     const [country, setCountry] = useState<string>("");
+    const [channelDescription, setChannelDescription] = useState<string>("");
+    const [channelAdminName, setChannelAdminName] = useState<string>("");
+    const [addressLine, setAddressLine] = useState<string>("");
     const [pinCode, setPincode] = useState<string>();
     const [address, setAddress] = useState<string>("");
     const [recoveryEmail, setRecoveryEmail] = useState<string>("");
@@ -75,7 +78,7 @@ const CreatorRegisterForm: React.FC = () => {
     };
     const handleOtpForm = useCallback(async () => {
         try {
-            console.log(email);
+            console.log("email",email);
             const creatorForm = new FormData();
             creatorForm.append('email', email);
             creatorForm.append('channelName', channelName);
@@ -85,6 +88,8 @@ const CreatorRegisterForm: React.FC = () => {
             creatorForm.append('state', state);
             creatorForm.append('country', country);
             creatorForm.append('recoveryEmail', recoveryEmail);
+            creatorForm.append('addressLine', addressLine);
+
             if (pinCode && contactNumber) {
                 creatorForm.append('contactNumber', contactNumber);
                 creatorForm.append('pinCode', pinCode);
@@ -379,6 +384,8 @@ const CreatorRegisterForm: React.FC = () => {
                                         className="peer m-0 block h-[58px] w-full rounded border border-solid border-secondary-500 bg-transparent bg-clip-padding px-3 py-4 text-base font-normal leading-tight text-neutral-700 transition duration-200 ease-linear placeholder:text-transparent focus:border-primary focus:pb-[0.625rem] focus:pt-[1.625rem] focus:text-neutral-700 focus:outline-none peer-focus:text-primary dark:border-neutral-400 dark:text-white dark:autofill:shadow-autofill dark:focus:border-primary dark:peer-focus:text-primary [&:not(:placeholder-shown)]:pb-[0.625rem] [&:not(:placeholder-shown)]:pt-[1.625rem]"
                                         id="floatingInput"
                                         placeholder="Enter your first name"
+                                        value={channelAdminName}
+                                        onChange={(e) => setChannelAdminName(e.target.value)}
                                     />
                                     <label
                                         htmlFor="floatingInput"
@@ -407,6 +414,9 @@ const CreatorRegisterForm: React.FC = () => {
                                         className="peer m-0 block h-[58px] w-full rounded border border-solid border-secondary-500 bg-transparent bg-clip-padding px-3 py-4 text-base font-normal leading-tight text-neutral-700 transition duration-200 ease-linear placeholder:text-transparent focus:border-primary focus:pb-[0.625rem] focus:pt-[1.625rem] focus:text-neutral-700 focus:outline-none peer-focus:text-primary dark:border-neutral-400 dark:text-white dark:autofill:shadow-autofill dark:focus:border-primary dark:peer-focus:text-primary [&:not(:placeholder-shown)]:pb-[0.625rem] [&:not(:placeholder-shown)]:pt-[1.625rem]"
                                         id="floatingInput"
                                         placeholder="Enter your first name"
+                                        value={channelDescription}
+                                        onChange={(e) => setChannelDescription(e.target.value)}
+
                                     />
                                     <label
                                         htmlFor="floatingInput"
@@ -543,8 +553,8 @@ const CreatorRegisterForm: React.FC = () => {
                                         className="peer m-0 block h-[58px] w-full rounded border border-solid border-secondary-500 bg-transparent bg-clip-padding px-3 py-4 text-base font-normal leading-tight text-neutral-700 transition duration-200 ease-linear placeholder:text-transparent focus:border-primary focus:pb-[0.625rem] focus:pt-[1.625rem] focus:text-neutral-700 focus:outline-none peer-focus:text-primary dark:border-neutral-400 dark:text-white dark:autofill:shadow-autofill dark:focus:border-primary dark:peer-focus:text-primary [&:not(:placeholder-shown)]:pb-[0.625rem] [&:not(:placeholder-shown)]:pt-[1.625rem]"
                                         id="floatingInput"
                                         placeholder="Enter your adddress"
-                                        value={address}
-                                        onChange={(e) => setAddress(e.target.value)}
+                                        value={addressLine}
+                                        onChange={(e) => setAddressLine(e.target.value)}
                                     />
                                     <label
                                         htmlFor="floatingInput"
@@ -552,6 +562,7 @@ const CreatorRegisterForm: React.FC = () => {
                                     >Address line</label>
                                 </div>
                                 <div className='flex'>
+
                                     <div className="relative mb-3">
                                         <input
                                             required

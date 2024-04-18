@@ -1,5 +1,5 @@
 "use client"
-import { uploadThumbnail, uploadVideo } from "@/firebase/config";
+import { getDownloadLink, uploadVideo } from "@/firebase/config";
 import React, { useCallback, useState, useEffect } from "react";
 import { Input } from "@nextui-org/react";
 import { RadioGroup, Radio } from "@nextui-org/react";
@@ -10,7 +10,7 @@ import { Progress } from "@nextui-org/react";
 import { useQuery, gql } from '@apollo/client';
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase/config";
-
+import { toast, ToastContainer } from "react-toastify";
 const GET_COURSENAME = gql`
 query Exam($email:String){
     getCourseName(email:$email) {
@@ -31,14 +31,14 @@ const VideoUploadForm: React.FC = () => {
     const [courseThumbnailFile, setCourseThumbnailFile] = useState<File | null>(null);
     const [allFileUploaded, setAllFileUploaded] = useState<boolean>(false);
     const [user] = useAuthState(auth);
-
     const [email, setEmail] = useState<string>("");
     const [price, setPrice] = useState<string>('');
     const [videoDescription, setVideoDescription] = useState<string>('');
     const [videoTitle, setVideoTitle] = useState<string>('');
     const [courseName, setCourseName] = useState<string>('');
     const [courseDescription, setCourseDescription] = useState<string>('');
-    const [videotags, setVideoTags] = useState<string[]>(['']);
+    const [videotags, setVideoTags] = useState<string>('');
+    const [videourl, setVideoUrl] = useState<string>('');
     const [courseList, setCourseList] = useState<{ label: string; value: string }[]>([]);
 
     const { loading, error, data } = useQuery(GET_COURSENAME, {
@@ -54,32 +54,70 @@ const VideoUploadForm: React.FC = () => {
             VideoUploadForm.append(`${isPaidCourse}`, price);
             VideoUploadForm.append('videoTitle', videoTitle);
             VideoUploadForm.append('videoDescription', videoDescription);
-            VideoUploadForm.append('videoTags', videotags.join(','));
+            VideoUploadForm.append('videoUrl', videourl);
+            VideoUploadForm.append('videoTags', videotags);
             if (thumbnailFile && courseThumbnailFile) {
                 VideoUploadForm.append('video', thumbnailFile);
                 VideoUploadForm.append('video', courseThumbnailFile);
+            }
+            try {
+                const response = await fetch("http://localhost:9063/video/uploadvideo", {
+                    method: "POST",
+                    body: VideoUploadForm
+                })
+                console.log(response);
+                if (response.ok) {
+                    toast.success("Registration success", {
+                        position: "top-center",
+                        autoClose: 1000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "light",
+                    });
+
+                } else {
+                    toast.error("Registration failed", {
+                        position: "top-center",
+                        autoClose: 1000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "light",
+                    });
+                }
+            }
+            catch (error: any) {
+                console.log("Internal server error", error);
             }
 
         } catch (error) {
             console.error('Error fetching isCreator:', error);
             throw new Error('Error fetching isCreator');
         }
-    }, []);
+    }, [email]);
 
-    const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const value = event.target.value;
-        const linesArray = value.split(',').map(line => line.trim());
-        setVideoTags(linesArray);
-    };
 
     const handleVideoFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files && event.target.files[0];
         setVideoFile(file);
     };
-
+    const handlecourseThumbnail = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files && event.target.files[0];
+        setCourseThumbnailFile(file);
+    };
     const upload = useCallback(async () => {
         const result = await uploadVideo(videoFile);
-        console.log(result.ref.fullPath);
+        const path = result.ref.fullPath
+        const linkPromise = getDownloadLink(path)
+        const link = await linkPromise; 
+        console.log(link);
+        setVideoUrl(link)
+        setAllFileUploaded(true)
     }, [videoFile]);
 
     const handlethumbnailFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -88,23 +126,23 @@ const VideoUploadForm: React.FC = () => {
     };
 
     useEffect(() => {
+    
         if (user) {
-
-            setEmail(user.email || "");
+            setEmail(user.email||'');
         } else {
             console.log("User is not available");
         }
         if (data) {
-
             const updatedCourseList = data.getCourseName.map((course: { courseNames: any; }) => ({
                 label: course.courseNames,
                 value: course.courseNames,
             }));
             setCourseList(updatedCourseList);
         }
-    }, [user, data]);
+    }, [user, data,email]);
     return (
         <>
+            <ToastContainer />
             <div className="flex">
                 <div className='ml-10' style={{ maxWidth: "600px" }}>
                     <h1 className='text-3xl font-bold mt-20 text-orange-500'>Upload You video</h1>
@@ -121,12 +159,11 @@ const VideoUploadForm: React.FC = () => {
                         <div>
                             <Input className="mb-5" type="text" variant="underlined" value={videoTitle}
                                 onChange={(e) => setVideoTitle(e.target.value)} label="Video title" />
-                            <Input className="mb-5" type="email" variant="underlined" label="Video description"
+                            <Input className="mb-5" type="text" variant="underlined" label="Video description"
                                 value={videoDescription}
                                 onChange={(e) => setVideoDescription(e.target.value)} />
                             <RadioGroup
                                 className="mb-5"
-
                                 label="Upload on your existing course"
                                 orientation="horizontal"
                             >
@@ -146,6 +183,7 @@ const VideoUploadForm: React.FC = () => {
                                             {courseList.map((course) => (
                                                 <SelectItem key={course.value} value={course.value}>
                                                     {course.label}
+
                                                 </SelectItem>
                                             ))}
                                         </Select>
@@ -165,12 +203,13 @@ const VideoUploadForm: React.FC = () => {
                                         variant="underlined" label="Course name" />
 
                                     <Input className="mb-5" type="text"
-                                        onChange={(e) => setCourseName(e.target.value)}
+                                        onChange={(e) => setCourseDescription(e.target.value)}
                                         variant="underlined" label="Course description" />
 
                                     <div className="max-w-xs mb-5">
                                         <label className="mb-1 block dark:text-neutral-400 text-sm font-medium text-neutral-500">Upload course thumbnail</label>
                                         <input id="example1"
+                                            onChange={handlecourseThumbnail}
                                             type="file"
                                             className="mt-2 block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-teal-500 file:py-2 file:px-4 file:text-sm file:font-semibold text-neutral-500 hover:file:bg-teal-700 focus:outline-none disabled:pointer-events-none disabled:opacity-60"
                                         />
@@ -196,8 +235,13 @@ const VideoUploadForm: React.FC = () => {
                                         labelPlacement="outside"
                                         placeholder="Enter your desired tags, separated by commas"
                                         className="col-span-12 md:col-span-6 mb-6 md:mb-0"
-                                        value={videotags.join(', ')}
-                                        onChange={() => handleInputChange}
+                                        value={videotags}
+                                        onChange={(event) => {
+                                            const value = event.target.value;
+                                            const tagsArray = value.split(',').map(tag => tag.trim());
+                                            const newValue = tagsArray.join(', ');
+                                            setVideoTags(newValue);
+                                          }}
                                     />
                                 </div>
 
@@ -291,14 +335,15 @@ const VideoUploadForm: React.FC = () => {
 
                             </div>
                             {allFileUploaded ? (
-                                <Button className='mt-5 ml-48 flex font-semibold' color="danger">
+                                <Button className='mt-5 ml-48 flex font-semibold' color="danger" onClick={handleSubmitForm}>
                                     Submit
                                 </Button>
                             ) : (
 
-                                <Button className='mt-5 ml-48 flex text-white font-semibold' color="warning">
+                                <Button className='mt-5 ml-48 flex text-white font-semibold' color="warning" onClick={upload}>
                                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4 0-2.05 1.53-3.76 3.56-3.97l1.07-.11.5-.95C8.08 7.14 9.94 6 12 6c2.62 0 4.88 1.86 5.39 4.43l.3 1.5 1.53.11c1.56.1 2.78 1.41 2.78 2.96 0 1.65-1.35 3-3 3zM8 13h2.55v3h2.9v-3H16l-4-4z" /></svg>
                                     Upload
+
                                 </Button>
                             )}
                         </div>
