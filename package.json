@@ -13,10 +13,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@apollo/client": "^3.10.0-rc.1",
+    "@apollo/experimental-nextjs-app-support": "^0.10.0",
     "@nextui-org/react": "^2.2.10",
     "autoprefixer": "^10.4.19",
     "firebase": "^10.11.0",
     "framer-motion": "^11.0.28",
+    "graphql": "^16.8.1",
     "multer": "^1.4.5-lts.1",
     "next": "14.2.0",
     "nextjs-toploader": "^1.6.11",

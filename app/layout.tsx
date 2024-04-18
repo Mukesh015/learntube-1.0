@@ -4,6 +4,7 @@ import "./globals.css";
 import { UiProviders } from "@/components/providers";
 import "react-toastify/dist/ReactToastify.css";
 import NextTopLoader from "nextjs-toploader";
+import { ApolloWrapper } from "@/apollo/client"
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,13 +18,16 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html lang="en" className='dark'>
       <body className={inter.className}>
         <NextTopLoader />
-        <UiProviders>
-          {children}
-        </UiProviders>
+        <ApolloWrapper>
+          <UiProviders>
+            {children}
+          </UiProviders>
+        </ApolloWrapper>
       </body>
     </html>
   );

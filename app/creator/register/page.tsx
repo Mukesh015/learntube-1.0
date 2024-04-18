@@ -314,7 +314,6 @@ const CreatorRegisterForm: React.FC = () => {
                                 <div className="w-full flex flex-col gap-4 mb-5">
                                     <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
                                         <Select
-                                            radius='small'
                                             variant="bordered"
                                             label="Select a platform"
                                             className="max-w-xs"

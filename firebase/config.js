@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getStorage, ref, uploadBytes } from "firebase/storage";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -27,12 +27,13 @@ const uploadThumbnail = async (thumbnail) => {
 };
 
 const uploadVideo = async (video) => {
-  const imgRef = ref(
-    storage,
-    `upload/video/${Date.now()}-${video.name}`
-  );
+  const imgRef = ref(storage, `upload/video/${Date.now()}-${video.name}`);
   const uploadTask = await uploadBytes(imgRef, video);
   return uploadTask;
 };
 
-export { app, auth, uploadThumbnail,uploadVideo };
+const getDownloadLink = (path) => {
+  return getDownloadURL(ref(storage, path));
+};
+
+export { app, auth, uploadThumbnail, uploadVideo,getDownloadLink  };

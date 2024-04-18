@@ -253,15 +253,17 @@ const Navbar: React.FC = () => {
                     <li className="cursor-pointer">
                         <Dropdown placement="bottom-end">
                             <DropdownTrigger>
-                                {avatar ? (
-                                    < img className="h-8 w-8 rounded-full" src={avatar} alt="" />
-                                ) : (
-                                    <img
-                                        className="h-8 w-8 rounded-full"
-                                        src="https://i.pinimg.com/736x/0d/64/98/0d64989794b1a4c9d89bff571d3d5842.jpg"
-                                        alt=""
-                                    />
-                                )}
+                                <div>
+                                    {avatar ? (
+                                        <img className="h-8 w-8 rounded-full" src={avatar} alt="" />
+                                    ) : (
+                                        <img
+                                            className="h-8 w-8 rounded-full"
+                                            src="https://i.pinimg.com/736x/0d/64/98/0d64989794b1a4c9d89bff571d3d5842.jpg"
+                                            alt=""
+                                        />
+                                    )}
+                                </div>
                             </DropdownTrigger>
                             {user ? (
                                 <DropdownMenu aria-label="Profile Actions" variant="flat">
@@ -295,6 +297,7 @@ const Navbar: React.FC = () => {
                                 </DropdownMenu>
                             )}
                         </Dropdown>
+
                     </li>
                 </ul>
             </nav >
