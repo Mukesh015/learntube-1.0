@@ -1,28 +1,47 @@
 import React from "react";
 import Navbar from "@/components/navbar";
 import Sidebar from "@/components/sidebar";
+import { Switch, cn } from "@nextui-org/react";
 import { Tooltip } from "@nextui-org/react";
 
-const SubsCriptions: React.FC = () => {
+const History: React.FC = () => {
     return (
         <>
             <Navbar />
             <Sidebar />
             <nav className="mt-24 mr-20">
                 <ul className="flex flex-row-reverse gap-10">
-                    <Tooltip color="warning" delay={700} showArrow={true} content="Fiter platlist">
+                    <Tooltip color="warning" delay={700} showArrow={true} content="Fiter videos">
                         <li className="flex ext-blue-500 text-blue-500 font-semibold hover:bg-blue-200 px-2 rounded-2xl cursor-default py-1">
                             <svg className="mr-2" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#2e4bc9"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z" /></svg>
                             Filter
                         </li>
                     </Tooltip>
-                    <Tooltip color="warning" delay={700} showArrow={true} content="Manage your playlist">
-                        <li className="text-blue-500 font-semibold hover:bg-blue-200 px-2 rounded-2xl cursor-default py-1">
-                            Manage
+                    <Tooltip color="warning" delay={700} showArrow={true} content="Save watch history">
+                        <li>
+                            <Switch
+                                classNames={{
+                                    base: cn(
+                                        "inline-flex flex-row-reverse w-full max-w-md items-center",
+                                        "justify-between cursor-pointer rounded-lg gap-2 p-2 ",
+                                        "data-[selected=true]:border-primary",
+                                    ),
+                                    wrapper: "p-0 h-4 overflow-visible",
+                                    thumb: cn("w-6 h-6 border-2 shadow-lg",
+                                        "group-data-[hover=true]:border-primary",
+                                        //selected
+                                        "group-data-[selected=true]:ml-6",
+                                        // pressed
+                                        "group-data-[pressed=true]:w-7",
+                                        "group-data-[selected]:group-data-[pressed]:ml-4",
+                                    ),
+                                }}
+                            >
+                            </Switch>
                         </li>
                     </Tooltip>
-                    <li className="text-3xl font-bold text-amber-600" style={{ marginRight: "160px" }} >
-                        Suggesting videos based on your subscriptions
+                    <li className="text-3xl font-bold text-amber-600" style={{ marginRight: "680px" }} >
+                        Watch History
                     </li>
                 </ul>
             </nav>
@@ -32,6 +51,7 @@ const SubsCriptions: React.FC = () => {
                     className=""
                     style={{ marginTop: "40px" }}
                 >
+                    <p className="text-xl mb-7">Today</p>
                     <div id="video-content" className="flex mb-10">
                         {/* video content here*/}
                         <img
@@ -170,4 +190,4 @@ const SubsCriptions: React.FC = () => {
     )
 }
 
-export default SubsCriptions;
+export default History;

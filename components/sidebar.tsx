@@ -1,6 +1,11 @@
+"use client"
 import React from "react";
+import { useRouter } from "next/navigation";
 
 const Sidebar: React.FC = () => {
+
+    const router = useRouter();
+
     return (
         <div
             id="docs-sidebar"
@@ -13,6 +18,7 @@ const Sidebar: React.FC = () => {
                 <ul className="space-y-1.5">
                     <li className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-150">
                         <button
+                            onClick={() => router.push("/")}
                             type="button"
                             className="hs-accordion-toggle hs-accordion-active:text-blue-600 hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-medium font-semibold rounded-lg hover:bg-gray-700"
                         >
@@ -35,6 +41,7 @@ const Sidebar: React.FC = () => {
                         id="users-accordion"
                     >
                         <button
+                            onClick={() => router.push("/subscriptions")}
                             type="button"
                             className="hs-accordion-toggle hs-accordion-active:text-blue-600 hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-medium font-semibold rounded-lg hover:bg-gray-700"
                         >
@@ -59,6 +66,7 @@ const Sidebar: React.FC = () => {
                         id="users-accordion"
                     >
                         <button
+                            onClick={() => router.push("/creator/dashboard")}
                             type="button"
                             className="hs-accordion-toggle hs-accordion-active:text-blue-600 hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-medium font-semibold  rounded-lg hover:bg-gray-700"
                         >
@@ -102,6 +110,7 @@ const Sidebar: React.FC = () => {
                         id="users-accordion"
                     >
                         <button
+                            onClick={() => router.push("/playlists")}
                             type="button"
                             className="hs-accordion-toggle hs-accordion-active:text-blue-600 hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-medium font-semibold rounded-lg hover:bg-gray-700"
                         >
@@ -148,6 +157,7 @@ const Sidebar: React.FC = () => {
                         id="projects-accordion"
                     >
                         <button
+                            onClick={() => router.push("/history")}
                             type="button"
                             className=" hs-accordion-toggle hs-accordion-active:text-blue-600 hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-medium font-semibold rounded-lg hover:bg-gray-700"
                         >
@@ -181,6 +191,7 @@ const Sidebar: React.FC = () => {
 
                     <li className="hs-accordion" id="account-accordion">
                         <button
+                            onClick={() => router.push("/creator/dashboard")}
                             type="button"
                             className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-150 hs-accordion-toggle hs-accordion-active:text-blue-600 hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-medium font-semibold rounded-lg hover:bg-gray-700"
                         >
@@ -199,6 +210,7 @@ const Sidebar: React.FC = () => {
                     </li>
                     <li className="hs-accordion" id="account-accordion">
                         <button
+                            onClick={() => router.push("/watchlater")}
                             type="button"
                             className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-150 hs-accordion-toggle hs-accordion-active:text-blue-600 hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-medium font-semibold rounded-lg hover:bg-gray-700"
                         >
@@ -224,6 +236,7 @@ const Sidebar: React.FC = () => {
                     </li>
                     <li className="hs-accordion" id="account-accordion">
                         <button
+                            onClick={() => router.push("/likedvideos")}
                             type="button"
                             className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-150 hs-accordion-toggle hs-accordion-active:text-blue-600 hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-medium font-semibold rounded-lg hover:bg-gray-700"
                         >
@@ -266,6 +279,7 @@ const Sidebar: React.FC = () => {
                     >
                         <button
                             type="button"
+                            onClick={() => router.push("/settings")}
                             className=" hs-accordion-toggle hs-accordion-active:text-blue-600 hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-medium font-semibold rounded-lg hover:bg-gray-700"
                         >
                             <svg
@@ -286,6 +300,7 @@ const Sidebar: React.FC = () => {
                         id="projects-accordion"
                     >
                         <button
+                            onClick={() => router.push("/feedback")}
                             type="button"
                             className=" hs-accordion-toggle hs-accordion-active:text-blue-600 hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-medium font-semibold rounded-lg hover:bg-gray-700"
                         >
@@ -321,6 +336,7 @@ const Sidebar: React.FC = () => {
                         id="projects-accordion"
                     >
                         <button
+                            onClick={() => router.push("/contact")}
                             type="button"
                             className=" hs-accordion-toggle hs-accordion-active:text-blue-600 hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-medium font-semibold rounded-lg hover:bg-gray-700"
                         >
@@ -342,6 +358,7 @@ const Sidebar: React.FC = () => {
                         id="projects-accordion"
                     >
                         <button
+                            onClick={() => router.push("/about")}
                             type="button"
                             className=" hs-accordion-toggle hs-accordion-active:text-blue-600 hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-medium font-semibold rounded-lg hover:bg-gray-700"
                         >

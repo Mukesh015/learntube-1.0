@@ -3,7 +3,7 @@ import Navbar from "@/components/navbar";
 import Sidebar from "@/components/sidebar";
 import { Tooltip } from "@nextui-org/react";
 
-const SubsCriptions: React.FC = () => {
+const Playlist: React.FC = () => {
     return (
         <>
             <Navbar />
@@ -21,8 +21,8 @@ const SubsCriptions: React.FC = () => {
                             Manage
                         </li>
                     </Tooltip>
-                    <li className="text-3xl font-bold text-amber-600" style={{ marginRight: "160px" }} >
-                        Suggesting videos based on your subscriptions
+                    <li className="text-3xl font-bold text-amber-600" style={{ marginRight: "650px" }} >
+                        Saved Playlists
                     </li>
                 </ul>
             </nav>
@@ -170,4 +170,4 @@ const SubsCriptions: React.FC = () => {
     )
 }
 
-export default SubsCriptions;
+export default Playlist;

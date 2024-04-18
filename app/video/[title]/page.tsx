@@ -24,7 +24,7 @@ const VideoPage: React.FC = () => {
                     <div>
                         <h1 className="text-xl mb-5">Chahun Main Ya Naa - | Slowed + Reverb | Lyrics | Aashiqui 2 | Use Headphones</h1>
                         <nav className="mb-5">
-                            <ul className="flex gap-6">
+                            <ul className="flex gap-4">
                                 <li>
                                     <Tooltip color="warning" delay={700} showArrow={true} content="Jane's channel">
 
@@ -52,7 +52,7 @@ const VideoPage: React.FC = () => {
                                         </Button>
                                     </Tooltip>
                                 </li>
-                                <li className="ml-24">
+                                <li className="">
                                     <ButtonGroup variant="bordered">
                                         <Tooltip color="warning" delay={700} showArrow={true} content="Like">
 
@@ -86,10 +86,19 @@ const VideoPage: React.FC = () => {
                                     </Tooltip>
                                 </li>
                                 <li>
-                                    <Tooltip color="warning" delay={700} showArrow={true} content="Save it to playlist">
+                                    <Tooltip color="warning" delay={700} showArrow={true} content="Add to playlist">
                                         <Button className="flex" variant="bordered">
                                             <svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><g><rect fill="none" height="24" width="24" /></g><g><path d="M14,10H3v2h11V10z M14,6H3v2h11V6z M18,14v-4h-2v4h-4v2h4v4h2v-4h4v-2H18z M3,16h7v-2H3V16z" /></g></svg>
                                             Save
+                                        </Button>
+                                    </Tooltip>
+                                </li>
+                                <li>
+                                    <Tooltip color="warning" delay={700} showArrow={true} content="Add to watch later">
+                                        <Button className="flex" variant="bordered">
+                                            <svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><g><rect fill="none" height="24" width="24" x="0" /></g><g><g><path d="M12,2C6.5,2,2,6.5,2,12s4.5,10,10,10s10-4.5,10-10S17.5,2,12,2z M12,20c-4.41,0-8-3.59-8-8s3.59-8,8-8s8,3.59,8,8 S16.41,20,12,20z M12.5,7H11v6l5.2,3.2l0.8-1.3l-4.5-2.7V7z" /></g></g></svg>
+
+                                            Watch later
                                         </Button>
                                     </Tooltip>
                                 </li>

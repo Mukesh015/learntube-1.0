@@ -1,6 +1,6 @@
 "use client"
 import { uploadThumbnail, uploadVideo } from "@/firebase/config";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import { Input } from "@nextui-org/react";
 import { RadioGroup, Radio } from "@nextui-org/react";
 import { Select, SelectItem } from "@nextui-org/react";
@@ -29,6 +29,8 @@ const VideoUploadForm: React.FC = () => {
     const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
     const [value, setValue] = React.useState(0);
     const [courseThumbnailFile, setCourseThumbnailFile] = useState<File | null>(null);
+    const [allFileUploaded, setAllFileUploaded] = useState<boolean>(false);
+    const [user] = useAuthState(auth);
 
     const [email, setEmail] = useState<string>("");
     const [price, setPrice] = useState<string>('');
@@ -63,24 +65,28 @@ const VideoUploadForm: React.FC = () => {
             throw new Error('Error fetching isCreator');
         }
     }, []);
-    const [user] = useAuthState(auth);
+
     const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         const value = event.target.value;
         const linesArray = value.split(',').map(line => line.trim());
         setVideoTags(linesArray);
     };
+
     const handleVideoFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files && event.target.files[0];
         setVideoFile(file);
     };
+
     const upload = useCallback(async () => {
         const result = await uploadVideo(videoFile);
         console.log(result.ref.fullPath);
-      }, [videoFile]);
+    }, [videoFile]);
+
     const handlethumbnailFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files && event.target.files[0];
         setThumbnailFile(file);
     };
+
     useEffect(() => {
         if (user) {
 
@@ -90,7 +96,7 @@ const VideoUploadForm: React.FC = () => {
         }
         if (data) {
 
-            const updatedCourseList = data.getCourseName.map(course => ({
+            const updatedCourseList = data.getCourseName.map((course: { courseNames: any; }) => ({
                 label: course.courseNames,
                 value: course.courseNames,
             }));
@@ -154,12 +160,24 @@ const VideoUploadForm: React.FC = () => {
                                 </div>
                             ) : (
                                 <div>
-                                    <Input className="mb-5" type="email" value={courseName}
+                                    <Input className="mb-5" type="text" value={courseName}
                                         onChange={(e) => setCourseName(e.target.value)}
                                         variant="underlined" label="Course name" />
+
+                                    <Input className="mb-5" type="text"
+                                        onChange={(e) => setCourseName(e.target.value)}
+                                        variant="underlined" label="Course description" />
+
+                                    <div className="max-w-xs mb-5">
+                                        <label className="mb-1 block dark:text-neutral-400 text-sm font-medium text-neutral-500">Upload course thumbnail</label>
+                                        <input id="example1"
+                                            type="file"
+                                            className="mt-2 block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-teal-500 file:py-2 file:px-4 file:text-sm file:font-semibold text-neutral-500 hover:file:bg-teal-700 focus:outline-none disabled:pointer-events-none disabled:opacity-60"
+                                        />
+                                    </div>
+
                                     <RadioGroup
                                         className="mb-5"
-
                                         label="Is this a paid course"
                                         orientation="horizontal"
                                     >
@@ -179,7 +197,7 @@ const VideoUploadForm: React.FC = () => {
                                         placeholder="Enter your desired tags, separated by commas"
                                         className="col-span-12 md:col-span-6 mb-6 md:mb-0"
                                         value={videotags.join(', ')}
-                                        onChange={handleInputChange}
+                                        onChange={() => handleInputChange}
                                     />
                                 </div>
 
@@ -208,26 +226,28 @@ const VideoUploadForm: React.FC = () => {
                                                     type="file"
                                                     className="h-full w-full opacity-0"
                                                     name=""
+                                                    onChange={handlethumbnailFileChange}
                                                 />
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="ml-3">
+                                    <div className="ml-3 flex">
                                         <Progress
-                                            aria-label="Downloading..."
+                                            color="warning"
                                             size="sm"
-                                            value={value}
-                                            color="success"
-                                            showValueLabel={true}
-                                            className="max-w-md"
+                                            isIndeterminate
+                                            aria-label="Loading..."
+                                            className="max-w-40 mt-3"
                                         />
+
+                                        {thumbnailFile && (
+                                            <div className="text-center flex ml-5">
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="mt-1 mr-2" height="18px" viewBox="0 0 24 24" width="18px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4.86 8.86l-3 3.87L9 13.14 6 17h12l-3.86-5.14z" /></svg>
+                                                <p className="text-gray-500 mr-2 text-sm mt-1">{thumbnailFile.name}</p>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
-                                {thumbnailFile && (
-                                    <div className="mt-4 text-center">
-                                        <p className="text-gray-500">Selected file: {thumbnailFile.name}</p>
-                                    </div>
-                                )}
                             </div>
                             <div className="py-5 px-2">
                                 <div className="max-w-md mx-auto rounded-lg overflow-hidden md:max-w-xl">
@@ -246,38 +266,45 @@ const VideoUploadForm: React.FC = () => {
                                                     type="file"
                                                     className="h-full w-full opacity-0"
                                                     name=""
+                                                    onChange={handleVideoFileChange}
                                                 />
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="ml-3">
+                                    <div className="ml-3 flex">
                                         <Progress
-                                            aria-label="Downloading..."
+                                            color="warning"
                                             size="sm"
-                                            value={value}
-                                            color="success"
-                                            showValueLabel={true}
-                                            className="max-w-md"
+                                            isIndeterminate
+                                            aria-label="Loading..."
+                                            className="max-w-40 mt-3 mr-5"
                                         />
+                                        {videoFile && (
+                                            <div className="text-center flex">
+                                                <svg className="mt-1 mr-2" xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 0 24 24" width="18px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M15 8v8H5V8h10m1-2H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4V7c0-.55-.45-1-1-1z" /></svg>
+
+                                                <p className="text-gray-500 text-sm mt-1">{videoFile.name}</p>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
-                                {videoFile && (
-                                    <div className="mt-4 text-center">
-                                        <p className="text-gray-500">Selected file: {videoFile.name}</p>
-                                    </div>
-                                )}
+
                             </div>
-                            <Button className='mt-5 ml-48 flex' color="danger">
-                                Submit
-                            </Button>
+                            {allFileUploaded ? (
+                                <Button className='mt-5 ml-48 flex font-semibold' color="danger">
+                                    Submit
+                                </Button>
+                            ) : (
+
+                                <Button className='mt-5 ml-48 flex text-white font-semibold' color="warning">
+                                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4 0-2.05 1.53-3.76 3.56-3.97l1.07-.11.5-.95C8.08 7.14 9.94 6 12 6c2.62 0 4.88 1.86 5.39 4.43l.3 1.5 1.53.11c1.56.1 2.78 1.41 2.78 2.96 0 1.65-1.35 3-3 3zM8 13h2.55v3h2.9v-3H16l-4-4z" /></svg>
+                                    Upload
+                                </Button>
+                            )}
                         </div>
                     )}
-
                 </div>
-                <Button onClick={handleSubmitForm}>Submit</Button>
-                <Button onClick={upload}>upload</Button>
             </div>
-
         </>
     )
 }

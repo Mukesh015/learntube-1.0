@@ -1,28 +1,23 @@
 import React from "react";
 import Navbar from "@/components/navbar";
 import Sidebar from "@/components/sidebar";
+import { Switch, cn } from "@nextui-org/react";
 import { Tooltip } from "@nextui-org/react";
 
-const SubsCriptions: React.FC = () => {
+const WatchLater: React.FC = () => {
     return (
         <>
             <Navbar />
             <Sidebar />
             <nav className="mt-24 mr-20">
                 <ul className="flex flex-row-reverse gap-10">
-                    <Tooltip color="warning" delay={700} showArrow={true} content="Fiter platlist">
-                        <li className="flex ext-blue-500 text-blue-500 font-semibold hover:bg-blue-200 px-2 rounded-2xl cursor-default py-1">
-                            <svg className="mr-2" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#2e4bc9"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z" /></svg>
-                            Filter
+                    <Tooltip color="warning" delay={700} showArrow={true} content="clear all">
+                        <li className="flex ext-blue-500 font-semibold hover:bg-gray-700 rounded-full cursor-default">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="m-2" height="24px" viewBox="0 0 24 24" width="24px" fill="#e30b13"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M5 13h14v-2H5v2zm-2 4h14v-2H3v2zM7 7v2h14V7H7z" /></svg>
                         </li>
                     </Tooltip>
-                    <Tooltip color="warning" delay={700} showArrow={true} content="Manage your playlist">
-                        <li className="text-blue-500 font-semibold hover:bg-blue-200 px-2 rounded-2xl cursor-default py-1">
-                            Manage
-                        </li>
-                    </Tooltip>
-                    <li className="text-3xl font-bold text-amber-600" style={{ marginRight: "160px" }} >
-                        Suggesting videos based on your subscriptions
+                    <li className="text-3xl font-bold text-amber-600" style={{ marginRight: "820px" }} >
+                        Watch later list
                     </li>
                 </ul>
             </nav>
@@ -170,4 +165,4 @@ const SubsCriptions: React.FC = () => {
     )
 }
 
-export default SubsCriptions;
+export default WatchLater;
