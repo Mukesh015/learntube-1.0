@@ -36,4 +36,4 @@ const getDownloadLink = (path) => {
   return getDownloadURL(ref(storage, path));
 };
 
-export { app, auth, uploadThumbnail, uploadVideo,getDownloadLink  };
+export { app, auth, uploadThumbnail, uploadVideo, getDownloadLink };

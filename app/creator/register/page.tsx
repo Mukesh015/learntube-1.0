@@ -20,13 +20,14 @@ const CreatorRegisterForm: React.FC = () => {
     const [country, setCountry] = useState<string>("");
     const [pinCode, setPincode] = useState<string>();
     const [recoveryEmail, setRecoveryEmail] = useState<string>("");
-    const [occupation, setOccupation] = useState<string>("");
     const [logo, setLogo] = useState<File | null>(null);
     const [cover, setCover] = useState<File | null>(null);
-    const [mediaLinks, setMediaLinks] = useState<object | null>(null);
+    const [platform, setPlatform] = useState<string>('');
+    const [link, setLink] = useState<string>('');
+    const [mediaLinks, setMediaLinks] = useState<{ [key: string]: string } | null>(null);
 
     const platforms = [
-        { label: "Your domain", value: "domain" },
+        { label: "Your domain", value: "any" },
         { label: "Facebook", value: "Facebook" },
         { label: "Instagram", value: "Instagram" },
         { label: "Github", value: "Github" },
@@ -43,9 +44,27 @@ const CreatorRegisterForm: React.FC = () => {
     const handleChannelInfoForm = useCallback(async () => {
         setOtpForm(true);
     }, [setOtpForm]);
+    const handlePlatformChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setPlatform(event.target.value);
+    };
 
+    const handleLinkChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setLink(event.target.value);
+    };
+
+    const handleAddButtonClick = () => {
+        if (platform && link) {
+            setMediaLinks((prevLinks) => ({
+                ...prevLinks,
+                [platform]: link,
+            }));
+            setPlatform('');
+            setLink('');
+        }
+    };
     const handleOtpForm = useCallback(async () => {
         try {
+           console.log(email); 
             const creatorForm = new FormData();
             creatorForm.append('email', email);
             creatorForm.append('channelName', channelName);
@@ -55,7 +74,6 @@ const CreatorRegisterForm: React.FC = () => {
             creatorForm.append('state', state);
             creatorForm.append('country', country);
             creatorForm.append('recoveryEmail', recoveryEmail);
-            creatorForm.append('occupation', occupation);
             if (pinCode && contactNumber) {
                 creatorForm.append('contactNumber', contactNumber);
                 creatorForm.append('pinCode', pinCode);
@@ -64,7 +82,12 @@ const CreatorRegisterForm: React.FC = () => {
                 creatorForm.append('image', logo);
                 creatorForm.append('image', cover);
             }
-            console.log(contactNumber, pinCode);
+            if(mediaLinks ){
+                for (const [key, value] of Object.entries(mediaLinks)) {
+                    creatorForm.append(`${key}`, value);
+                    console.log(`${key}: ${value}`);
+                }
+            }
             try {
                 const response = await fetch("http://localhost:9063/api/createchannel", {
                     method: "POST",
@@ -314,27 +337,37 @@ const CreatorRegisterForm: React.FC = () => {
                                 <div className="w-full flex flex-col gap-4 mb-5">
                                     <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
                                         <Select
+                                            radius='small'
                                             variant="bordered"
                                             label="Select a platform"
                                             className="max-w-xs"
+                                            value={platform}
+                                            onChange={handlePlatformChange}
                                         >
-                                            {platforms.map((platforms) => (
-                                                <SelectItem key={platforms.value} value={platforms.value}>
-                                                    {platforms.label}
+                                            {/* Assuming platforms is an array of objects with label and value */}
+                                            {platforms.map((platform) => (
+                                                <SelectItem key={platform.value} value={platform.value}>
+                                                    {platform.label}
                                                 </SelectItem>
                                             ))}
                                         </Select>
-                                        <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
-                                            <Input type="email" variant="bordered" label="Link" />
-                                        </div>
-                                        <Button color='primary' className='mt-2' radius="sm">
+                                        <Input
+                                            type="text"
+                                            variant="bordered"
+                                            label="Link"
+                                            value={link}
+                                            onChange={handleLinkChange}
+                                        />
+                                        <Button color='primary' className='mt-2' radius="sm" onClick={handleAddButtonClick}>
                                             Add
                                         </Button>
                                     </div>
                                     {mediaLinks &&
                                         <div className='grid grid-cols-2 gap-2'>
                                             <div className='flex bg-gray-700 p-1 rounded-xl text-gray-200 px-2'>
-                                                <p className='text-sm underline text-blue-500'>http://localhost:9090</p>
+                                                {Object.entries(mediaLinks).map(([platform, link]) => (
+                                                    <p className='text-sm underline text-blue-500' key={platform}>{link}</p>
+                                                ))}
                                                 <svg className='bg-gray-500 rounded-full absolute ml-52' xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 0 24 24" width="18px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" /></svg>
                                             </div>
                                         </div>

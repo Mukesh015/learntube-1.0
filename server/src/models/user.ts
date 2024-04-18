@@ -13,9 +13,11 @@ interface UserDocument extends Document {
     firstname?: string;
     recoveryEmail?: string;
     occupation?: string;
-
-    address: { country: string; state: string; city: string; pincode:number; phone:number}[];
-    history: any[]; 
+    channelId?: string;
+    channelDescription?: string;
+    website: { any: string, Facebook: string, Instagram: string, Twitter: string, Github: string, LinkedIn: string, Discord: string }
+    address: { country: string; state: string; city: string; pincode: number; phone: number };
+    history: any[];
     analytics: { date: Date; watchTime: number }[];
 
 }
@@ -43,11 +45,30 @@ const userSchema = new mongoose.Schema<UserDocument>(
             type: Boolean,
             default: false
         },
-        channelName:{
+        channelName: {
             type: String,
             required: false
         },
-        channelLogo:{
+        channelId: {
+            type: String,
+            required: false
+        },
+        channelDescription: {
+            type: String,
+            required: false
+        },
+        website:
+        {
+            any: { type: String },
+            Facebook: { type: String },
+            Instagram: { type: String },
+            Twitter: { type: String },
+            Github: { type: String },
+            LinkedIn: { type: String },
+            Discord: { type: String }
+        },
+
+        channelLogo: {
             type: String,
             required: false
         },
@@ -59,27 +80,26 @@ const userSchema = new mongoose.Schema<UserDocument>(
             type: String,
             required: false
         },
-        firstname:{
+        firstname: {
             type: String,
             required: false
         },
-        recoveryEmail:{
+        recoveryEmail: {
             type: String,
             required: false
         },
-        occupation:{
+        occupation: {
             type: String,
             required: false
         },
-        address: [
-            {
-                country: { type: String, },
-                state: { type: String, },
-                city: { type: String, },
-                pincode: { type: Number, },
-                phone: { type: Number, },
-            }
-        ],
+        address:
+        {
+            country: { type: String, },
+            state: { type: String, },
+            city: { type: String, },
+            pincode: { type: Number, },
+            phone: { type: Number, },
+        },
         history: [mongoose.Schema.Types.Mixed],
         analytics: [
             {
