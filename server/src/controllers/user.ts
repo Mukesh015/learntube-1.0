@@ -67,7 +67,9 @@ export async function createChannel(req: Request, res: Response) {
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-
+    if(user.isCreator==true) {
+    return res.status(400).json({ message: 'User already has a channel' });
+    }
     const urls: string[] = [];
     const files: Express.Multer.File[] = req.files as Express.Multer.File[];
     for (const file of files) {
@@ -99,10 +101,10 @@ export async function createChannel(req: Request, res: Response) {
 
     await user.save();
 
-    res.status(200).json({ message: 'User updated successfully' });
+    res.status(200).json({ message: 'Channel created successfully' });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: err });
   }
 }
 
