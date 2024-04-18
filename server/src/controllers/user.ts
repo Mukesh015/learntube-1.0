@@ -54,11 +54,11 @@ async function cloudinaryImageUploadMethod(file: string): Promise<CloudinaryImag
 export async function createChannel(req: Request, res: Response) {
 
   const { email, channelName, firstName, gender, contactNumber, city, state, country, pinCode,
-    recoveryEmail, occupation, channelDescription, any, Facebook, Instagram, Twitter, Github, LinkedIn, Discord } = req.body;
+    recoveryEmail, occupation, channelDescription, any, Facebook, Instagram, Twitter, Github, LinkedIn, Discord,addressLine } = req.body;
   const contactnumber = parseInt(contactNumber)
   const pincode = parseInt(pinCode)
   const channelId = `@${channelName}`
-  console.log(email)
+  console.log("email",email)
   let channelLogo: string | null = null;
   let coverPhoto: string | null = null;
 
@@ -97,7 +97,7 @@ export async function createChannel(req: Request, res: Response) {
     user.channelDescription = channelDescription;
     user.occupation = occupation;
     user.website = { any, Facebook, Twitter, Instagram, Github, LinkedIn, Discord };
-    user.address = { country, state, city, pincode: pincode, phone: contactnumber };
+    user.address = { country, state, city, pincode: pincode,addressLine, phone: contactnumber };
 
     await user.save();
 
