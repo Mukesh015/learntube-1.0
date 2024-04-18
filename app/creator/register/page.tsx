@@ -1,30 +1,38 @@
 "use client"
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useRef } from 'react';
 import { RadioGroup, Radio } from "@nextui-org/react";
 import { Select, SelectItem } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 import { Button } from "@nextui-org/react";
 import { toast, ToastContainer } from "react-toastify";
+import { otpValidation } from '@/firebase/config';
 
 const CreatorRegisterForm: React.FC = () => {
-
     const [personalInfoNext, setPersonalInfoNext] = useState<boolean>(false);
     const [otpForm, setOtpForm] = useState<boolean>(false);
     const [email, setEmail] = useState<string>("");
+    const [verifyEmail, setVerifyEmail] = useState<string>("");
     const [channelName, setChannelName] = useState<string>("");
     const [firstName, setFirstName] = useState<string>("");
     const [gender, setGender] = useState<string>("");
-    const [contactNumber, setContactNumber] = useState<string>();
+    const [contactNumber, setContactNumber] = useState<string>("");
+    const [verifyContactNumber, setVerifyContactNumber] = useState<string>("");
     const [city, setCity] = useState<string>("");
     const [state, setState] = useState<string>("");
     const [country, setCountry] = useState<string>("");
     const [pinCode, setPincode] = useState<string>();
+    const [address, setAddress] = useState<string>("");
     const [recoveryEmail, setRecoveryEmail] = useState<string>("");
     const [logo, setLogo] = useState<File | null>(null);
     const [cover, setCover] = useState<File | null>(null);
     const [platform, setPlatform] = useState<string>('');
     const [link, setLink] = useState<string>('');
     const [mediaLinks, setMediaLinks] = useState<{ [key: string]: string } | null>(null);
+    const [showEmailOtp, setShowEmailOtp] = useState<Boolean>(true);
+    const [showPhoneOtp, setShowPhoneOtp] = useState<Boolean>(true);
+    const [emailOtp, setEmailOtp] = useState("");
+    const [phoneOtp, setPhoneOtp] = useState<number>();
+    const [confirmObj, setConfirmObj] = useState<any>();
 
     const platforms = [
         { label: "Your domain", value: "any" },
@@ -36,6 +44,9 @@ const CreatorRegisterForm: React.FC = () => {
         { label: "Discord", value: "Discord" }
     ];
 
+    const showDetails = useCallback(async () => {
+        console.log(firstName, email, contactNumber, address, city, pinCode, state, country);
+    }, [firstName, email, contactNumber, address, city, pinCode, state, country])
 
     const handlePersonalInfoForm = useCallback(async () => {
         setPersonalInfoNext(true);
@@ -141,6 +152,30 @@ const CreatorRegisterForm: React.FC = () => {
             setCover(file);
         }
     }
+
+    const sendOtp = useCallback(async () => {
+        const number = "+91" + verifyContactNumber;
+        console.log(number);
+        try {
+            const response = await otpValidation(number);
+            setConfirmObj(response);
+            console.log(response);
+        } catch (err: any) {
+            console.log(err.message);
+        }
+    }, [emailOtp, verifyEmail, setConfirmObj, verifyContactNumber, phoneOtp])
+
+    const validateOtp = useCallback(async () => {
+        console.log(confirmObj);
+        try {
+            await confirmObj.confirm(phoneOtp).then(() => {
+                console.log("Success")
+            })
+        } catch (err: any) {
+            console.log(err.message);
+        }
+    }, [confirmObj, phoneOtp])
+
     return (
         <>
             <ToastContainer />
@@ -177,38 +212,82 @@ const CreatorRegisterForm: React.FC = () => {
                             Phone Number: A otp is sent to your given phone number please verify the phone number to continue this process otherwise the process will terminate immediately.
                         </p>
                     </div>
-                    <div className='border shadow-lg shadow-orange-400 border-gray-700 p-7 rounded-lg absolute' style={{ marginTop: "150px", width: "550px", marginLeft: "800px" }}>
+                    <div className='border shadow-lg shadow-orange-400 border-gray-700 p-7 rounded-lg absolute' style={{ marginTop: "90px", width: "550px", marginLeft: "800px" }}>
                         <div>
                             <svg onClick={(e) => setOtpForm(false)} className='mb-10 hover:bg-gray-700 rounded-full' xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M21 11H6.83l3.58-3.59L9 6l-6 6 6 6 1.41-1.41L6.83 13H21v-2z" /></svg>
-                            <div className="relative mb-3">
-                                <input
-                                    required
-                                    type="number"
-                                    className="peer m-0 block h-[58px] w-full rounded border border-solid border-secondary-500 bg-transparent bg-clip-padding px-3 py-4 text-base font-normal leading-tight text-neutral-700 transition duration-200 ease-linear placeholder:text-transparent focus:border-primary focus:pb-[0.625rem] focus:pt-[1.625rem] focus:text-neutral-700 focus:outline-none peer-focus:text-primary dark:border-neutral-400 dark:text-white dark:autofill:shadow-autofill dark:focus:border-primary dark:peer-focus:text-primary [&:not(:placeholder-shown)]:pb-[0.625rem] [&:not(:placeholder-shown)]:pt-[1.625rem]"
-                                    id="floatingInput"
-                                    placeholder="Enter your first name"
-                                />
-                                <label
-                                    htmlFor="floatingInput"
-                                    className="pointer-events-none absolute left-0 top-0 origin-[0_0] border border-solid border-transparent px-3 py-4 text-neutral-500 transition-[opacity,_transform] duration-200 ease-linear peer-focus:-translate-y-2 peer-focus:translate-x-[0.15rem] peer-focus:scale-[0.85] peer-focus:text-primary peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:translate-x-[0.15rem] peer-[:not(:placeholder-shown)]:scale-[0.85] motion-reduce:transition-none dark:text-neutral-400 dark:peer-focus:text-primary"
-                                >Enter email otp</label>
+                            <div className='flex'>
+                                <div className="relative mb-3">
+                                    <input
+                                        onChange={(e) => setVerifyEmail(e.target.value)}
+                                        required
+                                        type="email"
+                                        className="w-80 peer m-0 block h-[58px] rounded border border-solid border-secondary-500 bg-transparent bg-clip-padding px-3 py-4 text-base font-normal leading-tight text-neutral-700 transition duration-200 ease-linear placeholder:text-transparent focus:border-primary focus:pb-[0.625rem] focus:pt-[1.625rem] focus:text-neutral-700 focus:outline-none peer-focus:text-primary dark:border-neutral-400 dark:text-white dark:autofill:shadow-autofill dark:focus:border-primary dark:peer-focus:text-primary [&:not(:placeholder-shown)]:pb-[0.625rem] [&:not(:placeholder-shown)]:pt-[1.625rem]"
+                                        id="floatingInput"
+                                        placeholder="Enter your first name"
+                                    />
+                                    <label
+                                        htmlFor="floatingInput"
+                                        className="pointer-events-none absolute left-0 top-0 origin-[0_0] border border-solid border-transparent px-3 py-4 text-neutral-500 transition-[opacity,_transform] duration-200 ease-linear peer-focus:-translate-y-2 peer-focus:translate-x-[0.15rem] peer-focus:scale-[0.85] peer-focus:text-primary peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:translate-x-[0.15rem] peer-[:not(:placeholder-shown)]:scale-[0.85] motion-reduce:transition-none dark:text-neutral-400 dark:peer-focus:text-primary"
+                                    >Enter email</label>
+                                </div>
+                                <Button className='ml-10 mt-2' color="warning">
+                                    Send
+                                </Button>
                             </div>
-
-                            <div className="relative mb-3">
-                                <input
-                                    required
-                                    type="number"
-                                    className="peer m-0 block h-[58px] w-full rounded border border-solid border-secondary-500 bg-transparent bg-clip-padding px-3 py-4 text-base font-normal leading-tight text-neutral-700 transition duration-200 ease-linear placeholder:text-transparent focus:border-primary focus:pb-[0.625rem] focus:pt-[1.625rem] focus:text-neutral-700 focus:outline-none peer-focus:text-primary dark:border-neutral-400 dark:text-white dark:autofill:shadow-autofill dark:focus:border-primary dark:peer-focus:text-primary [&:not(:placeholder-shown)]:pb-[0.625rem] [&:not(:placeholder-shown)]:pt-[1.625rem]"
-                                    id="floatingInput"
-                                    placeholder="Enter your first name"
-                                />
-                                <label
-                                    htmlFor="floatingInput"
-                                    className="pointer-events-none absolute left-0 top-0 origin-[0_0] border border-solid border-transparent px-3 py-4 text-neutral-500 transition-[opacity,_transform] duration-200 ease-linear peer-focus:-translate-y-2 peer-focus:translate-x-[0.15rem] peer-focus:scale-[0.85] peer-focus:text-primary peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:translate-x-[0.15rem] peer-[:not(:placeholder-shown)]:scale-[0.85] motion-reduce:transition-none dark:text-neutral-400 dark:peer-focus:text-primary"
-                                >Enter mobile otp</label>
+                            {showEmailOtp &&
+                                <div className="relative mb-3">
+                                    <input
+                                        onChange={(e) => setEmailOtp(e.target.value)}
+                                        required
+                                        type="number"
+                                        className="w-80 peer m-0 block h-[58px] rounded border border-solid border-secondary-500 bg-transparent bg-clip-padding px-3 py-4 text-base font-normal leading-tight text-neutral-700 transition duration-200 ease-linear placeholder:text-transparent focus:border-primary focus:pb-[0.625rem] focus:pt-[1.625rem] focus:text-neutral-700 focus:outline-none peer-focus:text-primary dark:border-neutral-400 dark:text-white dark:autofill:shadow-autofill dark:focus:border-primary dark:peer-focus:text-primary [&:not(:placeholder-shown)]:pb-[0.625rem] [&:not(:placeholder-shown)]:pt-[1.625rem]"
+                                        id="floatingInput"
+                                        placeholder="Enter your first name"
+                                    />
+                                    <label
+                                        htmlFor="floatingInput"
+                                        className="pointer-events-none absolute left-0 top-0 origin-[0_0] border border-solid border-transparent px-3 py-4 text-neutral-500 transition-[opacity,_transform] duration-200 ease-linear peer-focus:-translate-y-2 peer-focus:translate-x-[0.15rem] peer-focus:scale-[0.85] peer-focus:text-primary peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:translate-x-[0.15rem] peer-[:not(:placeholder-shown)]:scale-[0.85] motion-reduce:transition-none dark:text-neutral-400 dark:peer-focus:text-primary"
+                                    >Enter otp</label>
+                                </div>
+                            }
+                            <div className='flex'>
+                                <div className="relative mb-3">
+                                    <input
+                                        onChange={(e) => setVerifyContactNumber(e.target.value)}
+                                        required
+                                        type="number"
+                                        className="w-80 peer m-0 block h-[58px] rounded border border-solid border-secondary-500 bg-transparent bg-clip-padding px-3 py-4 text-base font-normal leading-tight text-neutral-700 transition duration-200 ease-linear placeholder:text-transparent focus:border-primary focus:pb-[0.625rem] focus:pt-[1.625rem] focus:text-neutral-700 focus:outline-none peer-focus:text-primary dark:border-neutral-400 dark:text-white dark:autofill:shadow-autofill dark:focus:border-primary dark:peer-focus:text-primary [&:not(:placeholder-shown)]:pb-[0.625rem] [&:not(:placeholder-shown)]:pt-[1.625rem]"
+                                        id="floatingInput"
+                                        placeholder="Enter your first name"
+                                    />
+                                    <label
+                                        htmlFor="floatingInput"
+                                        className="pointer-events-none absolute left-0 top-0 origin-[0_0] border border-solid border-transparent px-3 py-4 text-neutral-500 transition-[opacity,_transform] duration-200 ease-linear peer-focus:-translate-y-2 peer-focus:translate-x-[0.15rem] peer-focus:scale-[0.85] peer-focus:text-primary peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:translate-x-[0.15rem] peer-[:not(:placeholder-shown)]:scale-[0.85] motion-reduce:transition-none dark:text-neutral-400 dark:peer-focus:text-primary"
+                                    >Enter phone number</label>
+                                </div>
+                                <Button onPress={sendOtp} className='ml-10 mt-2' color="warning">
+                                    Send
+                                </Button>
                             </div>
-
-                            <Button onPress={(e) => handleOtpForm()} className='mt-16 ml-48 flex' color="danger">
+                            <div className='mb-3' id='recaptcha-container'></div>
+                            {showPhoneOtp &&
+                                <div className="relative mb-3">
+                                    <input
+                                        type='number'
+                                        // @ts-ignore
+                                        onChange={(e) => setPhoneOtp(e.target.value)}
+                                        required
+                                        className="w-80 peer m-0 block h-[58px] rounded border border-solid border-secondary-500 bg-transparent bg-clip-padding px-3 py-4 text-base font-normal leading-tight text-neutral-700 transition duration-200 ease-linear placeholder:text-transparent focus:border-primary focus:pb-[0.625rem] focus:pt-[1.625rem] focus:text-neutral-700 focus:outline-none peer-focus:text-primary dark:border-neutral-400 dark:text-white dark:autofill:shadow-autofill dark:focus:border-primary dark:peer-focus:text-primary [&:not(:placeholder-shown)]:pb-[0.625rem] [&:not(:placeholder-shown)]:pt-[1.625rem]"
+                                        id="floatingInput"
+                                        placeholder="Enter your first name"
+                                    />
+                                    <label
+                                        htmlFor="floatingInput"
+                                        className="pointer-events-none absolute left-0 top-0 origin-[0_0] border border-solid border-transparent px-3 py-4 text-neutral-500 transition-[opacity,_transform] duration-200 ease-linear peer-focus:-translate-y-2 peer-focus:translate-x-[0.15rem] peer-focus:scale-[0.85] peer-focus:text-primary peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:translate-x-[0.15rem] peer-[:not(:placeholder-shown)]:scale-[0.85] motion-reduce:transition-none dark:text-neutral-400 dark:peer-focus:text-primary"
+                                    >Enter otp</label>
+                                </div>
+                            }
+                            <Button onPress={() => validateOtp()} className='mt-16 ml-48 flex' color="danger">
                                 submit
                             </Button>
                         </div>
@@ -464,7 +543,8 @@ const CreatorRegisterForm: React.FC = () => {
                                         className="peer m-0 block h-[58px] w-full rounded border border-solid border-secondary-500 bg-transparent bg-clip-padding px-3 py-4 text-base font-normal leading-tight text-neutral-700 transition duration-200 ease-linear placeholder:text-transparent focus:border-primary focus:pb-[0.625rem] focus:pt-[1.625rem] focus:text-neutral-700 focus:outline-none peer-focus:text-primary dark:border-neutral-400 dark:text-white dark:autofill:shadow-autofill dark:focus:border-primary dark:peer-focus:text-primary [&:not(:placeholder-shown)]:pb-[0.625rem] [&:not(:placeholder-shown)]:pt-[1.625rem]"
                                         id="floatingInput"
                                         placeholder="Enter your adddress"
-
+                                        value={address}
+                                        onChange={(e) => setAddress(e.target.value)}
                                     />
                                     <label
                                         htmlFor="floatingInput"

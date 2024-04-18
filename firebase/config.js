@@ -1,5 +1,9 @@
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import {
+  getAuth,
+  signInWithPhoneNumber,
+  RecaptchaVerifier,
+} from "firebase/auth";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const firebaseConfig = {
@@ -32,8 +36,25 @@ const uploadVideo = async (video) => {
   return uploadTask;
 };
 
+const otpValidation = async (number) => {
+  const recaptchaVerifier = new RecaptchaVerifier(
+    auth,
+    "recaptcha-container",
+    {}
+  );
+  recaptchaVerifier.render();
+  return signInWithPhoneNumber(auth, number, recaptchaVerifier);
+};
+
 const getDownloadLink = (path) => {
   return getDownloadURL(ref(storage, path));
 };
 
-export { app, auth, uploadThumbnail, uploadVideo, getDownloadLink };
+export {
+  app,
+  auth,
+  uploadThumbnail,
+  uploadVideo,
+  getDownloadLink,
+  otpValidation,
+};
