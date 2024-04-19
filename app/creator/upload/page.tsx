@@ -4,26 +4,27 @@ import React, { useCallback, useState, useEffect } from "react";
 import { Input } from "@nextui-org/react";
 import { RadioGroup, Radio } from "@nextui-org/react";
 import { Select, SelectItem } from "@nextui-org/react";
-import { Textarea } from "@nextui-org/react";
+import { Textarea, Spinner } from "@nextui-org/react";
 import { Button } from "@nextui-org/react";
 import { Progress } from "@nextui-org/react";
 import { useQuery, gql } from '@apollo/client';
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase/config";
 import { toast, ToastContainer } from "react-toastify";
+
+
 const GET_COURSENAME = gql`
 query Exam($email:String){
     getCourseName(email:$email) {
       courseNames
     } 
   }
-  
 `
 
 const VideoUploadForm: React.FC = () => {
 
     const [isExistingCourse, setIsExistingCourse] = useState<boolean>(false);
-    const [isPaidCourse, setIsPaidCourse] = useState<boolean>(false);
+    const [isPaidCourse, setIsPaidCourse] = useState<string>("");
     const [showUploadForm, setShowUploadForm] = useState<boolean>(false);
     const [videoFile, setVideoFile] = useState<File | null>(null);
     const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
@@ -38,14 +39,16 @@ const VideoUploadForm: React.FC = () => {
     const [courseName, setCourseName] = useState<string>('');
     const [courseDescription, setCourseDescription] = useState<string>('');
     const [videotags, setVideoTags] = useState<string>('');
-    const [videourl, setVideoUrl] = useState<string>('');
+    const [videoUrl, setVideoUrl] = useState<string>('');
     const [courseList, setCourseList] = useState<{ label: string; value: string }[]>([]);
+    const [showSpinner, setShowSpinner] = useState<boolean>(false)
 
     const { loading, error, data } = useQuery(GET_COURSENAME, {
         variables: { email: email },
     });
 
     const handleSubmitForm = useCallback(async () => {
+        console.log("url is:", videoUrl)
         try {
             const VideoUploadForm = new FormData();
             VideoUploadForm.append('email', email);
@@ -54,7 +57,7 @@ const VideoUploadForm: React.FC = () => {
             VideoUploadForm.append(`${isPaidCourse}`, price);
             VideoUploadForm.append('videoTitle', videoTitle);
             VideoUploadForm.append('videoDescription', videoDescription);
-            VideoUploadForm.append('videoUrl', videourl);
+            VideoUploadForm.append('videoUrl', videoUrl);
             VideoUploadForm.append('videoTags', videotags);
             if (thumbnailFile && courseThumbnailFile) {
                 VideoUploadForm.append('video', thumbnailFile);
@@ -67,7 +70,7 @@ const VideoUploadForm: React.FC = () => {
                 })
                 console.log(response);
                 if (response.ok) {
-                    toast.success("Registration success", {
+                    toast.success("Video uploaded", {
                         position: "top-center",
                         autoClose: 1000,
                         hideProgressBar: false,
@@ -79,7 +82,7 @@ const VideoUploadForm: React.FC = () => {
                     });
 
                 } else {
-                    toast.error("Registration failed", {
+                    toast.error("Video upload failed", {
                         position: "top-center",
                         autoClose: 1000,
                         hideProgressBar: false,
@@ -95,11 +98,10 @@ const VideoUploadForm: React.FC = () => {
                 console.log("Internal server error", error);
             }
 
-        } catch (error) {
-            console.error('Error fetching isCreator:', error);
-            throw new Error('Error fetching isCreator');
+        } catch (error: any) {
+            throw new Error('Form operation failed', error);
         }
-    }, [email]);
+    }, [email, courseName, courseDescription, videoTitle, videoDescription, price, videoUrl, videotags, thumbnailFile, courseThumbnailFile]);
 
 
     const handleVideoFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -111,14 +113,15 @@ const VideoUploadForm: React.FC = () => {
         setCourseThumbnailFile(file);
     };
     const upload = useCallback(async () => {
+        setShowSpinner(true);
         const result = await uploadVideo(videoFile);
         const path = result.ref.fullPath
-        const linkPromise = getDownloadLink(path)
-        const link = await linkPromise; 
+        const link: any = await getDownloadLink(path);
+        setVideoUrl(link);
         console.log(link);
-        setVideoUrl(link)
+        setShowSpinner(false);
         setAllFileUploaded(true)
-    }, [videoFile]);
+    }, [videoFile, videoUrl, setVideoUrl, setShowSpinner]);
 
     const handlethumbnailFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files && event.target.files[0];
@@ -126,20 +129,18 @@ const VideoUploadForm: React.FC = () => {
     };
 
     useEffect(() => {
-    
+
         if (user) {
-            setEmail(user.email||'');
-        } else {
-            console.log("User is not available");
+            setEmail(user.email || "");
         }
-        if (data) {
-            const updatedCourseList = data.getCourseName.map((course: { courseNames: any; }) => ({
+        if (data && email !== "") {
+            const updatedCourseList = data.getCourseName.map((course: { courseNames: any }) => ({
                 label: course.courseNames,
                 value: course.courseNames,
             }));
             setCourseList(updatedCourseList);
         }
-    }, [user, data,email]);
+    }, [user, data, email,courseList]);
     return (
         <>
             <ToastContainer />
@@ -220,8 +221,8 @@ const VideoUploadForm: React.FC = () => {
                                         label="Is this a paid course"
                                         orientation="horizontal"
                                     >
-                                        <Radio onClick={(e) => setIsPaidCourse(true)} value="paid">Yes</Radio>
-                                        <Radio onClick={(e) => setIsPaidCourse(false)} value="free">No</Radio>
+                                        <Radio onChange={(e) => setIsPaidCourse(e.target.value)} value="paid">Yes</Radio>
+                                        <Radio onChange={(e) => setIsPaidCourse(e.target.value)} value="free">No</Radio>
                                     </RadioGroup>
                                     {isPaidCourse &&
                                         <Input className="mb-5"
@@ -241,7 +242,7 @@ const VideoUploadForm: React.FC = () => {
                                             const tagsArray = value.split(',').map(tag => tag.trim());
                                             const newValue = tagsArray.join(', ');
                                             setVideoTags(newValue);
-                                          }}
+                                        }}
                                     />
                                 </div>
 
@@ -276,13 +277,15 @@ const VideoUploadForm: React.FC = () => {
                                         </div>
                                     </div>
                                     <div className="ml-3 flex">
-                                        <Progress
-                                            color="warning"
-                                            size="sm"
-                                            isIndeterminate
-                                            aria-label="Loading..."
-                                            className="max-w-40 mt-3"
-                                        />
+                                        {showSpinner &&
+                                            <Progress
+                                                color="warning"
+                                                size="sm"
+                                                isIndeterminate
+                                                aria-label="Loading..."
+                                                className="max-w-40 mt-3 mr-5"
+                                            />
+                                        }
 
                                         {thumbnailFile && (
                                             <div className="text-center flex ml-5">
@@ -316,13 +319,15 @@ const VideoUploadForm: React.FC = () => {
                                         </div>
                                     </div>
                                     <div className="ml-3 flex">
-                                        <Progress
-                                            color="warning"
-                                            size="sm"
-                                            isIndeterminate
-                                            aria-label="Loading..."
-                                            className="max-w-40 mt-3 mr-5"
-                                        />
+                                        {showSpinner &&
+                                            <Progress
+                                                color="warning"
+                                                size="sm"
+                                                isIndeterminate
+                                                aria-label="Loading..."
+                                                className="max-w-40 mt-3 mr-5"
+                                            />
+                                        }
                                         {videoFile && (
                                             <div className="text-center flex">
                                                 <svg className="mt-1 mr-2" xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 0 24 24" width="18px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M15 8v8H5V8h10m1-2H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4V7c0-.55-.45-1-1-1z" /></svg>
@@ -339,11 +344,12 @@ const VideoUploadForm: React.FC = () => {
                                     Submit
                                 </Button>
                             ) : (
-
                                 <Button className='mt-5 ml-48 flex text-white font-semibold' color="warning" onClick={upload}>
                                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4 0-2.05 1.53-3.76 3.56-3.97l1.07-.11.5-.95C8.08 7.14 9.94 6 12 6c2.62 0 4.88 1.86 5.39 4.43l.3 1.5 1.53.11c1.56.1 2.78 1.41 2.78 2.96 0 1.65-1.35 3-3 3zM8 13h2.55v3h2.9v-3H16l-4-4z" /></svg>
                                     Upload
-
+                                    {showSpinner &&
+                                        <Spinner color="danger" size="sm" />
+                                    }
                                 </Button>
                             )}
                         </div>
