@@ -4,7 +4,7 @@ import "./globals.css";
 import { UiProviders } from "@/components/providers";
 import "react-toastify/dist/ReactToastify.css";
 import NextTopLoader from "nextjs-toploader";
-import { ApolloWrapper } from "@/apollo/client"
+import { ApolloWrapper } from "@/configurations/apollo/client"
 
 const inter = Inter({ subsets: ["latin"] });
 

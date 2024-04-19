@@ -5,7 +5,7 @@ import { Select, SelectItem } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 import { Button } from "@nextui-org/react";
 import { toast, ToastContainer } from "react-toastify";
-import { otpValidation } from '@/firebase/config';
+import { otpValidation } from '@/configurations/firebase/config';
 
 const CreatorRegisterForm: React.FC = () => {
     const [personalInfoNext, setPersonalInfoNext] = useState<boolean>(false);
@@ -32,12 +32,12 @@ const CreatorRegisterForm: React.FC = () => {
     const [mediaLinks, setMediaLinks] = useState<{ [key: string]: string } | null>(null);
     const [showEmailOtp, setShowEmailOtp] = useState<Boolean>(false);
     const [showPhoneOtp, setShowPhoneOtp] = useState<Boolean>(false);
-    const [emailOtp, setEmailOtp] = useState("");
-    const [phoneOtp, setPhoneOtp] = useState<number>();
+    const [emailOtp, setEmailOtp] = useState<string>();
+    const [phoneOtp, setPhoneOtp] = useState<Number>();
     const [confirmObj, setConfirmObj] = useState<any>();
-    const [verify, setVerify] = useState<boolean>(false);
+    const [verify, setVerify] = useState<boolean>(true);
     const [isVerifed, setIsVerifed] = useState<boolean>(false);
-    const [serverOtp, setServerOtp] = useState<number>();
+    const [serverOtp, setServerOtp] = useState<string>();
 
     const platforms = [
         { label: "Your domain", value: "any" },
@@ -76,6 +76,7 @@ const CreatorRegisterForm: React.FC = () => {
     };
 
     const handleSubmitRegisterForm = useCallback(async () => {
+        console.log(name, email, gender, contactNumber, addressLine, city, state, pinCode, country, channelName, channelAdminName, channelDescription, recoveryEmail, mediaLinks, logo, cover)
         try {
             const creatorForm = new FormData();
             creatorForm.append('firstName', name);
@@ -109,7 +110,7 @@ const CreatorRegisterForm: React.FC = () => {
                     method: "POST",
                     body: creatorForm
                 })
-                console.log(response);
+                console.log(response.json());
                 if (response.ok) {
                     toast.success("Registration success", {
                         position: "top-center",
@@ -166,12 +167,14 @@ const CreatorRegisterForm: React.FC = () => {
             const response = await otpValidation(number);
             setConfirmObj(response);
             console.log(response);
+            setShowPhoneOtp(true);
         } catch (err: any) {
             console.log(err.message);
         }
-    }, [emailOtp, verifyEmail, setConfirmObj, verifyContactNumber, phoneOtp])
+    }, [emailOtp, verifyEmail, setShowPhoneOtp, setConfirmObj, verifyContactNumber, phoneOtp])
 
     const sendEmailOtp = useCallback(async () => {
+        console.log(email, verifyEmail)
         if (!verifyEmail || email === "" || email !== verifyEmail || verifyEmail === "") {
             toast.error("Please enter valid email or emails does not macth", {
                 position: "top-right",
@@ -209,13 +212,18 @@ const CreatorRegisterForm: React.FC = () => {
         try {
             await confirmObj.confirm(phoneOtp).then(() => {
                 console.log("Success")
-                setShowPhoneOtp(true);
             })
-            
+            if (emailOtp === serverOtp) {
+                setIsVerifed(true);
+                setVerify(true);
+            }
+            else {
+                throw new Error("Invalid otp");
+            }
         } catch (err: any) {
-            console.log(err.message);
+            console.log("Server error", err.message);
         }
-    }, [confirmObj, phoneOtp])
+    }, [confirmObj, phoneOtp, emailOtp, setShowPhoneOtp, serverOtp, setIsVerifed]);
 
     return (
         <>
@@ -283,7 +291,7 @@ const CreatorRegisterForm: React.FC = () => {
                                         type="number"
                                         className="w-80 peer m-0 block h-[58px] rounded border border-solid border-secondary-500 bg-transparent bg-clip-padding px-3 py-4 text-base font-normal leading-tight text-neutral-700 transition duration-200 ease-linear placeholder:text-transparent focus:border-primary focus:pb-[0.625rem] focus:pt-[1.625rem] focus:text-neutral-700 focus:outline-none peer-focus:text-primary dark:border-neutral-400 dark:text-white dark:autofill:shadow-autofill dark:focus:border-primary dark:peer-focus:text-primary [&:not(:placeholder-shown)]:pb-[0.625rem] [&:not(:placeholder-shown)]:pt-[1.625rem]"
                                         id="floatingInput"
-                                        placeholder="Enter your first name"
+                                        placeholder="Enter otp"
                                     />
                                     <label
                                         htmlFor="floatingInput"
@@ -459,7 +467,6 @@ const CreatorRegisterForm: React.FC = () => {
                                         placeholder="Enter your first name"
                                         value={channelDescription}
                                         onChange={(e) => setChannelDescription(e.target.value)}
-
                                     />
                                     <label
                                         htmlFor="floatingInput"
@@ -535,7 +542,7 @@ const CreatorRegisterForm: React.FC = () => {
                                 <div className="relative mb-3">
                                     <input
                                         required
-                                        type="name"
+                                        type="text"
                                         className="peer m-0 block h-[58px] w-full rounded border border-solid border-secondary-500 bg-transparent bg-clip-padding px-3 py-4 text-base font-normal leading-tight text-neutral-700 transition duration-200 ease-linear placeholder:text-transparent focus:border-primary focus:pb-[0.625rem] focus:pt-[1.625rem] focus:text-neutral-700 focus:outline-none peer-focus:text-primary dark:border-neutral-400 dark:text-white dark:autofill:shadow-autofill dark:focus:border-primary dark:peer-focus:text-primary [&:not(:placeholder-shown)]:pb-[0.625rem] [&:not(:placeholder-shown)]:pt-[1.625rem]"
                                         id="floatingInput"
                                         placeholder="Enter your first name"
