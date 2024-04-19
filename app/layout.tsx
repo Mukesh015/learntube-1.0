@@ -5,7 +5,7 @@ import { UiProviders } from "@/components/providers";
 import "react-toastify/dist/ReactToastify.css";
 import NextTopLoader from "nextjs-toploader";
 import { ApolloWrapper } from "@/configurations/apollo/client"
-
+import {StoreProvider} from "../redux/storeProvider"
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -23,11 +23,13 @@ export default function RootLayout({
     <html lang="en" className='dark'>
       <body className={inter.className}>
         <NextTopLoader />
+        <StoreProvider>
         <ApolloWrapper>
           <UiProviders>
             {children}
           </UiProviders>
         </ApolloWrapper>
+        </StoreProvider>
       </body>
     </html>
   );

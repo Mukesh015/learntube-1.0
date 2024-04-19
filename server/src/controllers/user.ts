@@ -185,7 +185,7 @@ export async function generateOtp(req: Request, res: Response) {
       text: `Please use the code below to confirm your email address. This code will expire in 2 hours. If you don't think you should be receiving this email, you can safely ignore it. 
         ${newotp}`,
     };
-    transporter.sendMail(mailOptions, (error, info) => {
+    transporter.sendMail(mailOptions, (error: any, info: { response: string; }) => {
       if (error) {
         res.status(500).send("Error sending email")
       } else {

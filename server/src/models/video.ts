@@ -38,7 +38,7 @@ const videoSchema = new mongoose.Schema<VideoDocument>(
                 courseThumbUrl: { type: String },
                 courseDescription: { type: String },
                 courseFess: {
-                    free: { type: Number, default: 0 }, 
+                    free: { type: Number }, 
                     paid: { type: Number },
                 },
                 videos: [

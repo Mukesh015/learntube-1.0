@@ -31,6 +31,7 @@ async function cloudinaryImageUploadMethod(file: string): Promise<CloudinaryImag
 export async function uploadVideo(req: Request, res: Response) {
   try {
     const { email, courseName, courseDescription, free, paid, videoTitle, videoDescription, videoTags, videoUrl } = req.body;
+    console.log('Uploading video', videoUrl,"couseprice paid",paid,"couseprice free",free)
     let videoThumbUrl: string | null = null;
     let courseThumbUrl: string | null = null;
     const urls: string[] = [];
@@ -61,7 +62,7 @@ export async function uploadVideo(req: Request, res: Response) {
 
     if (course) {
       course.videos.push({
-        videoUrl,
+        videoUrl:videoUrl,
         videoTitle,
         videoDescription,
         videoThumbnail: videoThumbUrl,
@@ -79,7 +80,7 @@ export async function uploadVideo(req: Request, res: Response) {
         courseDescription,
         courseFess: { free, paid },
         videos: [{
-          videoUrl: '',
+          videoUrl: videoUrl,
           videoTitle,
           videoDescription,
           videoThumbnail: videoThumbUrl,
@@ -94,6 +95,12 @@ export async function uploadVideo(req: Request, res: Response) {
       user.courses.push(course);
     }
 
+    // Update free/paid based on the value of "paid"
+    if (paid === null) {
+      course.courseFess.free = 0;
+    } else {
+      course.courseFess.paid = paid;
+    }
 
     await user.save();
 

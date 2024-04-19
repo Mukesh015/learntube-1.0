@@ -1156,6 +1156,11 @@ node-fetch@^2.6.7:
   dependencies:
     whatwg-url "^5.0.0"
 
+nodemailer-email-sender@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/nodemailer-email-sender/-/nodemailer-email-sender-1.0.1.tgz#52162eacc1fee05ab8c49f89aa0b26168c316527"
+  integrity sha512-Kc65oIF1TTEkFUcD5wcfLPKrxgLsOHkV31UhWvhrH9JN2tRxSxCDWWSYf1cK4JerJqb2PQIfX+bzBNz1iw51pA==
+
 nodemailer@^6.9.13:
   version "6.9.13"
   resolved "https://registry.yarnpkg.com/nodemailer/-/nodemailer-6.9.13.tgz#5b292bf1e92645f4852ca872c56a6ba6c4a3d3d6"
