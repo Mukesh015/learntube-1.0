@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import { UserModel, UserDocument } from "../models/user";
+import { transporter } from '../middlewares/user';
 import bcrypt from 'bcrypt';
 import * as cloudinary from 'cloudinary';
 import dotenv from "dotenv";
@@ -54,11 +55,11 @@ async function cloudinaryImageUploadMethod(file: string): Promise<CloudinaryImag
 export async function createChannel(req: Request, res: Response) {
 
   const { email, channelName, firstName, gender, contactNumber, city, state, country, pinCode,
-    recoveryEmail, occupation, channelDescription, any, Facebook, Instagram, Twitter, Github, LinkedIn, Discord,addressLine } = req.body;
+    recoveryEmail, occupation, channelDescription, any, Facebook, Instagram, Twitter, Github, LinkedIn, Discord, addressLine } = req.body;
   const contactnumber = parseInt(contactNumber)
   const pincode = parseInt(pinCode)
   const channelId = `@${channelName}`
-  console.log("email",email)
+  console.log("email", email)
   let channelLogo: string | null = null;
   let coverPhoto: string | null = null;
 
@@ -67,8 +68,8 @@ export async function createChannel(req: Request, res: Response) {
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    if(user.isCreator==true) {
-    return res.status(400).json({ message: 'User already has a channel' });
+    if (user.isCreator == true) {
+      return res.status(400).json({ message: 'User already has a channel' });
     }
     const urls: string[] = [];
     const files: Express.Multer.File[] = req.files as Express.Multer.File[];
@@ -97,7 +98,7 @@ export async function createChannel(req: Request, res: Response) {
     user.channelDescription = channelDescription;
     user.occupation = occupation;
     user.website = { any, Facebook, Twitter, Instagram, Github, LinkedIn, Discord };
-    user.address = { country, state, city, pincode: pincode,addressLine, phone: contactnumber };
+    user.address = { country, state, city, pincode: pincode, addressLine, phone: contactnumber };
 
     await user.save();
 
@@ -165,5 +166,33 @@ export async function handleuservalidation(req: Request, res: Response) {
       console.error("Error:", error);
       res.status(500).send({ message: "Internal Server Error" });
     }
+  }
+}
+
+export async function generateOtp(req: Request, res: Response) {
+  const email = req.body;
+  let newotp = "";
+  for (let i = 0; i <= 3; i++) {
+    newotp += Math.floor(Math.random() * 10).toString();
+  }
+  try {
+    const mailOptions = {
+      from: "bikikutta25@gmail.com",
+      to: email.email,
+      subject: "OTP-Verification",
+      text: `Please use the code below to confirm your email address. This code will expire in 2 hours. If you don't think you should be receiving this email, you can safely ignore it. 
+        ${newotp}`,
+    };
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        res.status(500).send("Error sending email")
+      } else {
+        console.log("Email sent: " + info.response);
+      }
+    });
+    res.status(200).send({ message: "OTP sent successfully", otp: newotp });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: "OTP generation failed" });
   }
 }

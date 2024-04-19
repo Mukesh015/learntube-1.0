@@ -13,7 +13,7 @@ const CreatorRegisterForm: React.FC = () => {
     const [email, setEmail] = useState<string>("");
     const [verifyEmail, setVerifyEmail] = useState<string>("");
     const [channelName, setChannelName] = useState<string>("");
-    const [firstName, setFirstName] = useState<string>("");
+    const [name, setName] = useState<string>("");
     const [gender, setGender] = useState<string>("");
     const [contactNumber, setContactNumber] = useState<string>("");
     const [verifyContactNumber, setVerifyContactNumber] = useState<string>("");
@@ -24,18 +24,20 @@ const CreatorRegisterForm: React.FC = () => {
     const [channelAdminName, setChannelAdminName] = useState<string>("");
     const [addressLine, setAddressLine] = useState<string>("");
     const [pinCode, setPincode] = useState<string>();
-    const [address, setAddress] = useState<string>("");
     const [recoveryEmail, setRecoveryEmail] = useState<string>("");
     const [logo, setLogo] = useState<File | null>(null);
     const [cover, setCover] = useState<File | null>(null);
     const [platform, setPlatform] = useState<string>('');
     const [link, setLink] = useState<string>('');
     const [mediaLinks, setMediaLinks] = useState<{ [key: string]: string } | null>(null);
-    const [showEmailOtp, setShowEmailOtp] = useState<Boolean>(true);
-    const [showPhoneOtp, setShowPhoneOtp] = useState<Boolean>(true);
+    const [showEmailOtp, setShowEmailOtp] = useState<Boolean>(false);
+    const [showPhoneOtp, setShowPhoneOtp] = useState<Boolean>(false);
     const [emailOtp, setEmailOtp] = useState("");
     const [phoneOtp, setPhoneOtp] = useState<number>();
     const [confirmObj, setConfirmObj] = useState<any>();
+    const [verify, setVerify] = useState<boolean>(false);
+    const [isVerifed, setIsVerifed] = useState<boolean>(false);
+    const [serverOtp, setServerOtp] = useState<number>();
 
     const platforms = [
         { label: "Your domain", value: "any" },
@@ -46,10 +48,6 @@ const CreatorRegisterForm: React.FC = () => {
         { label: "Twitter", value: "Twitter" },
         { label: "Discord", value: "Discord" }
     ];
-
-    const showDetails = useCallback(async () => {
-        console.log(firstName, email, contactNumber, address, city, pinCode, state, country);
-    }, [firstName, email, contactNumber, address, city, pinCode, state, country])
 
     const handlePersonalInfoForm = useCallback(async () => {
         setPersonalInfoNext(true);
@@ -76,19 +74,21 @@ const CreatorRegisterForm: React.FC = () => {
             setLink('');
         }
     };
-    const handleOtpForm = useCallback(async () => {
+
+    const handleSubmitRegisterForm = useCallback(async () => {
         try {
-            console.log("email",email);
             const creatorForm = new FormData();
+            creatorForm.append('firstName', name);
             creatorForm.append('email', email);
-            creatorForm.append('channelName', channelName);
-            creatorForm.append('firstName', firstName);
             creatorForm.append('gender', gender);
             creatorForm.append('city', city);
             creatorForm.append('state', state);
             creatorForm.append('country', country);
             creatorForm.append('recoveryEmail', recoveryEmail);
             creatorForm.append('addressLine', addressLine);
+            creatorForm.append('channelName', channelName);
+            creatorForm.append('channelAdminName', channelAdminName);
+            creatorForm.append('ChannelDescription', channelDescription);
 
             if (pinCode && contactNumber) {
                 creatorForm.append('contactNumber', contactNumber);
@@ -105,7 +105,7 @@ const CreatorRegisterForm: React.FC = () => {
                 }
             }
             try {
-                const response = await fetch("http://localhost:9063/api/createchannel", {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN}/api/createchannel`, {
                     method: "POST",
                     body: creatorForm
                 })
@@ -142,7 +142,8 @@ const CreatorRegisterForm: React.FC = () => {
         catch (error: any) {
             console.log("Internal server error", error);
         }
-    }, [])
+    }, [name, email, gender, contactNumber, addressLine, city, state, pinCode, country, channelName, channelAdminName, channelDescription, recoveryEmail, mediaLinks, logo, cover]);
+
     const handleLogo = (e: React.ChangeEvent<HTMLInputElement>) => {
         const fileInput = e.target;
         const file = fileInput.files && fileInput.files[0];
@@ -158,7 +159,7 @@ const CreatorRegisterForm: React.FC = () => {
         }
     }
 
-    const sendOtp = useCallback(async () => {
+    const sendPhoneOtp = useCallback(async () => {
         const number = "+91" + verifyContactNumber;
         console.log(number);
         try {
@@ -170,12 +171,47 @@ const CreatorRegisterForm: React.FC = () => {
         }
     }, [emailOtp, verifyEmail, setConfirmObj, verifyContactNumber, phoneOtp])
 
+    const sendEmailOtp = useCallback(async () => {
+        if (!verifyEmail || email === "" || email !== verifyEmail || verifyEmail === "") {
+            toast.error("Please enter valid email or emails does not macth", {
+                position: "top-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "dark",
+            });
+            return;
+        }
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN}/api/generateotp`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email: verifyEmail
+                })
+            });
+            const data = await response.json();
+            setServerOtp(data.otp);
+
+        } catch (error) {
+            console.log("Cant send otp, server error", error);
+        }
+        setShowEmailOtp(true);
+    }, [setShowEmailOtp, verifyEmail, setServerOtp, serverOtp]);
+
     const validateOtp = useCallback(async () => {
-        console.log(confirmObj);
+        console.log(confirmObj, serverOtp);
         try {
             await confirmObj.confirm(phoneOtp).then(() => {
                 console.log("Success")
+                setShowPhoneOtp(true);
             })
+            
         } catch (err: any) {
             console.log(err.message);
         }
@@ -235,7 +271,7 @@ const CreatorRegisterForm: React.FC = () => {
                                         className="pointer-events-none absolute left-0 top-0 origin-[0_0] border border-solid border-transparent px-3 py-4 text-neutral-500 transition-[opacity,_transform] duration-200 ease-linear peer-focus:-translate-y-2 peer-focus:translate-x-[0.15rem] peer-focus:scale-[0.85] peer-focus:text-primary peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:translate-x-[0.15rem] peer-[:not(:placeholder-shown)]:scale-[0.85] motion-reduce:transition-none dark:text-neutral-400 dark:peer-focus:text-primary"
                                     >Enter email</label>
                                 </div>
-                                <Button className='ml-10 mt-2' color="warning">
+                                <Button onPress={() => sendEmailOtp()} className='ml-10 mt-2' color="warning">
                                     Send
                                 </Button>
                             </div>
@@ -270,7 +306,7 @@ const CreatorRegisterForm: React.FC = () => {
                                         className="pointer-events-none absolute left-0 top-0 origin-[0_0] border border-solid border-transparent px-3 py-4 text-neutral-500 transition-[opacity,_transform] duration-200 ease-linear peer-focus:-translate-y-2 peer-focus:translate-x-[0.15rem] peer-focus:scale-[0.85] peer-focus:text-primary peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:translate-x-[0.15rem] peer-[:not(:placeholder-shown)]:scale-[0.85] motion-reduce:transition-none dark:text-neutral-400 dark:peer-focus:text-primary"
                                     >Enter phone number</label>
                                 </div>
-                                <Button onPress={sendOtp} className='ml-10 mt-2' color="warning">
+                                <Button onPress={() => sendPhoneOtp()} className='ml-10 mt-2' color="warning">
                                     Send
                                 </Button>
                             </div>
@@ -292,9 +328,16 @@ const CreatorRegisterForm: React.FC = () => {
                                     >Enter otp</label>
                                 </div>
                             }
-                            <Button onPress={() => validateOtp()} className='mt-16 ml-48 flex' color="danger">
-                                submit
-                            </Button>
+                            {verify ? (
+                                <Button onPress={() => handleSubmitRegisterForm()} className='mt-16 ml-48 flex' color="danger">
+                                    submit
+                                </Button>
+                            ) : (
+                                <Button onPress={() => validateOtp()} className='mt-16 ml-48 flex' color="danger">
+                                    verify
+                                </Button>
+                            )}
+
                         </div>
                     </div >
                 </div >
@@ -496,8 +539,8 @@ const CreatorRegisterForm: React.FC = () => {
                                         className="peer m-0 block h-[58px] w-full rounded border border-solid border-secondary-500 bg-transparent bg-clip-padding px-3 py-4 text-base font-normal leading-tight text-neutral-700 transition duration-200 ease-linear placeholder:text-transparent focus:border-primary focus:pb-[0.625rem] focus:pt-[1.625rem] focus:text-neutral-700 focus:outline-none peer-focus:text-primary dark:border-neutral-400 dark:text-white dark:autofill:shadow-autofill dark:focus:border-primary dark:peer-focus:text-primary [&:not(:placeholder-shown)]:pb-[0.625rem] [&:not(:placeholder-shown)]:pt-[1.625rem]"
                                         id="floatingInput"
                                         placeholder="Enter your first name"
-                                        onChange={(e) => setFirstName(e.target.value)}
-                                        value={firstName}
+                                        onChange={(e) => setName(e.target.value)}
+                                        value={name}
                                     />
                                     <label
                                         htmlFor="floatingInput"

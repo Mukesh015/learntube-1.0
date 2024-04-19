@@ -15,7 +15,7 @@ const queries = {
     getCourseName: async (_: any, { email }: { email: string }) => {
         try {
             const videoDetails: VideoDocument | null = await VideoModel.findOne({ email });
-    
+            
             if (!videoDetails) {
                 throw new Error('User not found');
             }

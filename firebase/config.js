@@ -46,8 +46,8 @@ const otpValidation = async (number) => {
   return signInWithPhoneNumber(auth, number, recaptchaVerifier);
 };
 
-const getDownloadLink = (path) => {
-  return getDownloadURL(ref(storage, path));
+const getDownloadLink = async (path) => {
+  return await getDownloadURL(ref(storage, path));
 };
 
 export {
