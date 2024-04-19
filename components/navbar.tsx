@@ -222,7 +222,7 @@ const Navbar: React.FC = () => {
                         </Tooltip>
 
                     </li>
-                    <li className="hover:bg-gray-700 rounded-full p-1 cursor-pointer">
+                    <li onClick={() => router.push("/creator/upload")} className="hover:bg-gray-700 rounded-full p-1 cursor-pointer">
                         <Tooltip color="warning" delay={700} showArrow={true} content="Create video">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"

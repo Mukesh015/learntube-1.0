@@ -24,7 +24,7 @@ query Exam($email:String){
 const VideoUploadForm: React.FC = () => {
 
     const [isExistingCourse, setIsExistingCourse] = useState<boolean>(false);
-    const [isPaidCourse, setIsPaidCourse] = useState<string>("");
+    const [isPaidCourse, setIsPaidCourse] = useState<boolean>(false);
     const [showUploadForm, setShowUploadForm] = useState<boolean>(false);
     const [videoFile, setVideoFile] = useState<File | null>(null);
     const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
@@ -41,14 +41,15 @@ const VideoUploadForm: React.FC = () => {
     const [videotags, setVideoTags] = useState<string>('');
     const [videoUrl, setVideoUrl] = useState<string>('');
     const [courseList, setCourseList] = useState<{ label: string; value: string }[]>([]);
-    const [showSpinner, setShowSpinner] = useState<boolean>(false)
+    const [showSpinner, setShowSpinner] = useState<boolean>(false);
+    const [showLoading, setShowLoading] = useState<boolean>(false);
 
     const { loading, error, data } = useQuery(GET_COURSENAME, {
         variables: { email: email },
     });
 
     const handleSubmitForm = useCallback(async () => {
-        console.log("url is:", videoUrl)
+        setShowLoading(true);
         try {
             const VideoUploadForm = new FormData();
             VideoUploadForm.append('email', email);
@@ -80,6 +81,8 @@ const VideoUploadForm: React.FC = () => {
                         progress: undefined,
                         theme: "light",
                     });
+                    setShowLoading(false);
+                    
 
                 } else {
                     toast.error("Video upload failed", {
@@ -101,7 +104,7 @@ const VideoUploadForm: React.FC = () => {
         } catch (error: any) {
             throw new Error('Form operation failed', error);
         }
-    }, [email, courseName, courseDescription, videoTitle, videoDescription, price, videoUrl, videotags, thumbnailFile, courseThumbnailFile]);
+    }, [email, setShowSpinner, courseName, courseDescription, videoTitle, videoDescription, price, videoUrl, videotags, thumbnailFile, courseThumbnailFile]);
 
 
     const handleVideoFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -140,7 +143,7 @@ const VideoUploadForm: React.FC = () => {
             }));
             setCourseList(updatedCourseList);
         }
-    }, [user, data, email,courseList]);
+    }, [user, data, email, courseList]);
     return (
         <>
             <ToastContainer />
@@ -221,8 +224,8 @@ const VideoUploadForm: React.FC = () => {
                                         label="Is this a paid course"
                                         orientation="horizontal"
                                     >
-                                        <Radio onChange={(e) => setIsPaidCourse(e.target.value)} value="paid">Yes</Radio>
-                                        <Radio onChange={(e) => setIsPaidCourse(e.target.value)} value="free">No</Radio>
+                                        <Radio onClick={() => setIsPaidCourse(true)} value="paid">Yes</Radio>
+                                        <Radio onClick={() => setIsPaidCourse(false)} value="free">No</Radio>
                                     </RadioGroup>
                                     {isPaidCourse &&
                                         <Input className="mb-5"
@@ -342,6 +345,9 @@ const VideoUploadForm: React.FC = () => {
                             {allFileUploaded ? (
                                 <Button className='mt-5 ml-48 flex font-semibold' color="danger" onClick={handleSubmitForm}>
                                     Submit
+                                    {showLoading &&
+                                        <Spinner color="success" size="sm" />
+                                    }
                                 </Button>
                             ) : (
                                 <Button className='mt-5 ml-48 flex text-white font-semibold' color="warning" onClick={upload}>

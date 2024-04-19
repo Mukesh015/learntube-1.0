@@ -152,7 +152,7 @@ export async function getUserDetails(req: Request, res: Response) {
 
 
 
-export async function handleuservalidation(req: Request, res: Response) {
+export async function userValidation(req: Request, res: Response) {
   const { email, username, avatar } = req.body;
   if (email) {
     try {
@@ -160,9 +160,9 @@ export async function handleuservalidation(req: Request, res: Response) {
       if (existingUser) {
         res.status(200).send({ message: "User already exists" });
       } else {
-        const newUser = new UserModel({ email: email, username: username, avatar: avatar });
+        const newUser = new UserModel({ email: email, username: username, avatar: avatar, password: `${username}@${Date.now()}` });
         await newUser.save();
-        res.status(201).send({ message: "User registered successfully" });
+        res.status(201).send({ message: "User registered successfully", user: newUser });
       }
     } catch (error) {
       console.error("Error:", error);

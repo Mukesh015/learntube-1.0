@@ -31,32 +31,30 @@ const Login: React.FC = () => {
                     const res = await signInWithGoogle();
                     setGoogleLoading(false);
                     if (res) {
-                        toast.success("Login success", {
-                            position: "top-center",
-                            autoClose: 1000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: true,
-                            progress: undefined,
-                            theme: "light",
+                        const response = await fetch(`${process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN}/api/validation`, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                email: res.user.email,
+                                avatar: res.user.photoURL,
+                                username: res.user.displayName
+                            })
                         });
-                        setLoading(true);
-                        setTimeout(() => {
-                            router.push("/");
-                        }, 2000);
-                    }
-                    else {
-                        toast.error("Something went wrong, please try again", {
-                            position: "top-center",
-                            autoClose: 1000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: true,
-                            progress: undefined,
-                            theme: "light",
-                        });
+                        if (response.ok) {
+                            toast.success("Login success", {
+                                position: "top-center",
+                                autoClose: 1000,
+                                hideProgressBar: false,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                                draggable: true,
+                                progress: undefined,
+                                theme: "light",
+                            });
+                            router.push("/")
+                        }
                     }
                 } else if (provider === "email") {
                     if (!email && !password) {
