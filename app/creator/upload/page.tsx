@@ -1,5 +1,5 @@
 "use client"
-import { getDownloadLink, uploadVideo } from "@/firebase/config";
+import { getDownloadLink, uploadVideo } from "@/configurations/firebase/config";
 import React, { useCallback, useState, useEffect } from "react";
 import { Input } from "@nextui-org/react";
 import { RadioGroup, Radio } from "@nextui-org/react";
@@ -9,7 +9,7 @@ import { Button } from "@nextui-org/react";
 import { Progress } from "@nextui-org/react";
 import { useQuery, gql } from '@apollo/client';
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "@/firebase/config";
+import { auth } from "@/configurations/firebase/config";
 import { toast, ToastContainer } from "react-toastify";
 
 

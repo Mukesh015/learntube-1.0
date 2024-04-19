@@ -12,7 +12,7 @@ import { Button } from "@nextui-org/button";
 import { Switch } from "@nextui-org/react";
 import { MoonIcon } from "@/components/MoonIcon";
 import { SunIcon } from "@/components/SunIcon";
-import { auth } from "@/firebase/config";
+import { auth } from "@/configurations/firebase/config";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/react";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Input } from "@nextui-org/react";
 

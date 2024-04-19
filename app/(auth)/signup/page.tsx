@@ -3,7 +3,7 @@ import { Spinner } from "@nextui-org/spinner";
 import { toast, ToastContainer } from "react-toastify";
 import LoadingEffect from "@/components/loading";
 import React, { useCallback, useState } from "react";
-import { auth } from "@/firebase/config";
+import { auth } from "@/configurations/firebase/config";
 import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
 import { useRouter } from "next/navigation";
 

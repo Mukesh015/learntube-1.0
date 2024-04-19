@@ -1,10 +1,10 @@
 "use client"
 
 import React, { useCallback, useState } from "react";
-import { uploadThumbnail, getDownloadLink } from "@/firebase/config";
+import { uploadThumbnail, getDownloadLink } from "@/configurations/firebase/config";
 import { useSelector, useDispatch } from 'react-redux'
-import { decrement, increment } from '../../redux/features/todos/counter'
-import { RootState } from '../../redux/store';
+import { decrement, increment } from '@/configurations/redux/features/todos/counter'
+import { RootState } from '@/configurations/redux/store';
 const App = () => {
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const count = useSelector((state: RootState) => state.counter.value);

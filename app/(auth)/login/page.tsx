@@ -10,7 +10,7 @@ import {
     useSignInWithGoogle,
     useSignInWithEmailAndPassword,
 } from "react-firebase-hooks/auth";
-import { auth } from "@/firebase/config";
+import { auth } from "@/configurations/firebase/config";
 
 const Login: React.FC = () => {
     const [email, setEmail] = useState<string>("");

@@ -55,7 +55,11 @@ async function cloudinaryImageUploadMethod(file: string): Promise<CloudinaryImag
 export async function createChannel(req: Request, res: Response) {
 
   const { email, channelName, firstName, gender, contactNumber, city, state, country, pinCode,
-    recoveryEmail, occupation, channelDescription, any, Facebook, Instagram, Twitter, Github, LinkedIn, Discord, addressLine } = req.body;
+    recoveryEmail, channelAdminName, ChannelDescription, any, Facebook, Instagram, Twitter, Github, LinkedIn, Discord, addressLine } = req.body;
+
+  console.log(email, channelName, firstName, gender, contactNumber, city, state, country, pinCode,
+    recoveryEmail, channelAdminName, ChannelDescription, addressLine)
+
   const contactnumber = parseInt(contactNumber)
   const pincode = parseInt(pinCode)
   const channelId = `@${channelName}`
@@ -95,13 +99,11 @@ export async function createChannel(req: Request, res: Response) {
     user.gender = gender;
     user.recoveryEmail = recoveryEmail;
     user.channelId = channelId;
-    user.channelDescription = channelDescription;
-    user.occupation = occupation;
+    user.channelDescription = ChannelDescription;
     user.website = { any, Facebook, Twitter, Instagram, Github, LinkedIn, Discord };
     user.address = { country, state, city, pincode: pincode, addressLine, phone: contactnumber };
 
     await user.save();
-
     res.status(200).json({ message: 'Channel created successfully' });
   } catch (err) {
     console.error(err);
@@ -121,29 +123,28 @@ async function getUserByUsername(email: string): Promise<UserDocument | null> {
 }
 
 export async function getUserDetails(req: Request, res: Response) {
-  const { email } = req.body;
-  console.log(email)
+
   try {
-    const user = await getUserByUsername(email);
-    if (user) {
-      const userDetailsArray = [
-        {
-          email: user.email,
-          username: user.username,
-          password: user.password,
-          avatar: user.avatar,
-          isCreator: user.isCreator,
-          channelName: user.channelName,
-          channelLogo: user.channelLogo,
-          history: user.history,
-          analytics: user.analytics
-        }
-      ];
-      res.status(200).send(userDetailsArray);
+    const users: UserDocument[] = await UserModel.find();
+    if (users && users.length > 0) {
+      const userDetailsArray = users.map(user => ({
+        email: user.email,
+        username: user.username,
+        password: user.password,
+        avatar: user.avatar,
+        isCreator: user.isCreator,
+        channelName: user.channelName,
+        channelLogo: user.channelLogo,
+        history: user.history,
+        analytics: user.analytics
+  
+      }));
+      res.status(200).json(userDetailsArray);
     } else {
-      res.status(404).json({ message: 'User not found' });
+      res.status(404).json({ message: 'Users not found' });
     }
   } catch (error) {
+    console.error('Error fetching user details:', error);
     res.status(500).json({ message: 'Server error' });
   }
 }
