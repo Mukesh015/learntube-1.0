@@ -2,10 +2,13 @@
 
 import React, { useCallback, useState } from "react";
 import { uploadThumbnail, getDownloadLink } from "@/firebase/config";
-
+import { useSelector, useDispatch } from 'react-redux'
+import { decrement, increment } from '../../redux/features/todos/counter'
+import { RootState } from '../../redux/store';
 const App = () => {
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
-  
+  const count = useSelector((state: RootState) => state.counter.value);
+  const dispatch = useDispatch()
   const upload = useCallback(async () => {
     const result = await uploadThumbnail(thumbnailFile);
     const path = result.ref.fullPath
@@ -42,6 +45,21 @@ const App = () => {
             </div>
           </div>
           <button onClick={upload}>Submit</button>
+          <div>
+            <button
+              aria-label="Increment value"
+              onClick={() => dispatch(increment())}
+            >
+              Increment
+            </button>
+            <span>{count}</span>
+            <button
+              aria-label="Decrement value"
+              onClick={() => dispatch(decrement())}
+            >
+              Decrement
+            </button>
+          </div>
         </div>
       </div>
     </div>

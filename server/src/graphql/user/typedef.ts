@@ -5,4 +5,11 @@ type creator{
 type courseName{
     courseNames: String
 }
+type courseName{
+    courseNames: String
+}
+type videoUrl{
+    allVideoUrls: String
+    allThumbnailUrls: String
+}
 `;
