@@ -253,7 +253,10 @@ const Navbar: React.FC = () => {
                     <li className="cursor-pointer">
                         <Dropdown placement="bottom-end">
                             <DropdownTrigger>
-                                <div>
+                                <Button
+                                    isIconOnly
+                                    variant="light"
+                                >
                                     {avatar ? (
                                         <img className="h-8 w-8 rounded-full" src={avatar} alt="" />
                                     ) : (
@@ -263,7 +266,7 @@ const Navbar: React.FC = () => {
                                             alt=""
                                         />
                                     )}
-                                </div>
+                                </Button>
                             </DropdownTrigger>
                             {user ? (
                                 <DropdownMenu aria-label="Profile Actions" variant="flat">
@@ -280,7 +283,7 @@ const Navbar: React.FC = () => {
                                     <DropdownItem onPress={() => handleModelOpen("avatarChange")} key="avatar">
                                         Change avatar
                                     </DropdownItem>
-                                    <DropdownItem key="team_settings">Switch account</DropdownItem>
+                                    <DropdownItem key="Switch-account">Switch account</DropdownItem>
                                     <DropdownItem onPress={() => handleLogout()} key="logout" color="danger">
                                         Log Out
                                     </DropdownItem>
@@ -297,7 +300,6 @@ const Navbar: React.FC = () => {
                                 </DropdownMenu>
                             )}
                         </Dropdown>
-
                     </li>
                 </ul>
             </nav >
