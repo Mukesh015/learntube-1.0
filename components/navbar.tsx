@@ -51,8 +51,16 @@ const Navbar: React.FC = () => {
         variables: { email: email },
     });
 
+    const handleCreateVideo = useCallback(async () => {
+        if (isCreator) {
+            router.push("/creator/upload")
+        } else {
+            router.push("/creator/register")
+        }
+    }, [isCreator])
 
-    
+
+
     const handleUpdateProfile = useCallback(async () => {
         if (!newInfo) {
             console.log("Input field cannot be empty");
@@ -144,12 +152,12 @@ const Navbar: React.FC = () => {
         if (data && email !== "") {
             const verifyIsCreator = data.getIsCreator[0].isCreator
             setIsCreator(verifyIsCreator);
-            console.log("Veify creator",isCreator)
+            console.log("Veify creator", isCreator)
         }
         else {
             console.log("User is not available");
         }
-    }, [user,isCreator,data]);
+    }, [user, isCreator, data]);
 
     return (
         <>
@@ -246,7 +254,7 @@ const Navbar: React.FC = () => {
                         </Tooltip>
 
                     </li>
-                    <li onClick={() => router.push("/creator/upload")} className="hover:bg-gray-700 rounded-full p-1 cursor-pointer">
+                    <li onClick={() => handleCreateVideo()} className="hover:bg-gray-700 rounded-full p-1 cursor-pointer">
                         <Tooltip color="warning" delay={700} showArrow={true} content="Create video">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
