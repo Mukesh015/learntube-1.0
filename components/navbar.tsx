@@ -15,6 +15,16 @@ import { SunIcon } from "@/components/SunIcon";
 import { auth } from "@/configurations/firebase/config";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/react";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Input } from "@nextui-org/react";
+import { gql, useQuery } from "@apollo/client";
+
+
+const VERIFY_CREATOR = gql`
+query Exam($email:String){
+    getIsCreator(email: $email) {
+        isCreator
+      }
+  }
+`
 
 const Navbar: React.FC = () => {
     // React components
@@ -24,6 +34,8 @@ const Navbar: React.FC = () => {
     const [headerText, setHeaderText] = useState<string>("");
     const [newInfo, setnewInfo] = useState<string>("");
     const [toUpdate, settoUpdate] = useState<string>("");
+    const [isCreator, setIsCreator] = useState<string>("");
+
     const [spinnerButton, setspinnerButton] = useState<boolean>(false);
 
     const router = useRouter();
@@ -34,6 +46,13 @@ const Navbar: React.FC = () => {
 
     const { isOpen, onOpen, onClose } = useDisclosure();
 
+
+    const { loading, error, data } = useQuery(VERIFY_CREATOR, {
+        variables: { email: email },
+    });
+
+
+    
     const handleUpdateProfile = useCallback(async () => {
         if (!newInfo) {
             console.log("Input field cannot be empty");
@@ -116,16 +135,21 @@ const Navbar: React.FC = () => {
         }
     }, []);
 
-
     useEffect(() => {
         if (user) {
             setuserName(user.displayName || "");
             setavatar(user.photoURL || "");
             setEmail(user.email || "");
-        } else {
+        }
+        if (data && email !== "") {
+            const verifyIsCreator = data.getIsCreator[0].isCreator
+            setIsCreator(verifyIsCreator);
+            console.log("Veify creator",isCreator)
+        }
+        else {
             console.log("User is not available");
         }
-    }, [user]);
+    }, [user,isCreator,data]);
 
     return (
         <>
