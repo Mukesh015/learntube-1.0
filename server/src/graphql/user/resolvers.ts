@@ -88,19 +88,18 @@ const queries = {
                             thumbnail: Video.videoThumbnail,
                             videoTitle: Video.videoTitle,
                             uploadAt: Video.videoPublishedAt,
-                            channelLogo: channelLogo // Adding channel logo to the video details
+                            channelLogo: channelLogo 
                         });
                     }
                 }
             }
-            console.log(allVideoThumbUrls)
             return allVideoThumbUrls.map(videothumb => ({
                 allVideoUrls: videothumb.videoUrl,
                 allThumbnailUrls: videothumb.thumbnail,
                 allVideoTitles: videothumb.videoTitle,
                 allEmail: videothumb.email,
                 uploadAt: videothumb.uploadAt,
-                channelLogo: videothumb.channelLogo // Including channel logo in the response
+                channelLogo: videothumb.channelLogo 
             }));
         } catch (error) {
             console.error('Error fetching video URLs:', error);
