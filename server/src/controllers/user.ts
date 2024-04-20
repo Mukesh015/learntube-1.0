@@ -123,29 +123,28 @@ async function getUserByUsername(email: string): Promise<UserDocument | null> {
 }
 
 export async function getUserDetails(req: Request, res: Response) {
-  const { email } = req.body;
-  console.log(email)
+
   try {
-    const user = await getUserByUsername(email);
-    if (user) {
-      const userDetailsArray = [
-        {
-          email: user.email,
-          username: user.username,
-          password: user.password,
-          avatar: user.avatar,
-          isCreator: user.isCreator,
-          channelName: user.channelName,
-          channelLogo: user.channelLogo,
-          history: user.history,
-          analytics: user.analytics
-        }
-      ];
-      res.status(200).send(userDetailsArray);
+    const users: UserDocument[] = await UserModel.find();
+    if (users && users.length > 0) {
+      const userDetailsArray = users.map(user => ({
+        email: user.email,
+        username: user.username,
+        password: user.password,
+        avatar: user.avatar,
+        isCreator: user.isCreator,
+        channelName: user.channelName,
+        channelLogo: user.channelLogo,
+        history: user.history,
+        analytics: user.analytics
+  
+      }));
+      res.status(200).json(userDetailsArray);
     } else {
-      res.status(404).json({ message: 'User not found' });
+      res.status(404).json({ message: 'Users not found' });
     }
   } catch (error) {
+    console.error('Error fetching user details:', error);
     res.status(500).json({ message: 'Server error' });
   }
 }

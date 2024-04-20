@@ -95,7 +95,6 @@ export async function uploadVideo(req: Request, res: Response) {
       user.courses.push(course);
     }
 
-    // Update free/paid based on the value of "paid"
     if (paid === null) {
       course.courseFess.free = 0;
     } else {
@@ -113,10 +112,9 @@ export async function uploadVideo(req: Request, res: Response) {
 
 
 export async function getVideoDetails(req: Request, res: Response) {
-  const { email } = req.body;
-  console.log(email);
+
   try {
-    const videos: VideoDocument[] = await VideoModel.find({ email: email });
+    const videos: VideoDocument[] = await VideoModel.find();
 
 
     const videoDetails = videos.map(video => ({
@@ -143,7 +141,6 @@ export async function getVideoDetails(req: Request, res: Response) {
 
     res.status(200).json({ videoDetails });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 }
