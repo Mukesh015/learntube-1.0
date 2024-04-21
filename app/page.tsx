@@ -34,10 +34,16 @@ const Home: React.FC = () => {
     const uploadDate = new Date(uploadAt);
     const currentDate = new Date();
     const timeDiff = Math.abs(currentDate.getTime() - uploadDate.getTime());
-    const days = Math.floor(timeDiff / (1000 * 3600 * 24));
-    return `${days} days ago`;
+    const hours = Math.floor(timeDiff / (1000 * 3600));
+    const days = Math.floor(hours / 24);
+  
+    if (days >= 1) {
+      return `${days} day${days > 1 ? 's' : ''} ago`;
+    } else {
+      return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+    }
   };
-
+  
   return (
     <>
       <div>

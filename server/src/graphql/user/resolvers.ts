@@ -31,7 +31,7 @@ const queries = {
             const response = await axios.post(`${process.env.server_domain}/api/getuserdetails`);
             const userDetails = response.data.find((detail: any) => detail.email === email);
             if (!userDetails) {
-                throw new Error('User details not found');
+                return ("User not found");
             }
             return [{ isCreator: userDetails.isCreator }];
         } catch (error) {
@@ -44,7 +44,7 @@ const queries = {
             const response = await axios.post(`${process.env.server_domain}/api/getuserdetails`);
             const userDetails: User[] = response.data;
             const creators = userDetails.filter(user => user.isCreator);
-            return creators.map(creator => ({ channelLogo: creator.channelLogo,email: creator.email}));
+            return creators.map(creator => ({ channelLogo: creator.channelLogo, email: creator.email }));
         } catch (error) {
             console.error('Error fetching channellogo:', error);
             throw new Error('Error fetching channellogo');
@@ -56,7 +56,7 @@ const queries = {
 
             const userDetails = response.data.videoDetails.find((detail: any) => detail.email === email);
             if (!userDetails) {
-                throw new Error('User details not found');
+                return ('User details not found');
             }
 
             const courseNames: string[] = userDetails.courses.map((course: any) => course.courseName);
@@ -71,7 +71,7 @@ const queries = {
         try {
             const videoDetailsResponse = await axios.post(`${process.env.server_domain}/video/getvideodetails`);
             const allVideoThumbUrls: VideoInfo[] = [];
-    
+
             for (const video of videoDetailsResponse.data.videoDetails) {
                 for (const course of video.courses) {
                     for (const Video of course.videos) {
@@ -83,9 +83,9 @@ const queries = {
                             thumbnail: Video.videoThumbnail,
                             videoTitle: Video.videoTitle,
                             uploadAt: Video.videoPublishedAt,
-                             videoId: Video.videoId,
+                            videoId: Video.videoId,
 
-                            channelLogo: channelLogo 
+                            channelLogo: channelLogo
                         });
                     }
                 }
@@ -97,7 +97,7 @@ const queries = {
                 allEmail: videothumb.email,
                 uploadAt: videothumb.uploadAt,
                 videoId: videothumb.videoId,
-                channelLogo: videothumb.channelLogo 
+                channelLogo: videothumb.channelLogo
             }));
         } catch (error) {
             console.error('Error fetching video URLs:', error);
