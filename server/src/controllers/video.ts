@@ -30,25 +30,9 @@ async function cloudinaryImageUploadMethod(file: string): Promise<CloudinaryImag
 
 export async function uploadVideo(req: Request, res: Response) {
   try {
-    const { email, courseName, courseDescription, free, paid, videoTitle, videoDescription, videoTags, videoUrl } = req.body;
-    console.log('Uploading video', videoUrl,"couseprice paid",paid,"couseprice free",free)
-    let videoThumbUrl: string | null = null;
-    let courseThumbUrl: string | null = null;
-    const urls: string[] = [];
-    const files: Express.Multer.File[] = req.files as Express.Multer.File[];
-    for (const file of files) {
-      const { path } = file;
-      try {
-        const newPath = await cloudinaryImageUploadMethod(path);
-        urls.push(newPath.res);
-      } catch (err) {
-        console.error(err);
-        return res.status(500).json({ message: 'Error uploading image' });
-      }
-    }
+    const { email, courseName, courseDescription, free, paid, videoTitle, courseThumbnail, videoThumbnail, videoDescription, videoTags, videoUrl } = req.body;
+    console.log(email, courseName, courseDescription, free, paid, videoTitle, courseThumbnail, videoThumbnail, videoDescription, videoTags, videoUrl)
 
-    videoThumbUrl = urls[0];
-    courseThumbUrl = urls[1];
     let user: VideoDocument | null = await VideoModel.findOne({ email });
 
     if (!user) {
@@ -62,10 +46,10 @@ export async function uploadVideo(req: Request, res: Response) {
 
     if (course) {
       course.videos.push({
-        videoUrl:videoUrl,
+        videoUrl: videoUrl,
         videoTitle,
         videoDescription,
-        videoThumbnail: videoThumbUrl,
+        videoThumbnail: videoThumbnail,
         videoPublishedAt: new Date(),
         videoTags,
         videoViewCount: 0,
@@ -76,14 +60,14 @@ export async function uploadVideo(req: Request, res: Response) {
     } else {
       course = {
         courseName,
-        courseThumbUrl: courseThumbUrl,
+        courseThumbUrl: courseThumbnail,
         courseDescription,
         courseFess: { free, paid },
         videos: [{
           videoUrl: videoUrl,
           videoTitle,
           videoDescription,
-          videoThumbnail: videoThumbUrl,
+          videoThumbnail: videoThumbnail,
           videoPublishedAt: new Date(),
           videoTags,
           videoViewCount: 0,
