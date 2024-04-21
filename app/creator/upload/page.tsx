@@ -51,63 +51,60 @@ const VideoUploadForm: React.FC = () => {
     });
 
     const handleSubmitForm = useCallback(async () => {
+        console.log(thumbnailUrl, courseThumbnailUrl, email);
         setShowLoading(true);
+
         try {
-            const VideoUploadForm = new FormData();
-            VideoUploadForm.append('email', email);
-            VideoUploadForm.append('courseName', courseName);
-            VideoUploadForm.append('courseDescription', courseDescription);
-            VideoUploadForm.append(`${isPaidCourse}`, price);
-            VideoUploadForm.append('videoTitle', videoTitle);
-            VideoUploadForm.append('videoDescription', videoDescription);
-            VideoUploadForm.append('videoUrl', videoUrl);
-            VideoUploadForm.append('videoTags', videotags);
-            VideoUploadForm.append('videoThumbUrl', thumbnailUrl);
-            if (courseThumbnailUrl) {
-                
-                VideoUploadForm.append('courseThumbUrl', courseThumbnailUrl);
-            }
-            try {
-                const response = await fetch("http://localhost:9063/video/uploadvideo", {
-                    method: "POST",
-                    body: VideoUploadForm
+            const response = await fetch(`${process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN}/video/uploadvideo`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email: email,
+                    courseName: courseName,
+                    courseDescription: courseDescription,
+                    price: price,
+                    videoTitle: videoTitle,
+                    videoDescription: videoDescription,
+                    videoUrl: videoUrl,
+                    videoTags: videotags,
+                    videoThumbnail: thumbnailUrl,
+                    courseThumbnail: courseThumbnailUrl
                 })
-                console.log(response);
-                if (response.ok) {
-                    toast.success("Video uploaded", {
-                        position: "top-center",
-                        autoClose: 1000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        progress: undefined,
-                        theme: "light",
-                    });
-                    setShowLoading(false);
-                    
+            })
+            console.log(response);
+            if (response.ok) {
+                toast.success("Video uploaded", {
+                    position: "top-center",
+                    autoClose: 1000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                });
+                setShowLoading(false);
 
-                } else {
-                    toast.error("Video upload failed", {
-                        position: "top-center",
-                        autoClose: 1000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        progress: undefined,
-                        theme: "light",
-                    });
-                }
-            }
-            catch (error: any) {
-                console.log("Internal server error", error);
-            }
 
-        } catch (error: any) {
-            throw new Error('Form operation failed', error);
+            } else {
+                toast.error("Video upload failed", {
+                    position: "top-center",
+                    autoClose: 1000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                });
+            }
         }
-    }, [email, setShowSpinner, courseName, courseDescription, videoTitle, videoDescription, price, videoUrl, videotags, thumbnailUrl, courseThumbnailUrl]);
+        catch (error: any) {
+            console.log("Internal server error", error);
+        }
+    }, [email, setShowSpinner, courseThumbnailUrl, courseName, thumbnailUrl, courseDescription, videoTitle, videoDescription, price, videoUrl, videotags, thumbnailFile]);
 
 
     const handleVideoFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {

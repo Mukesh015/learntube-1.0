@@ -1,37 +1,17 @@
 import express, { Request, Response } from 'express';
 import { VideoModel, VideoDocument } from "../models/video";
-import * as cloudinary from 'cloudinary';
 import dotenv from "dotenv";
 
 dotenv.config({ path: "./.env" });
 
-cloudinary.v2.config({
-  cloud_name: process.env.CLOUD_NAME,
-  api_key: process.env.API_KEY,
-  api_secret: process.env.API_SECRET,
-});
 
 
-type CloudinaryImageUploadResult = { res: string };
-
-
-async function cloudinaryImageUploadMethod(file: string): Promise<CloudinaryImageUploadResult> {
-  return new Promise((resolve, reject) => {
-    cloudinary.v2.uploader.upload(file, (err: Error, res: any) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve({ res: res.url });
-      }
-    });
-  });
-}
 
 
 export async function uploadVideo(req: Request, res: Response) {
   try {
-    const { email, courseName, courseDescription, free, paid, videoTitle, videoDescription, videoTags, videoUrl,videoThumbUrl,courseThumbUrl } = req.body;
-    console.log('Uploading video', videoUrl, "couseprice paid", paid, "couseprice free", free)
+    const { email, courseName, courseDescription, price, videoTitle, videoDescription, videoTags, videoUrl, videoThumbnail, courseThumbUrl } = req.body;
+    console.log(email, courseName, courseDescription, price, videoTitle, videoDescription, videoTags, videoUrl, videoThumbnail, courseThumbUrl)
 
     let user: VideoDocument | null = await VideoModel.findOne({ email });
 
@@ -48,9 +28,9 @@ export async function uploadVideo(req: Request, res: Response) {
       course.videos.push({
         videoUrl: videoUrl,
         videoTitle,
-        videoID: `@${Date.now()}${videoTitle.slice(0,4)}`,
+        videoID: `@${Date.now()}${videoTitle.slice(0, 4)}`,
         videoDescription,
-        videoThumbnail: videoThumbUrl,
+        videoThumbnail: videoThumbnail,
         videoPublishedAt: new Date(),
         videoTags,
         videoViewCount: 0,
@@ -61,15 +41,15 @@ export async function uploadVideo(req: Request, res: Response) {
     } else {
       course = {
         courseName,
-        courseThumbUrl,
+        courseThumbUrl: courseThumbUrl,
         courseDescription,
-        courseFess: { free, paid },
+        courseFess: price ? price : "free",
         videos: [{
           videoUrl: videoUrl,
           videoTitle,
-          videoID: `@${Date.now()}${videoTitle.slice(0,4)}`,
+          videoID: `@${Date.now()}${videoTitle.slice(0, 4)}`,
           videoDescription,
-          videoThumbnail: videoThumbUrl,
+          videoThumbnail: videoThumbnail,
           videoPublishedAt: new Date(),
           videoTags,
           videoViewCount: 0,
@@ -81,7 +61,7 @@ export async function uploadVideo(req: Request, res: Response) {
       user.courses.push(course);
     }
 
-    
+
 
     await user.save();
 
