@@ -63,6 +63,7 @@ export async function uploadVideo(req: Request, res: Response) {
         courseName,
         courseThumbUrl,
         courseDescription,
+        if()
         courseFess: { free, paid },
         videos: [{
           videoUrl: videoUrl,
