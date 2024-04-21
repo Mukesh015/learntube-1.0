@@ -51,58 +51,59 @@ const VideoUploadForm: React.FC = () => {
     });
 
     const handleSubmitForm = useCallback(async () => {
-        console.log(thumbnailUrl, courseThumbnailUrl);
+        console.log(thumbnailUrl, courseThumbnailUrl, email);
         setShowLoading(true);
+
         try {
-            const response = await fetch(${ process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN }/video/uploadvideo, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN}/video/uploadvideo`, {
                 method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
                 body: JSON.stringify({
                     email: email,
                     courseName: courseName,
-                    if(!isExistingCourse){
                     courseDescription: courseDescription,
-                    `${isPaidCourse}`: price,
-                    courseThumbUrl: courseThumbnailUrl
-                    }
+                    price: price,
                     videoTitle: videoTitle,
                     videoDescription: videoDescription,
                     videoUrl: videoUrl,
                     videoTags: videotags,
                     videoThumbnail: thumbnailUrl,
-                    courseThumbnail: courseThumbnailUrl
-                    })
-        })
-    console.log(response);
-    if (response.ok) {
-        toast.success("Video uploaded", {
-            position: "top-center",
-            autoClose: 1000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-        });
-        setShowLoading(false);
+                    courseThumbUrl: courseThumbnailUrl
+                })
+            })
+            console.log(response);
+            if (response.ok) {
+                toast.success("Video uploaded", {
+                    position: "top-center",
+                    autoClose: 1000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                });
+                setShowLoading(false);
 
 
-    } else {
-        toast.error("Video upload failed", {
-            position: "top-center",
-            autoClose: 1000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-        });
-    }
-}
+            } else {
+                toast.error("Video upload failed", {
+                    position: "top-center",
+                    autoClose: 1000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                });
+            }
+        }
         catch (error: any) {
-    throw new Error('Form operation failed', error);
-}
+            console.log("Internal server error", error);
+        }
     }, [email, setShowSpinner, courseThumbnailUrl, courseName, thumbnailUrl, courseDescription, videoTitle, videoDescription, price, videoUrl, videotags, thumbnailFile]);
 
 
