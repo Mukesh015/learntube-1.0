@@ -33,7 +33,7 @@ export async function uploadVideo(req: Request, res: Response) {
         videoThumbnail: videoThumbnail,
         videoPublishedAt: new Date(),
         videoTags,
-        videoViewCount: [{ user: email, timestamp: Date.now() }],
+        videoViews: [{ user: email, timestamp: Date.now() }],
         videoLikeCount: 0,
         videoDislikeCount: 0,
         videoComment: 0
@@ -54,7 +54,7 @@ export async function uploadVideo(req: Request, res: Response) {
           videoThumbnail: videoThumbnail,
           videoPublishedAt: new Date(),
           videoTags,
-          videoViewCount: [{ user: '', timestamp: Date.now() }],
+          videoViews: [{ user: '', timestamp: Date.now() }],
           videoLikeCount: 0,
           videoDislikeCount: 0,
           videoComment: 0
@@ -96,7 +96,8 @@ export async function getVideoDetails(req: Request, res: Response) {
           videoThumbnail: video.videoThumbnail,
           videoPublishedAt: video.videoPublishedAt,
           videoTags: video.videoTags,
-          videoViewCount: video.videoViewCount,
+          videoViews: video.videoViews,
+          videoViewCount:video.videoViews.length,
           videoLikeCount: video.videoLikeCount,
           videoDislikeCount: video.videoDislikeCount,
           videoComment: video.videoComment
@@ -111,7 +112,7 @@ export async function getVideoDetails(req: Request, res: Response) {
 }
 
 
-export async function redirect(req: Request, res: Response){
+export async function redirect(req: Request, res: Response) {
   const videoID: string = req.params.videoID as string;
   const { email } = req.body;
   console.log(videoID, email);
@@ -123,7 +124,8 @@ export async function redirect(req: Request, res: Response){
         $push: {
           "courses.$[course].videos.$[video].videoViews": {
             user: email,
-            timestamp: Date.now()
+            timestamp: Date.now(),
+    
           }
         },
       },

@@ -10,7 +10,8 @@ interface VideoInfo {
     videoTitle: string;
     uploadAt: Date;
     videoId: string;
-    channelLogo?: string;
+    videoViews: number;
+    channelLogo: string | undefined;
 }
 interface User {
     email: string;
@@ -18,6 +19,8 @@ interface User {
     password: string;
     avatar: string;
     isCreator: boolean;
+    videoId: string;
+    videoViews: any;
     channelName?: string;
     channelLogo?: string;
     history: any[];
@@ -44,7 +47,7 @@ const queries = {
             const response = await axios.post(`${process.env.server_domain}/api/getuserdetails`);
             const userDetails: User[] = response.data;
             const creators = userDetails.filter(user => user.isCreator);
-            return creators.map(creator => ({ channelLogo: creator.channelLogo,email: creator.email}));
+            return creators.map(creator => ({ channelLogo: creator.channelLogo, email: creator.email }));
         } catch (error) {
             console.error('Error fetching channellogo:', error);
             throw new Error('Error fetching channellogo');
@@ -71,7 +74,7 @@ const queries = {
         try {
             const videoDetailsResponse = await axios.post(`${process.env.server_domain}/video/getvideodetails`);
             const allVideoThumbUrls: VideoInfo[] = [];
-    
+
             for (const video of videoDetailsResponse.data.videoDetails) {
                 for (const course of video.courses) {
                     for (const Video of course.videos) {
@@ -83,9 +86,9 @@ const queries = {
                             thumbnail: Video.videoThumbnail,
                             videoTitle: Video.videoTitle,
                             uploadAt: Video.videoPublishedAt,
-                             videoId: Video.videoId,
-
-                            channelLogo: channelLogo 
+                            videoId: Video.videoID,
+                            videoViews: Video.videoViewCount,
+                            channelLogo: channelLogo,
                         });
                     }
                 }
@@ -97,7 +100,8 @@ const queries = {
                 allEmail: videothumb.email,
                 uploadAt: videothumb.uploadAt,
                 videoId: videothumb.videoId,
-                channelLogo: videothumb.channelLogo 
+                views: videothumb.videoViews,
+                channelLogo: videothumb.channelLogo
             }));
         } catch (error) {
             console.error('Error fetching video URLs:', error);

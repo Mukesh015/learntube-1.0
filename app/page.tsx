@@ -15,6 +15,7 @@ const HOMEPAGE_DETAILS = gql`
       allVideoUrls
       uploadAt
       videoId
+      views
     }
   }
 `;
