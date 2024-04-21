@@ -16,6 +16,7 @@ type videoUrl{
     allVideoTitles: String
     allEmail: String
     uploadAt: String
+    videoId: String
     channelLogo:String
 }
 `;

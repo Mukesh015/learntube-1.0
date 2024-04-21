@@ -1,5 +1,5 @@
 "use client"
-import { getDownloadLink, uploadVideo } from "@/configurations/firebase/config";
+import { getDownloadLink, uploadVideo, uploadThumbnail } from "@/configurations/firebase/config";
 import React, { useCallback, useState, useEffect } from "react";
 import { Input } from "@nextui-org/react";
 import { RadioGroup, Radio } from "@nextui-org/react";
@@ -29,7 +29,6 @@ const VideoUploadForm: React.FC = () => {
     const [showUploadForm, setShowUploadForm] = useState<boolean>(false);
     const [videoFile, setVideoFile] = useState<File | null>(null);
     const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
-    const [value, setValue] = React.useState(0);
     const [courseThumbnailFile, setCourseThumbnailFile] = useState<File | null>(null);
     const [allFileUploaded, setAllFileUploaded] = useState<boolean>(false);
     const [user] = useAuthState(auth);
@@ -44,6 +43,8 @@ const VideoUploadForm: React.FC = () => {
     const [courseList, setCourseList] = useState<{ label: string; value: string }[]>([]);
     const [showSpinner, setShowSpinner] = useState<boolean>(false);
     const [showLoading, setShowLoading] = useState<boolean>(false);
+    const [thumbnailUrl, setThumbnailUrl] = useState<string>('');
+    const [courseThumbnailUrl, setCourseThumbnailUrl] = useState<string>('');
 
     const { loading, error, data } = useQuery(GET_COURSENAME, {
         variables: { email: email },
@@ -61,9 +62,10 @@ const VideoUploadForm: React.FC = () => {
             VideoUploadForm.append('videoDescription', videoDescription);
             VideoUploadForm.append('videoUrl', videoUrl);
             VideoUploadForm.append('videoTags', videotags);
-            if (thumbnailFile && courseThumbnailFile) {
-                VideoUploadForm.append('video', thumbnailFile);
-                VideoUploadForm.append('video', courseThumbnailFile);
+            VideoUploadForm.append('videoThumbUrl', thumbnailUrl);
+            if (courseThumbnailUrl) {
+                
+                VideoUploadForm.append('courseThumbUrl', courseThumbnailUrl);
             }
             try {
                 const response = await fetch("http://localhost:9063/video/uploadvideo", {
@@ -105,7 +107,7 @@ const VideoUploadForm: React.FC = () => {
         } catch (error: any) {
             throw new Error('Form operation failed', error);
         }
-    }, [email, setShowSpinner, courseName, courseDescription, videoTitle, videoDescription, price, videoUrl, videotags, thumbnailFile, courseThumbnailFile]);
+    }, [email, setShowSpinner, courseName, courseDescription, videoTitle, videoDescription, price, videoUrl, videotags, thumbnailUrl, courseThumbnailUrl]);
 
 
     const handleVideoFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -117,15 +119,31 @@ const VideoUploadForm: React.FC = () => {
         setCourseThumbnailFile(file);
     };
     const upload = useCallback(async () => {
-        setShowSpinner(true);
-        const result = await uploadVideo(videoFile);
-        const path = result.ref.fullPath
-        const link: any = await getDownloadLink(path);
-        setVideoUrl(link);
-        console.log(link);
-        setShowSpinner(false);
-        setAllFileUploaded(true)
-    }, [videoFile, videoUrl, setVideoUrl, setShowSpinner]);
+        try {
+            if (courseThumbnailFile) {
+                setShowSpinner(true);
+                const result3 = await uploadThumbnail(courseThumbnailFile);
+                const thumbnailPath = result3.ref.fullPath;
+                const thumbnailLink = await getDownloadLink(thumbnailPath);
+                setCourseThumbnailUrl(thumbnailLink);
+                console.log(thumbnailLink);
+
+            }
+            setShowSpinner(true);
+            const result1 = await uploadThumbnail(thumbnailFile);
+            const imgPath = result1.ref.fullPath;
+            const imgLink = await getDownloadLink(imgPath);
+            setThumbnailUrl(imgLink);
+            const result2 = await uploadVideo(videoFile);
+            const path = result2.ref.fullPath;
+            const link: any = await getDownloadLink(path);
+            setVideoUrl(link);
+            setShowSpinner(false);
+            setAllFileUploaded(true)
+        } catch (error: any) {
+            throw new Error("Firebase upload failed", error.message);
+        }
+    }, [videoFile, videoUrl, setVideoUrl, setCourseThumbnailUrl, setThumbnailUrl, setShowSpinner]);
 
     const handlethumbnailFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files && event.target.files[0];
@@ -144,7 +162,7 @@ const VideoUploadForm: React.FC = () => {
             }));
             setCourseList(updatedCourseList);
         }
-    }, [user, data, email, courseList]);
+    }, [user, data, email, setCourseList]);
     return (
         <>
             <ToastContainer />
@@ -266,7 +284,7 @@ const VideoUploadForm: React.FC = () => {
                                                 <div className="absolute">
                                                     <div className="flex flex-col items-center">
                                                         <i className="fa fa-folder-open fa-4x text-blue-700">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="90px" viewBox="0 0 24 24" width="90px" fill="#fc6203"><g><rect fill="none" height="24" width="24" /></g><g><path d="M18,15v3H6v-3H4v3c0,1.1,0.9,2,2,2h12c1.1,0,2-0.9,2-2v-3H18z M7,9l1.41,1.41L11,7.83V16h2V7.83l2.59,2.58L17,9l-5-5L7,9z" /></g></svg>
+                                                            <svg xmlns="http://www.w3.org/2000/svg" enableBackground="new 0 0 24 24" height="90px" viewBox="0 0 24 24" width="90px" fill="#fc6203"><g><rect fill="none" height="24" width="24" /></g><g><path d="M18,15v3H6v-3H4v3c0,1.1,0.9,2,2,2h12c1.1,0,2-0.9,2-2v-3H18z M7,9l1.41,1.41L11,7.83V16h2V7.83l2.59,2.58L17,9l-5-5L7,9z" /></g></svg>
                                                         </i>
                                                         <span className="block text-gray-400 font-normal">Upload video thumbnail</span>
                                                     </div>
@@ -308,7 +326,7 @@ const VideoUploadForm: React.FC = () => {
                                                 <div className="absolute">
                                                     <div className="flex flex-col items-center">
                                                         <i className="fa fa-folder-open fa-4x text-blue-700">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="90px" viewBox="0 0 24 24" width="90px" fill="#fc6203"><g><rect fill="none" height="24" width="24" /></g><g><path d="M18,15v3H6v-3H4v3c0,1.1,0.9,2,2,2h12c1.1,0,2-0.9,2-2v-3H18z M7,9l1.41,1.41L11,7.83V16h2V7.83l2.59,2.58L17,9l-5-5L7,9z" /></g></svg>
+                                                            <svg xmlns="http://www.w3.org/2000/svg" enableBackground="new 0 0 24 24" height="90px" viewBox="0 0 24 24" width="90px" fill="#fc6203"><g><rect fill="none" height="24" width="24" /></g><g><path d="M18,15v3H6v-3H4v3c0,1.1,0.9,2,2,2h12c1.1,0,2-0.9,2-2v-3H18z M7,9l1.41,1.41L11,7.83V16h2V7.83l2.59,2.58L17,9l-5-5L7,9z" /></g></svg>
                                                         </i>
                                                         <span className="block text-gray-400 font-normal">Upload your video</span>
                                                     </div>

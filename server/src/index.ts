@@ -7,6 +7,7 @@ import cors from "cors";
 import bodyParser from 'body-parser';
 import VideoRouter from './routes/video';
 import UserRouter from './routes/static';
+import FeaturesRouter from './routes/feature';
 import dotenv from "dotenv";
 import creategraphqlServer from "./graphql";
 dotenv.config({ path: "./.env" });
@@ -29,6 +30,7 @@ async function init() {
     app.use("/graphql", expressMiddleware(await creategraphqlServer(), ));
     app.use("/api", UserRouter);
     app.use("/video", VideoRouter);
+    app.use("/features", FeaturesRouter);
     try {
         await mongoose.connect(DB);
         console.log("DB connected");
