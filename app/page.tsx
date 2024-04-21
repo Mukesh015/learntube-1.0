@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect,useState } from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "@/components/navbar";
 import Sidebar from "@/components/sidebar";
 import { gql, useQuery } from "@apollo/client";
@@ -18,11 +18,11 @@ query Exam{
   }
 `
 
-
 const Home: React.FC = () => {
-  const [homePageDetails, setHomePageDetails] = useState<{ channelLogo: string; allEmail: string;allThumbnailUrls: string; allVideoTitles: string;
-    allVideoUrls: string; uploadAt: string
-   }[]>([]);
+  const [homePageDetails, setHomePageDetails] = useState<{
+    channelLogo: string; allEmail: string; allThumbnailUrls: string;
+    allVideoTitles: string; allVideoUrls: string; uploadAt: string; videoID: string;
+  }[]>([]);
 
 
   const { loading, error, data } = useQuery(HOPAGE_DETAILS);
@@ -31,21 +31,22 @@ const Home: React.FC = () => {
     if (data) {
       const homeDetails = data.getAllVideoUrl.map((url: {
         channelLogo: any, allEmail: any, allThumbnailUrls: any,
-        allVideoTitles: any, allVideoUrls: any, uploadAt: any
+        allVideoTitles: any, allVideoUrls: any, uploadAt: any, videoID: any
       }) => ({
         channelLogo: url.channelLogo,
         allEmail: url.allEmail,
         allThumbnailUrls: url.allThumbnailUrls,
         allVideoTitles: url.allVideoTitles,
         allVideoUrls: url.allVideoUrls,
-        uploadAt: url.uploadAt
+        uploadAt: url.uploadAt,
+        videoID: url.videoID
       }));
       console.log(homeDetails);
       setHomePageDetails(homeDetails);
     } else {
       console.log("User data is not available");
     }
-  }, [data,homePageDetails]);
+  }, [data, setHomePageDetails]);
 
   return (
     <>

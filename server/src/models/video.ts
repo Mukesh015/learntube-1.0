@@ -16,6 +16,7 @@ interface Course {
 interface Video {
     videoUrl: string;
     videoTitle: string;
+    videoID:string;
     videoDescription: string;
     videoThumbnail: string;
     videoPublishedAt: Date;
@@ -45,6 +46,7 @@ const videoSchema = new mongoose.Schema<VideoDocument>(
                     {
                         videoUrl: { type: String },
                         videoTitle: { type: String },
+                        videoID:{ type: String },
                         videoDescription: { type: String },
                         videoThumbnail: { type: String },
                         videoPublishedAt: { type: Date },

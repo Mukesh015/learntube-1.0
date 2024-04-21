@@ -9,6 +9,7 @@ interface VideoInfo {
     thumbnail: string;
     videoTitle: string;
     uploadAt: Date;
+    videoId: string;
     channelLogo?: string;
 }
 interface User {
@@ -71,23 +72,19 @@ const queries = {
             const videoDetailsResponse = await axios.post(`${process.env.server_domain}/video/getvideodetails`);
             const allVideoThumbUrls: VideoInfo[] = [];
     
-            // Iterate through each video detail
             for (const video of videoDetailsResponse.data.videoDetails) {
-                // Iterate through each course
                 for (const course of video.courses) {
-                    // Iterate through each video in the course
                     for (const Video of course.videos) {
-                        // Fetch channel logo for the video's email
                         const channelLogoResponse = await queries.getChannelLogo(undefined, { email: video.email });
                         const channelLogo = channelLogoResponse.find((logo: { email: string; }) => logo.email === video.email)?.channelLogo;
-    
-                        // Push video details along with channel logo to the array
                         allVideoThumbUrls.push({
                             email: video.email,
                             videoUrl: Video.videoUrl,
                             thumbnail: Video.videoThumbnail,
                             videoTitle: Video.videoTitle,
                             uploadAt: Video.videoPublishedAt,
+                             videoId: Video.videoId,
+
                             channelLogo: channelLogo 
                         });
                     }
@@ -99,6 +96,7 @@ const queries = {
                 allVideoTitles: videothumb.videoTitle,
                 allEmail: videothumb.email,
                 uploadAt: videothumb.uploadAt,
+                videoId: videothumb.videoId,
                 channelLogo: videothumb.channelLogo 
             }));
         } catch (error) {
