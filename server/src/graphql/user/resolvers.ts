@@ -34,7 +34,7 @@ const queries = {
             const response = await axios.post(`${process.env.server_domain}/api/getuserdetails`);
             const userDetails = response.data.find((detail: any) => detail.email === email);
             if (!userDetails) {
-                throw new Error('User details not found');
+                return ("User not found");
             }
             return [{ isCreator: userDetails.isCreator }];
         } catch (error) {
@@ -59,7 +59,7 @@ const queries = {
 
             const userDetails = response.data.videoDetails.find((detail: any) => detail.email === email);
             if (!userDetails) {
-                throw new Error('User details not found');
+                return ('User details not found');
             }
 
             const courseNames: string[] = userDetails.courses.map((course: any) => course.courseName);
@@ -109,6 +109,7 @@ const queries = {
         }
     },
     getVideoUrl: async (_: any, { email,videoID }: { email: string, videoID: string})=>{
+        console.log("Getting video URL",videoID)
         try {
             const entry: VideoDocument | null = await VideoModel.findOneAndUpdate(
               { "courses.videos.videoID": videoID },
