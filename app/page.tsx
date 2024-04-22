@@ -4,6 +4,8 @@ import React, { useEffect, useState } from "react";
 import Navbar from "@/components/navbar";
 import Sidebar from "@/components/sidebar";
 import { gql, useQuery } from "@apollo/client";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "@/configurations/firebase/config";
 
 const HOMEPAGE_DETAILS = gql`
   query GetAllVideoUrl {
@@ -22,14 +24,19 @@ const HOMEPAGE_DETAILS = gql`
 
 const Home: React.FC = () => {
   const [homePageDetails, setHomePageDetails] = useState<any[]>([]);
+  const [email, setEmail] = useState<string>("");
 
   const { loading, error, data } = useQuery(HOMEPAGE_DETAILS);
+  const [user] = useAuthState(auth);
 
   useEffect(() => {
+    if (user) {
+      setEmail(user.email || "");
+  }
     if (data) {
       setHomePageDetails(data.getAllVideoUrl);
     }
-  }, [data]);
+  }, [user,setEmail,data]);
 
   const timeSinceUpload = (uploadAt: string) => {
     const uploadDate = new Date(uploadAt);
@@ -60,8 +67,12 @@ const Home: React.FC = () => {
               <div key={index} id={`video-${index}`} className="video-card">
                 <img
                   className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-150 rounded-md"
-                  style={{ height: '250px', width: '350px' }} // Set height and width inline
+                  style={{ height: '250px', width: '350px' }}
                   src={video.allThumbnailUrls}
+                  onClick={() => {
+                    const url = `${process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN}/video/redirect/${video.videoId}/${email}`;
+                    window.location.href = url;
+                  }}
                   alt=""
                 />
                 <div className="flex mt-3 justify-center">
@@ -71,6 +82,7 @@ const Home: React.FC = () => {
                       width={30}
                       className="rounded-full m-1"
                       src={video.channelLogo}
+
                       alt=""
                     />
                   </div>

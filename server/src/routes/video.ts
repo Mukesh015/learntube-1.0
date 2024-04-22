@@ -5,7 +5,7 @@ const VideoRouter = express.Router();
 VideoRouter.post('/uploadvideo', uploadVideo);
 
 VideoRouter.post('/getvideodetails', getVideoDetails);
-VideoRouter.post('/redirect/:videoID', redirect);
+VideoRouter.get('/redirect/:videoID/:email', redirect);
 
 
 export default VideoRouter;

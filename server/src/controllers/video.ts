@@ -114,9 +114,7 @@ export async function getVideoDetails(req: Request, res: Response) {
 
 export async function redirect(req: Request, res: Response) {
   const videoID: string = req.params.videoID as string;
-  const { email } = req.body;
-  console.log(videoID, email);
-
+  const email: string = req.params.email as string;
   try {
     const entry: VideoDocument | null = await VideoModel.findOneAndUpdate(
       { "courses.videos.videoID": videoID },
@@ -150,6 +148,7 @@ export async function redirect(req: Request, res: Response) {
     }
 
     res.redirect(video.videoUrl);
+
   } catch (error) {
     console.error("Error redirecting:", error);
     return res.status(500).json({ error: "Internal Server Error" });
