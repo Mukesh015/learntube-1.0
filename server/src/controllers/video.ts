@@ -33,17 +33,19 @@ export async function uploadVideo(req: Request, res: Response) {
         videoThumbnail: videoThumbnail,
         videoPublishedAt: new Date(),
         videoTags,
-        videoViewCount: 0,
+        videoViews: [{ user: email, timestamp: Date.now() }],
         videoLikeCount: 0,
         videoDislikeCount: 0,
         videoComment: 0
       });
     } else {
+
       course = {
+
         courseName,
         courseThumbUrl: courseThumbUrl,
         courseDescription,
-        courseFess: price ? price : "free",
+        courseFees: { price },
         videos: [{
           videoUrl: videoUrl,
           videoTitle,
@@ -52,7 +54,7 @@ export async function uploadVideo(req: Request, res: Response) {
           videoThumbnail: videoThumbnail,
           videoPublishedAt: new Date(),
           videoTags,
-          videoViewCount: 0,
+          videoViews: [{ user: '', timestamp: Date.now() }],
           videoLikeCount: 0,
           videoDislikeCount: 0,
           videoComment: 0
@@ -85,7 +87,7 @@ export async function getVideoDetails(req: Request, res: Response) {
         courseName: course.courseName,
         courseThumbUrl: course.courseThumbUrl,
         courseDescription: course.courseDescription,
-        courseFess: course.courseFess,
+        courseFess: course.courseFees,
         videos: course.videos.map(video => ({
           videoUrl: video.videoUrl,
           videoID: video.videoID,
@@ -94,7 +96,8 @@ export async function getVideoDetails(req: Request, res: Response) {
           videoThumbnail: video.videoThumbnail,
           videoPublishedAt: video.videoPublishedAt,
           videoTags: video.videoTags,
-          videoViewCount: video.videoViewCount,
+          videoViews: video.videoViews,
+          videoViewCount:video.videoViews.length,
           videoLikeCount: video.videoLikeCount,
           videoDislikeCount: video.videoDislikeCount,
           videoComment: video.videoComment
@@ -105,5 +108,50 @@ export async function getVideoDetails(req: Request, res: Response) {
     res.status(200).json({ videoDetails });
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
+
+
+export async function redirect(req: Request, res: Response) {
+  const videoID: string = req.params.videoID as string;
+  const { email } = req.body;
+  console.log(videoID, email);
+
+  try {
+    const entry: VideoDocument | null = await VideoModel.findOneAndUpdate(
+      { "courses.videos.videoID": videoID },
+      {
+        $push: {
+          "courses.$[course].videos.$[video].videoViews": {
+            user: email,
+            timestamp: Date.now(),
+    
+          }
+        },
+      },
+      {
+        arrayFilters: [{ "course.videos.videoID": videoID }, { "video.videoID": videoID }],
+        new: true,
+      }
+    );
+
+    if (!entry) {
+      return res.status(404).json({ error: "URL not found" });
+    }
+
+    const video = entry.courses.flatMap(course => course.videos).find(video => video.videoID === videoID);
+
+    if (!video) {
+      return res.status(404).json({ error: "videoID not found" });
+    }
+
+    if (!video.videoUrl) {
+      return res.status(404).json({ error: "videoUrl not found" });
+    }
+
+    res.redirect(video.videoUrl);
+  } catch (error) {
+    console.error("Error redirecting:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 }

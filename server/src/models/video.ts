@@ -9,7 +9,7 @@ interface Course {
     courseName: string;
     courseThumbUrl: string;
     courseDescription: string;
-    courseFess: { free: number, paid: number }; 
+    courseFees: {price: number}; 
     videos: Video[];
 }
 
@@ -21,7 +21,7 @@ interface Video {
     videoThumbnail: string;
     videoPublishedAt: Date;
     videoTags: [];
-    videoViewCount: number;
+    videoViews: [{user: string,timestamp: number}];
     videoLikeCount: number;
     videoDislikeCount: number;
     videoComment: number;
@@ -38,9 +38,8 @@ const videoSchema = new mongoose.Schema<VideoDocument>(
                 courseName: { type: String },
                 courseThumbUrl: { type: String },
                 courseDescription: { type: String },
-                courseFess: {
-                    free: { type: Number }, 
-                    paid: { type: Number },
+                courseFees: {
+                    price: { type: Number,default:0 }, 
                 },
                 videos: [
                     {
@@ -51,7 +50,7 @@ const videoSchema = new mongoose.Schema<VideoDocument>(
                         videoThumbnail: { type: String },
                         videoPublishedAt: { type: Date },
                         videoTags: { type: Array<String> },
-                        videoViewCount: { type: Number, default:0},
+                        videoViews: [{ user:String,timestamp: Number }],
                         videoLikeCount: { type: Number, default:0},
                         videoDislikeCount: { type: Number, default:0},
                         videoComment: { type: Number, default:0},

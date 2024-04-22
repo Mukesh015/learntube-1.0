@@ -10,7 +10,8 @@ interface VideoInfo {
     videoTitle: string;
     uploadAt: Date;
     videoId: string;
-    channelLogo?: string;
+    videoViews: number;
+    channelLogo: string | undefined;
 }
 interface User {
     email: string;
@@ -18,6 +19,8 @@ interface User {
     password: string;
     avatar: string;
     isCreator: boolean;
+    videoId: string;
+    videoViews: any;
     channelName?: string;
     channelLogo?: string;
     history: any[];
@@ -83,9 +86,9 @@ const queries = {
                             thumbnail: Video.videoThumbnail,
                             videoTitle: Video.videoTitle,
                             uploadAt: Video.videoPublishedAt,
-                            videoId: Video.videoId,
-
-                            channelLogo: channelLogo
+                            videoId: Video.videoID,
+                            videoViews: Video.videoViewCount,
+                            channelLogo: channelLogo,
                         });
                     }
                 }
@@ -97,6 +100,7 @@ const queries = {
                 allEmail: videothumb.email,
                 uploadAt: videothumb.uploadAt,
                 videoId: videothumb.videoId,
+                views: videothumb.videoViews,
                 channelLogo: videothumb.channelLogo
             }));
         } catch (error) {
