@@ -20,4 +20,7 @@ type videoUrl{
     views:String
     channelLogo:String
 }
+type url{
+    videoURl: String
+}
 `;
