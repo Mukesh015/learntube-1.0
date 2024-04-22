@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 
 dotenv.config({ path: "./.env" });
 
-const stripe=require('stripe')(process.env.stripe_secret)
+const stripe = require('stripe')(process.env.stripe_secret)
 
 export async function addToPlaylist(req: Request, res: Response) {
     const { email, videoUrl } = req.body;
@@ -123,26 +123,34 @@ export async function addSubscription(req: Request, res: Response) {
 
 
 export async function makepayment(req: Request, res: Response) {
-    const {course}=req.body;
-    const lineItems=
-    {
-        price_data:{
-            currency:"inr",
-            product_data:
-                {
-                    name:'Student'
+    const { course, customerDetails } = req.body;
+    try {
+        // Define line items for the Checkout session
+        const lineItems = {
+            price_data: {
+                currency: "inr",
+                product_data: {
+                    name: 'Student'
                 },
-                unit_amount:1000,
+                unit_amount: 1000000, // Amount in smallest currency unit (here 10000 INR)
             },
-                quantity:1
-        }
-        const session=await stripe.checkout.sessions.create({
-            payment_method_types:["card"],
-            line_items:[lineItems],
-            mode:"payment",
-            success_url:"http://localhost:3000/success",
-            cancel_url:"http://localhost:3000/cancel",
-        })
-        res.send({id:session.id});
+            quantity: 1,
+        };
 
+        // Create the Checkout session with payment method types, line items, and other parameters
+        const session = await stripe.checkout.sessions.create({
+            payment_method_types: ["card"],
+            line_items: [lineItems],
+            mode: "payment",
+            success_url: "http://localhost:3000/success",
+            cancel_url: "http://localhost:3000/cancel",
+        });
+
+        res.send({ id: session.id });
+        console.log(session.id);
+    } catch (error) {
+        console.error('Error creating Checkout session:', error);
+        res.status(500).send({ error: 'Internal Server Error' });
     }
+
+}

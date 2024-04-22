@@ -2,7 +2,7 @@ import axios from "axios";
 import dotenv from "dotenv";
 
 dotenv.config({ path: "../.env" });
-
+import { VideoModel, VideoDocument } from "../../models/video";
 interface VideoInfo {
     email: string;
     videoUrl: string;
@@ -107,6 +107,46 @@ const queries = {
             console.error('Error fetching video URLs:', error);
             throw new Error('Error fetching video URLs');
         }
+    },
+    getVideoUrl: async (_: any, { email,videoID }: { email: string, videoID: string})=>{
+        try {
+            const entry: VideoDocument | null = await VideoModel.findOneAndUpdate(
+              { "courses.videos.videoID": videoID },
+              {
+                $push: {
+                  "courses.$[course].videos.$[video].videoViews": {
+                    user: email,
+                    timestamp: Date.now(),
+            
+                  }
+                },
+              },
+              {
+                arrayFilters: [{ "course.videos.videoID": videoID }, { "video.videoID": videoID }],
+                new: true,
+              }
+            );
+        
+            if (!entry) {
+              throw new Error ("URL not found" );
+            }
+        
+            const video = entry.courses.flatMap(course => course.videos).find(video => video.videoID === videoID);
+        
+            if (!video) {
+                throw new Error ("videoID not found" );
+            }
+        
+            if (!video.videoUrl) {
+                throw new Error ("videoUrl not found" );
+            }
+        
+            return [{videoURl:video.videoUrl}];
+        
+          } catch (error) {
+            console.error("Error redirecting:", error);
+            throw new Error ("Internal Server Error" );
+          }
     }
 
 };

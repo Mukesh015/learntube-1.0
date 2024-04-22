@@ -4,13 +4,42 @@ import Navbar from "@/components/navbar";
 import { User } from "@nextui-org/react"
 import { Button, ButtonGroup } from "@nextui-org/button";
 import { Accordion, AccordionItem } from "@nextui-org/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@nextui-org/react";
 import { Tooltip } from "@nextui-org/tooltip";
+import { gql, useQuery } from "@apollo/client";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "@/configurations/firebase/config";
+import { useRouter } from "next/router";
 
-const VideoPage: React.FC = () => {
-
+const VideoUrl = gql`
+  query GetVideoUrl( $email: String,$videoId: String) {
+    getVideoUrl {
+        videoURl
+    }
+  }
+`;
+const VideoPage: React.FC=() => {
     const [isFollowed, setIsFollowed] = useState<boolean>(false);
+    const [videoUrl, setVideoUrl] = useState<string>("")
+    const [email, setEmail] = useState<string>("");
+    // const router = useRouter();
+    // const { id } = router.query;
+    // console.log("id",id);
+    const { loading, error, data } = useQuery(VideoUrl, {
+        variables: { email: email, videoID:"@1713717611401A vi"},
+    });
+    const [user] = useAuthState(auth);
+    useEffect(() => {
+        if (data) {
+            setVideoUrl(data.videoURl);
+          }
+        if (user) {
+            setEmail(user.email || "");
+        }
+    }, [user, setEmail,data]);
+
+
 
     return (
         <>
@@ -18,7 +47,7 @@ const VideoPage: React.FC = () => {
             <div className="mt-24 ml-10 mr-10 flex">
                 <div id="video-container" style={{ maxWidth: "950px" }}>
                     <video style={{ height: "30rem" }} controls className="rounded-md opacity-50">
-                        <source src="https://youtu.be/8ORA2lIbkjo" type="video/mp4" />
+                        <source src={videoUrl} type="video/mp4" />
                         Your browser does not support the video tag.
                     </video>
                     <div>

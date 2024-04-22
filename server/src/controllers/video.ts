@@ -147,7 +147,7 @@ export async function redirect(req: Request, res: Response) {
       return res.status(404).json({ error: "videoUrl not found" });
     }
 
-    res.redirect(video.videoUrl);
+    res.send({videoURl:video.videoUrl});
 
   } catch (error) {
     console.error("Error redirecting:", error);

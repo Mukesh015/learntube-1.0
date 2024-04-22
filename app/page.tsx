@@ -4,8 +4,7 @@ import React, { useEffect, useState } from "react";
 import Navbar from "@/components/navbar";
 import Sidebar from "@/components/sidebar";
 import { gql, useQuery } from "@apollo/client";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "@/configurations/firebase/config";
+
 
 const HOMEPAGE_DETAILS = gql`
   query GetAllVideoUrl {
@@ -24,19 +23,14 @@ const HOMEPAGE_DETAILS = gql`
 
 const Home: React.FC = () => {
   const [homePageDetails, setHomePageDetails] = useState<any[]>([]);
-  const [email, setEmail] = useState<string>("");
 
   const { loading, error, data } = useQuery(HOMEPAGE_DETAILS);
-  const [user] = useAuthState(auth);
 
   useEffect(() => {
-    if (user) {
-      setEmail(user.email || "");
-  }
     if (data) {
       setHomePageDetails(data.getAllVideoUrl);
     }
-  }, [user,setEmail,data]);
+  }, [data]);
 
   const timeSinceUpload = (uploadAt: string) => {
     const uploadDate = new Date(uploadAt);
@@ -64,7 +58,7 @@ const Home: React.FC = () => {
                   style={{ height: '250px', width: '350px' }}
                   src={video.allThumbnailUrls}
                   onClick={() => {
-                    const url = `${process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN}/video/redirect/${video.videoId}/${email}`;
+                    const url = `${process.env.NEXT_PUBLIC_CLIENT_DOMAIN}/video/${video.videoId}`;
                     window.location.href = url;
                   }}
                   alt=""
