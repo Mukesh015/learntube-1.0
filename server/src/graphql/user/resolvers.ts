@@ -109,6 +109,7 @@ const queries = {
         }
     },
     getVideoUrl: async (_: any, { email,videoID }: { email: string, videoID: string})=>{
+        console.log("Getting video URL",videoID)
         try {
             const entry: VideoDocument | null = await VideoModel.findOneAndUpdate(
               { "courses.videos.videoID": videoID },

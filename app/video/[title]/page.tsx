@@ -1,5 +1,5 @@
 "use client"
-
+import ReactPlayer from 'react-player'
 import Navbar from "@/components/navbar";
 import { User } from "@nextui-org/react"
 import { Button, ButtonGroup } from "@nextui-org/button";
@@ -10,34 +10,38 @@ import { Tooltip } from "@nextui-org/tooltip";
 import { gql, useQuery } from "@apollo/client";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/configurations/firebase/config";
-import { useRouter } from "next/router";
 
 const VideoUrl = gql`
-  query GetVideoUrl( $email: String,$videoId: String) {
-    getVideoUrl {
+  query GetVideoUrl( $email: String, $videoId: String) {
+    getVideoUrl(email: $email, videoID: $videoId) {
         videoURl
     }
   }
 `;
-const VideoPage: React.FC=() => {
+const VideoPage: React.FC = () => {
     const [isFollowed, setIsFollowed] = useState<boolean>(false);
     const [videoUrl, setVideoUrl] = useState<string>("")
     const [email, setEmail] = useState<string>("");
-    // const router = useRouter();
-    // const { id } = router.query;
-    // console.log("id",id);
+    const [videoId, setVideoId] = useState<string | undefined>("");
+
     const { loading, error, data } = useQuery(VideoUrl, {
-        variables: { email: email, videoID:"@1713717611401A vi"},
+        variables: { email: email, videoId: "@1713712009888Ask "},
     });
+    console.log(data);
     const [user] = useAuthState(auth);
     useEffect(() => {
+        const href: string = window.location.href;
+        const id: string | undefined = href.split("/").pop();
+        setVideoId(id);
+        console.log(videoId);
         if (data) {
             setVideoUrl(data.videoURl);
-          }
+            console.log("URL is",data.videoUrl);
+        }
         if (user) {
             setEmail(user.email || "");
         }
-    }, [user, setEmail,data]);
+    }, [user, setEmail, setVideoUrl, setVideoId, data]);
 
 
 
@@ -46,10 +50,9 @@ const VideoPage: React.FC=() => {
             <Navbar />
             <div className="mt-24 ml-10 mr-10 flex">
                 <div id="video-container" style={{ maxWidth: "950px" }}>
-                    <video style={{ height: "30rem" }} controls className="rounded-md opacity-50">
-                        <source src={videoUrl} type="video/mp4" />
-                        Your browser does not support the video tag.
-                    </video>
+                    <div>
+                        <ReactPlayer controls url={videoUrl} />
+                    </div>
                     <div>
                         <h1 className="text-xl mb-5">Chahun Main Ya Naa - | Slowed + Reverb | Lyrics | Aashiqui 2 | Use Headphones</h1>
                         <nav className="mb-5">
@@ -117,7 +120,7 @@ const VideoPage: React.FC=() => {
                                 <li>
                                     <Tooltip color="warning" delay={700} showArrow={true} content="Add to playlist">
                                         <Button className="flex" variant="bordered">
-                                            <svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><g><rect fill="none" height="24" width="24" /></g><g><path d="M14,10H3v2h11V10z M14,6H3v2h11V6z M18,14v-4h-2v4h-4v2h4v4h2v-4h4v-2H18z M3,16h7v-2H3V16z" /></g></svg>
+                                            <svg xmlns="http://www.w3.org/2000/svg" enableBackground="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><g><rect fill="none" height="24" width="24" /></g><g><path d="M14,10H3v2h11V10z M14,6H3v2h11V6z M18,14v-4h-2v4h-4v2h4v4h2v-4h4v-2H18z M3,16h7v-2H3V16z" /></g></svg>
                                             Save
                                         </Button>
                                     </Tooltip>
@@ -125,7 +128,7 @@ const VideoPage: React.FC=() => {
                                 <li>
                                     <Tooltip color="warning" delay={700} showArrow={true} content="Add to watch later">
                                         <Button className="flex" variant="bordered">
-                                            <svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><g><rect fill="none" height="24" width="24" x="0" /></g><g><g><path d="M12,2C6.5,2,2,6.5,2,12s4.5,10,10,10s10-4.5,10-10S17.5,2,12,2z M12,20c-4.41,0-8-3.59-8-8s3.59-8,8-8s8,3.59,8,8 S16.41,20,12,20z M12.5,7H11v6l5.2,3.2l0.8-1.3l-4.5-2.7V7z" /></g></g></svg>
+                                            <svg xmlns="http://www.w3.org/2000/svg" enableBackground="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><g><rect fill="none" height="24" width="24" x="0" /></g><g><g><path d="M12,2C6.5,2,2,6.5,2,12s4.5,10,10,10s10-4.5,10-10S17.5,2,12,2z M12,20c-4.41,0-8-3.59-8-8s3.59-8,8-8s8,3.59,8,8 S16.41,20,12,20z M12.5,7H11v6l5.2,3.2l0.8-1.3l-4.5-2.7V7z" /></g></g></svg>
 
                                             Watch later
                                         </Button>
