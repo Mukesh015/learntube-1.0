@@ -32,11 +32,11 @@ const Home: React.FC = () => {
   useEffect(() => {
     if (user) {
       setEmail(user.email || "");
-  }
+    }
     if (data) {
       setHomePageDetails(data.getAllVideoUrl);
     }
-  }, [user,setEmail,data]);
+  }, [user, setEmail, data]);
 
   const timeSinceUpload = (uploadAt: string) => {
     const uploadDate = new Date(uploadAt);
@@ -44,14 +44,14 @@ const Home: React.FC = () => {
     const timeDiff = Math.abs(currentDate.getTime() - uploadDate.getTime());
     const hours = Math.floor(timeDiff / (1000 * 3600));
     const days = Math.floor(hours / 24);
-  
+
     if (days >= 1) {
       return `${days} day${days > 1 ? 's' : ''} ago`;
     } else {
       return `${hours} hour${hours > 1 ? 's' : ''} ago`;
     }
   };
-  
+
   return (
     <>
       <div>
@@ -70,7 +70,7 @@ const Home: React.FC = () => {
                   style={{ height: '250px', width: '350px' }}
                   src={video.allThumbnailUrls}
                   onClick={() => {
-                    const url = `${process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN}/video/redirect/${video.videoId}/${email}`;
+                    const url = `${process.env.NEXT_PUBLIC_CLIENT_DOMAIN}/video/${video.videoId}}`;
                     window.location.href = url;
                   }}
                   alt=""
