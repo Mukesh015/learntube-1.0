@@ -28,7 +28,7 @@ export async function uploadVideo(req: Request, res: Response) {
       course.videos.push({
         videoUrl: videoUrl,
         videoTitle,
-        videoID: `@${Date.now()}${videoTitle.slice(0, 4)}`,
+        videoID: `@${Date.now()}${videoTitle.slice(0, 4)}`.replace(/\s/g, ''),
         videoDescription,
         videoThumbnail: videoThumbnail,
         videoPublishedAt: new Date(),
