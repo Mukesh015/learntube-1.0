@@ -31,5 +31,10 @@ type url{
 }
 type features{
     haveInPlaylist: Boolean
+    isSubsCribed: Boolean
+    hasInHistory: Boolean
+    haveInMyVideos: Boolean
+    haveInWatchLater: Boolean
+    isLiked: Boolean
 }
 `;

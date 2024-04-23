@@ -161,9 +161,27 @@ const queries = {
             return "USer not found";
         }
         const playlist = user.features?.playlists || [];
-        const hasValue = playlist.includes(videoID);
+        const hasValuePlayList = playlist.includes(videoID);
 
-        return [{haveInPlaylist: hasValue}];
+
+        const subscriptions=user.features?.subscriptions|| [];
+        const hasValueSubscriptions = subscriptions.includes(videoID);
+
+        const history=user.features?.history|| [];
+        const hasValueHistory = history.includes(videoID);
+
+        const myVideos=user.features?.myVideos|| [];
+        const hasValueMyVideos = myVideos.includes(videoID);
+
+
+        const watchLater=user.features?.watchLater||[];
+        const hasValueWatchLater = watchLater.includes(videoID);
+
+        const likedVideos=user.features?.likedVideos|| [];
+        const hasValueLikedVideos = likedVideos.includes(videoID);
+
+        return [{haveInPlaylist: hasValuePlayList,isSubsCribed: hasValueSubscriptions,hasInHistory: hasValueHistory,
+            haveInMyVideos: hasValueMyVideos,haveInWatchLater: hasValueWatchLater,isLiked: hasValueLikedVideos}];
     }
 
 };

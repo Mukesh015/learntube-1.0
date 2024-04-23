@@ -7,14 +7,14 @@ dotenv.config({ path: "./.env" });
 const stripe = require('stripe')(process.env.stripe_secret)
 
 export async function addToPlaylist(req: Request, res: Response) {
-    const { email, videoUrl } = req.body;
+    const { email, videoId } = req.body;
     try {
         const user = await UserModel.findOne({ email: email });
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         } else {
             // Push the videoUrl to the playlists array
-            user.features?.playlists.push(videoUrl);
+            user.features?.playlists.push(videoId);
             // Save the updated user object to the database
             await user.save();
             return res.status(200).json({ message: 'Video added to the playlists' });
@@ -45,14 +45,14 @@ export async function addToHistory(req: Request, res: Response) {
 }
 
 export async function addToLikedVideo(req: Request, res: Response) {
-    const { email, videoUrl } = req.body;
+    const { email, videoId } = req.body;
     try {
         const user = await UserModel.findOne({ email: email });
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         } else {
             // Push the videoUrl to the history array
-            user.features?.likedVideos.push(videoUrl);
+            user.features?.likedVideos.push(videoId);
             // Save the updated user object to the database
             await user.save();
             return res.status(200).json({ message: 'Added to likedVideos' });
@@ -65,14 +65,14 @@ export async function addToLikedVideo(req: Request, res: Response) {
 
 
 export async function addToWatchLater(req: Request, res: Response) {
-    const { email, videoUrl } = req.body;
+    const { email, videoId } = req.body;
     try {
         const user = await UserModel.findOne({ email: email });
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         } else {
             // Push the videoUrl to the history array
-            user.features?.watchLater.push(videoUrl);
+            user.features?.watchLater.push(videoId);
             // Save the updated user object to the database
             await user.save();
             return res.status(200).json({ message: 'Video added to watchLater' });
@@ -84,14 +84,14 @@ export async function addToWatchLater(req: Request, res: Response) {
 }
 
 export async function addToMyVideos(req: Request, res: Response) {
-    const { email, videoUrl } = req.body;
+    const { email, videoId } = req.body;
     try {
         const user = await UserModel.findOne({ email: email });
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         } else {
             // Push the videoUrl to the myVideos array
-            user.features?.myVideos.push(videoUrl);
+            user.features?.myVideos.push(videoId);
             // Save the updated user object to the database
             await user.save();
             return res.status(200).json({ message: 'Video added to myVideos' });
