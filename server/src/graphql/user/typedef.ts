@@ -29,4 +29,7 @@ type url{
     videoPublishedAt:String
     videoTags:[String]
 }
+type features{
+    haveInPlaylist: Boolean
+}
 `;

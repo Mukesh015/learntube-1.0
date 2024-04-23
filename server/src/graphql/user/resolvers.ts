@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 
 dotenv.config({ path: "../.env" });
 import { VideoModel, VideoDocument } from "../../models/video";
-import { timeStamp } from "console";
+import { UserModel,UserDocument } from "../../models/user";
 interface VideoInfo {
     email: string;
     videoUrl: string;
@@ -156,7 +156,14 @@ const queries = {
         }
     },
     getFeatures: async(_: any,{ email, videoID }: { email: string, videoID: string }) => {
-        
+        const user: UserDocument | null = await UserModel.findOne({ email });
+        if (!user) {
+            return "USer not found";
+        }
+        const playlist = user.features?.playlists || [];
+        const hasValue = playlist.includes(videoID);
+
+        return [{haveInPlaylist: hasValue}];
     }
 
 };
