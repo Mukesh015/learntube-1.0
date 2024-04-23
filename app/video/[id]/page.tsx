@@ -1,15 +1,17 @@
 "use client"
-import ReactPlayer from 'react-player'
+import dynamic from 'next/dynamic'
 import Navbar from "@/components/navbar";
 import { User } from "@nextui-org/react"
 import { Button, ButtonGroup } from "@nextui-org/button";
 import { Accordion, AccordionItem } from "@nextui-org/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Input } from "@nextui-org/react";
 import { Tooltip } from "@nextui-org/tooltip";
 import { gql, useQuery } from "@apollo/client";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/configurations/firebase/config";
+
+const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 
 const VideoUrl = gql`
   query GetVideoUrl( $email: String, $videoId: String) {
@@ -20,44 +22,108 @@ const VideoUrl = gql`
 `;
 interface Props {
     params: {
-      id: string;
+        id: string;
     };
-  }
-const VideoPage: React.FC<Props> = ({ params })=> {
+}
+
+const VideoPage: React.FC<Props> = ({ params }) => {
+
+    const [user] = useAuthState(auth);
+
     const [isFollowed, setIsFollowed] = useState<boolean>(false);
+    const [isAddedToPlaylist, setIsAddedToPlaylist] = useState<boolean>(false);
+    const [isAddedToWatchLater, setIsAddedToWatchLater] = useState<boolean>(false);
+    const [isLikedVideo, setIsLikedVideo] = useState<boolean>(false);
+    const [isDisLikedVideo, setDisIsLikedVideo] = useState<boolean>(false);
     const [videoUrl, setVideoUrl] = useState<string>("")
     const [email, setEmail] = useState<string>("");
-    // const [videoId, setVideoId] = useState<string | undefined>("");
-    const videoId: any=decodeURIComponent(params.id)
+
+    const videoId: any = decodeURIComponent(params.id)
     const { loading, error, data } = useQuery(VideoUrl, {
-        variables: { email: email, videoId:videoId},
+        variables: { email: email, videoId: videoId },
     });
-    console.log(data);
-    const [user] = useAuthState(auth);
+
+    const handleLikedVideo = useCallback(async () => {
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN}/features/addtolikedvideos`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email: email,
+                    videoId: videoId
+                })
+            });
+            const data = await response.json();
+            console.log(data);
+            if (response.ok) {
+                setIsLikedVideo(true);
+            }
+        } catch (error) {
+            console.error("Failed to like this video", error)
+        }
+    }, [setIsLikedVideo, email, videoId]);
+
+    const handleAddToWatchLater = useCallback(async () => {
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN}/features/addtowatchlater`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email: email,
+                    videoId: videoId
+                })
+            });
+            const data = await response.json();
+            console.log(data);
+            if (response.ok) {
+                setIsAddedToWatchLater(true);
+            }
+        } catch (error) {
+            console.error("Failed to add watch later", error)
+        }
+    }, [email, videoId, setIsAddedToWatchLater])
+
+
+    const handleAddToPlaylist = useCallback(async () => {
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN}/features/addtoplaylist`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email: email,
+                    videoId: videoId
+                })
+            });
+            if (response.ok) {
+                setIsAddedToPlaylist(true);
+            }
+        } catch (error) {
+            console.error("Failed to add to playlist", error);
+        }
+    }, [email, videoId, setIsAddedToPlaylist])
+
     useEffect(() => {
-        // const href: string = window.location.href;
-        // const id: string | undefined = href.split("/").pop();
-        // setVideoId(id);
-        // console.log(videoId);
         if (data) {
             setVideoUrl(data.getVideoUrl[0].videoURl);
-            console.log("URL is",data.getVideoUrl[0].videoUrl);
+            console.log("URL is", data.getVideoUrl[0].videoUrl);
         }
         if (user) {
             setEmail(user.email || "");
         }
     }, [user, setEmail, setVideoUrl, data]);
 
-
-
     return (
         <>
             <Navbar />
             <div className="mt-24 ml-10 mr-10 flex">
                 <div id="video-container" style={{ maxWidth: "950px" }}>
-                    <div>
-                        <ReactPlayer controls url={videoUrl} />
-                    </div>
+                    <ReactPlayer width={960} height={550} controls={true} url={videoUrl} />
                     <div>
                         <h1 className="text-xl mb-5">Chahun Main Ya Naa - | Slowed + Reverb | Lyrics | Aashiqui 2 | Use Headphones</h1>
                         <nav className="mb-5">
@@ -92,15 +158,25 @@ const VideoPage: React.FC<Props> = ({ params })=> {
                                 <li className="">
                                     <ButtonGroup variant="bordered">
                                         <Tooltip color="warning" delay={700} showArrow={true} content="Like">
+                                            <Button onPress={handleLikedVideo}>
+                                                {isLikedVideo ? (
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill='#FFFFFF' height="24" viewBox="0 -960 960 960" width="24"><path d="M720-120H320v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h218q32 0 56 24t24 56v80q0 7-1.5 15t-4.5 15L794-168q-9 20-30 34t-44 14ZM240-640v520H80v-520h160Z" /></svg>
 
-                                            <Button>
-                                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0zm0 0h24v24H0V0z" fill="none" /><path d="M9 21h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.58 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2zM9 9l4.34-4.34L12 10h9v2l-3 7H9V9zM1 9h4v12H1z" /></svg>
+                                                ) : (
 
+                                                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0zm0 0h24v24H0V0z" fill="none" /><path d="M9 21h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.58 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2zM9 9l4.34-4.34L12 10h9v2l-3 7H9V9zM1 9h4v12H1z" /></svg>
+                                                )}
                                             </Button>
                                         </Tooltip>
                                         <Tooltip color="warning" delay={700} showArrow={true} content="Dislike">
+                                            <Button>
+                                                {isDisLikedVideo ? (
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill='#FFFFFF' height="24" viewBox="0 -960 960 960" width="48"><path d="M242-840h444v512L408-40l-39-31q-6-5-9-14t-3-22v-10l45-211H103q-24 0-42-18t-18-42v-81.839Q43-477 41.5-484.5T43-499l126-290q8.878-21.25 29.595-36.125Q219.311-840 242-840Zm384 60H229L103-481v93h373l-53 249 203-214v-427Zm0 427v-427 427Zm60 25v-60h133v-392H686v-60h193v512H686Z" /></svg>
 
-                                            <Button><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0zm0 0h24v24H0V0z" fill="none" /><path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm0 12-4.34 4.34L12 14H3v-2l3-7h9v10zm4-12h4v12h-4z" /></svg>
+                                                ) : (
+                                                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0zm0 0h24v24H0V0z" fill="none" /><path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm0 12-4.34 4.34L12 14H3v-2l3-7h9v10zm4-12h4v12h-4z" /></svg>
+                                                )}
+
                                             </Button>
                                         </Tooltip>
                                     </ButtonGroup>
@@ -124,17 +200,25 @@ const VideoPage: React.FC<Props> = ({ params })=> {
                                 </li>
                                 <li>
                                     <Tooltip color="warning" delay={700} showArrow={true} content="Add to playlist">
-                                        <Button className="flex" variant="bordered">
-                                            <svg xmlns="http://www.w3.org/2000/svg" enableBackground="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><g><rect fill="none" height="24" width="24" /></g><g><path d="M14,10H3v2h11V10z M14,6H3v2h11V6z M18,14v-4h-2v4h-4v2h4v4h2v-4h4v-2H18z M3,16h7v-2H3V16z" /></g></svg>
+                                        <Button onPress={handleAddToPlaylist} className="flex" variant="bordered">
+                                            {isAddedToPlaylist ? (
+                                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" /></svg>
+
+                                            ) : (
+                                                <svg xmlns="http://www.w3.org/2000/svg" enableBackground="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><g><rect fill="none" height="24" width="24" /></g><g><path d="M14,10H3v2h11V10z M14,6H3v2h11V6z M18,14v-4h-2v4h-4v2h4v4h2v-4h4v-2H18z M3,16h7v-2H3V16z" /></g></svg>
+                                            )}
                                             Save
                                         </Button>
                                     </Tooltip>
                                 </li>
                                 <li>
                                     <Tooltip color="warning" delay={700} showArrow={true} content="Add to watch later">
-                                        <Button className="flex" variant="bordered">
-                                            <svg xmlns="http://www.w3.org/2000/svg" enableBackground="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><g><rect fill="none" height="24" width="24" x="0" /></g><g><g><path d="M12,2C6.5,2,2,6.5,2,12s4.5,10,10,10s10-4.5,10-10S17.5,2,12,2z M12,20c-4.41,0-8-3.59-8-8s3.59-8,8-8s8,3.59,8,8 S16.41,20,12,20z M12.5,7H11v6l5.2,3.2l0.8-1.3l-4.5-2.7V7z" /></g></g></svg>
-
+                                        <Button onPress={handleAddToWatchLater} className="flex" variant="bordered">
+                                            {isAddedToWatchLater ? (
+                                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" /></svg>
+                                            ) : (
+                                                <svg xmlns="http://www.w3.org/2000/svg" enableBackground="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><g><rect fill="none" height="24" width="24" x="0" /></g><g><g><path d="M12,2C6.5,2,2,6.5,2,12s4.5,10,10,10s10-4.5,10-10S17.5,2,12,2z M12,20c-4.41,0-8-3.59-8-8s3.59-8,8-8s8,3.59,8,8 S16.41,20,12,20z M12.5,7H11v6l5.2,3.2l0.8-1.3l-4.5-2.7V7z" /></g></g></svg>
+                                            )}
                                             Watch later
                                         </Button>
                                     </Tooltip>
@@ -242,7 +326,7 @@ const VideoPage: React.FC<Props> = ({ params })=> {
 
                         </div>
                     </div>
-                </div>
+                </div >
                 <div>
                     <Tooltip color="warning" delay={700} showArrow={true} content="Video title here">
                         <div className="ml-10 flex mb-5">
@@ -311,7 +395,7 @@ const VideoPage: React.FC<Props> = ({ params })=> {
                         </div>
                     </Tooltip>
                 </div>
-            </div>
+            </div >
         </>
     )
 }
