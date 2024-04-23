@@ -48,7 +48,7 @@ const queries = {
             const response = await axios.post(`${process.env.server_domain}/api/getuserdetails`);
             const userDetails: User[] = response.data;
             const creators = userDetails.filter(user => user.isCreator);
-            return creators.map(creator => ({ channelLogo: creator.channelLogo, email: creator.email,channelName: creator.channelName}));
+            return creators.map(creator => ({ channelLogo: creator.channelLogo, email: creator.email, channelName: creator.channelName }));
         } catch (error) {
             console.error('Error fetching channellogo:', error);
             throw new Error('Error fetching channellogo');
@@ -109,51 +109,55 @@ const queries = {
             throw new Error('Error fetching video URLs');
         }
     },
-    getVideoUrl: async (_: any, { email,videoID }: { email: string, videoID: string})=>{
-        console.log("Getting video URL",videoID)
+    getVideoUrl: async (_: any, { email, videoID }: { email: string, videoID: string }) => {
+        console.log("Getting video URL", videoID)
         try {
             const entry: VideoDocument | null = await VideoModel.findOneAndUpdate(
-              { "courses.videos.videoID": videoID },
-              {
-                $push: {
-                  "courses.$[course].videos.$[video].videoViews": {
-                    user: email,
-                    timestamp: Date.now(),
-            
-                  }
+                { "courses.videos.videoID": videoID },
+                {
+                    $push: {
+                        "courses.$[course].videos.$[video].videoViews": {
+                            user: email,
+                            timestamp: Date.now(),
+
+                        }
+                    },
                 },
-              },
-              {
-                arrayFilters: [{ "course.videos.videoID": videoID }, { "video.videoID": videoID }],
-                new: true,
-              }
+                {
+                    arrayFilters: [{ "course.videos.videoID": videoID }, { "video.videoID": videoID }],
+                    new: true,
+                }
             );
-        
+
             if (!entry) {
-              throw new Error ("URL not found" );
+                throw new Error("URL not found");
             }
             const video = entry.courses.flatMap(course => course.videos).find(video => video.videoID === videoID);
             const channelLogoResponse = await queries.getChannelLogo(undefined, { email: entry.email });
             const channelLogo = channelLogoResponse.find((logo: { email: string; }) => logo.email === entry.email)?.channelLogo;
             const channelName = channelLogoResponse.find((name: { email: string; }) => name.email === entry.email)?.channelName;
-            
-            if (!video) {
-                throw new Error ("videoID not found" );
-            }
-        
-            if (!video.videoUrl) {
-                throw new Error ("videoUrl not found" );
-            }
-        
-            return [{videoURl:video.videoUrl,videoDescription:video.videoDescription,videoTitle:video.videoTitle,videoViews:video.videoViews.length,
-                videoPublishedAt:video.videoPublishedAt,videoTags:video.videoTags, channelLogo:channelLogo,channelName:channelName,}];
-        
-          } catch (error) {
-            console.error("Error redirecting:", error);
-            throw new Error ("Internal Server Error" );
-          }
-    },
 
+            if (!video) {
+                throw new Error("videoID not found");
+            }
+
+            if (!video.videoUrl) {
+                throw new Error("videoUrl not found");
+            }
+
+            return [{
+                videoURl: video.videoUrl, videoDescription: video.videoDescription, videoTitle: video.videoTitle, videoViews: video.videoViews.length,
+                videoPublishedAt: video.videoPublishedAt, videoTags: video.videoTags, channelLogo: channelLogo, channelName: channelName,
+            }];
+
+        } catch (error) {
+            console.error("Error redirecting:", error);
+            throw new Error("Internal Server Error");
+        }
+    },
+    getFeatures: async(_: any,{ email, videoID }: { email: string, videoID: string }) => {
+        
+    }
 
 };
 
