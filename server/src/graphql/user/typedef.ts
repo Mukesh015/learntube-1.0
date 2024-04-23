@@ -22,5 +22,11 @@ type videoUrl{
 }
 type url{
     videoURl: String
+    videoDescription: String
+    channelLogo:String
+    channelName:String
+    videoViews:String
+    videoPublishedAt:String
+    videoTags:[String]
 }
 `;

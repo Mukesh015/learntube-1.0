@@ -15,39 +15,39 @@ const VideoUrl = gql`
   query GetVideoUrl( $email: String, $videoId: String) {
     getVideoUrl(email: $email, videoID: $videoId) {
         videoURl
+        videoDescription
+        channelLogo
+        channelName
+        videoViews
+        videoPublishedAt
+        videoTags
     }
   }
 `;
 interface Props {
     params: {
-      id: string;
+        id: string;
     };
-  }
-const VideoPage: React.FC<Props> = ({ params })=> {
+}
+const VideoPage: React.FC<Props> = ({ params }) => {
     const [isFollowed, setIsFollowed] = useState<boolean>(false);
     const [videoUrl, setVideoUrl] = useState<string>("")
     const [email, setEmail] = useState<string>("");
-    // const [videoId, setVideoId] = useState<string | undefined>("");
-    const videoId: any=decodeURIComponent(params.id)
+    const videoId: any = decodeURIComponent(params.id)
     const { loading, error, data } = useQuery(VideoUrl, {
-        variables: { email: email, videoId:videoId},
+        variables: { email: email, videoId: videoId },
     });
     console.log(data);
     const [user] = useAuthState(auth);
     useEffect(() => {
-        // const href: string = window.location.href;
-        // const id: string | undefined = href.split("/").pop();
-        // setVideoId(id);
-        // console.log(videoId);
         if (data) {
             setVideoUrl(data.getVideoUrl[0].videoURl);
-            console.log("URL is",data.getVideoUrl[0].videoUrl);
+            console.log("URL is", data.getVideoUrl[0].videoUrl);
         }
         if (user) {
             setEmail(user.email || "");
         }
     }, [user, setEmail, setVideoUrl, data]);
-
 
 
     return (

@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 
 dotenv.config({ path: "../.env" });
 import { VideoModel, VideoDocument } from "../../models/video";
+import { timeStamp } from "console";
 interface VideoInfo {
     email: string;
     videoUrl: string;
@@ -47,7 +48,7 @@ const queries = {
             const response = await axios.post(`${process.env.server_domain}/api/getuserdetails`);
             const userDetails: User[] = response.data;
             const creators = userDetails.filter(user => user.isCreator);
-            return creators.map(creator => ({ channelLogo: creator.channelLogo, email: creator.email }));
+            return creators.map(creator => ({ channelLogo: creator.channelLogo, email: creator.email,channelName: creator.channelName}));
         } catch (error) {
             console.error('Error fetching channellogo:', error);
             throw new Error('Error fetching channellogo');
@@ -131,9 +132,11 @@ const queries = {
             if (!entry) {
               throw new Error ("URL not found" );
             }
-        
             const video = entry.courses.flatMap(course => course.videos).find(video => video.videoID === videoID);
-        
+            const channelLogoResponse = await queries.getChannelLogo(undefined, { email: entry.email });
+            const channelLogo = channelLogoResponse.find((logo: { email: string; }) => logo.email === entry.email)?.channelLogo;
+            const channelName = channelLogoResponse.find((name: { email: string; }) => name.email === entry.email)?.channelName;
+            
             if (!video) {
                 throw new Error ("videoID not found" );
             }
@@ -142,13 +145,15 @@ const queries = {
                 throw new Error ("videoUrl not found" );
             }
         
-            return [{videoURl:video.videoUrl}];
+            return [{videoURl:video.videoUrl,videoDescription:video.videoDescription,videoTitle:video.videoTitle,videoViews:video.videoViews.length,
+                videoPublishedAt:video.videoPublishedAt,videoTags:video.videoTags, channelLogo:channelLogo,channelName:channelName,}];
         
           } catch (error) {
             console.error("Error redirecting:", error);
             throw new Error ("Internal Server Error" );
           }
-    }
+    },
+
 
 };
 
