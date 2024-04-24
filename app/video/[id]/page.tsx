@@ -24,25 +24,24 @@ const VideoUrl = gql`
         videoPublishedAt
         videoTags
     }
-    
     getFeatures(email: $email, videoID: $videoId) {
-            haveInMyVideos
-            haveInPlaylist
-            haveInWatchLater
-            isLiked
-            isSubsCribed
-            hasInHistory
+        haveInMyVideos
+        haveInPlaylist
+        haveInWatchLater
+        isLiked
+        isSubsCribed
+        hasInHistory
+    }
+    getAllVideoUrl {
+        channelLogo
+        allEmail
+        allThumbnailUrls
+        allVideoTitles
+        allVideoUrls
+        uploadAt
+        videoId
+        views
         }
-        getAllVideoUrl {
-            channelLogo
-            allEmail
-            allThumbnailUrls
-            allVideoTitles
-            allVideoUrls
-            uploadAt
-            videoId
-            views
-          }
     }
 `;
 
@@ -68,6 +67,28 @@ const VideoPage: React.FC<Props> = ({ params }) => {
     const { loading, error, data } = useQuery(VideoUrl, {
         variables: { email: email, videoId: videoId },
     });
+
+    const handleDislikeVideo = useCallback(async () => {
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN}/features/addtodislikevideo`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email: email,
+                    videoId: videoId
+                })
+            });
+            const data = await response.json();
+            console.log(data);
+            if (response.ok) {
+                setDisIsLikedVideo(true);
+            }
+        } catch (error) {
+            console.error("Failed to fetch", error);
+        }
+    }, [setDisIsLikedVideo, email, videoId]);
 
     const handleLikedVideo = useCallback(async () => {
         try {
@@ -127,7 +148,7 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                 })
             });
             if (response.ok) {
-                // popup
+                setIsAddedToPlaylist(true);
                 console.log("video added successfully")
             }
         } catch (error) {
@@ -154,7 +175,7 @@ const VideoPage: React.FC<Props> = ({ params }) => {
             <Navbar />
             <div className="mt-24 ml-10 mr-10 flex">
                 <div id="video-container" style={{ maxWidth: "950px" }}>
-                    <ReactPlayer width={960} height={550} controls={true} url={videoUrl} />
+                    <ReactPlayer width={960} height={550} controls url={videoUrl} />
                     <div>
                         <h1 className="text-xl mb-5">Chahun Main Ya Naa - | Slowed + Reverb | Lyrics | Aashiqui 2 | Use Headphones</h1>
                         <nav className="mb-5">
@@ -200,10 +221,9 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                                             </Button>
                                         </Tooltip>
                                         <Tooltip color="warning" delay={700} showArrow={true} content="Dislike">
-                                            <Button>
+                                            <Button onPress={handleDislikeVideo}>
                                                 {isDisLikedVideo ? (
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill='#FFFFFF' height="24" viewBox="0 -960 960 960" width="48"><path d="M242-840h444v512L408-40l-39-31q-6-5-9-14t-3-22v-10l45-211H103q-24 0-42-18t-18-42v-81.839Q43-477 41.5-484.5T43-499l126-290q8.878-21.25 29.595-36.125Q219.311-840 242-840Zm384 60H229L103-481v93h373l-53 249 203-214v-427Zm0 427v-427 427Zm60 25v-60h133v-392H686v-60h193v512H686Z" /></svg>
-
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill='#FFFFFF' height="24" viewBox="0 -960 960 960" width="24"><path d="M240-840h400v520L360-40l-50-50q-7-7-11.5-19t-4.5-23v-14l44-174H120q-32 0-56-24t-24-56v-80q0-7 1.5-15t4.5-15l120-282q9-20 30-34t44-14Zm480 520v-520h160v520H720Z" /></svg>
                                                 ) : (
                                                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0zm0 0h24v24H0V0z" fill="none" /><path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm0 12-4.34 4.34L12 14H3v-2l3-7h9v10zm4-12h4v12h-4z" /></svg>
                                                 )}

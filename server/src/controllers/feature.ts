@@ -9,21 +9,39 @@ const stripe = require('stripe')(process.env.stripe_secret)
 export async function addToPlaylist(req: Request, res: Response) {
     const { email, videoId } = req.body;
     try {
+
         const user = await UserModel.findOne({ email: email });
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        } else {
-            // Push the videoUrl to the playlists array
-            user.features?.playlists.push(videoId);
-            // Save the updated user object to the database
+            res.status(404).json({ message: 'User not found' });
+            return;
+        }
+
+        const videoIdString: string = String(videoId);
+
+        const index = user.features?.playlists.indexOf(videoIdString);
+        if (index !== -1 && user.features?.playlists) {
+
+            await UserModel.updateOne(
+                { email: email },
+                { $pull: { 'features.playlists': videoIdString } }
+            );
+
+            res.status(200).json({ message: 'Video removed from playlists' });
+        } else if (user.features?.playlists) {
+
+            user.features.playlists.push(videoIdString);
             await user.save();
-            return res.status(200).json({ message: 'Video added to the playlists' });
+            res.status(200).json({ message: 'Video added to playlists' });
+        } else {
+            console.error('User features or playlists are undefined');
+            res.status(500).json({ message: 'Internal Server Error' });
         }
     } catch (error) {
-        console.error('Error adding video to playlist:', error);
-        return res.status(500).json({ message: 'Internal Server Error' });
+        console.error('Error adding/removing video to/from playlist:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
     }
 }
+
 
 export async function addToHistory(req: Request, res: Response) {
     const { email, videoUrl } = req.body;
@@ -47,19 +65,44 @@ export async function addToHistory(req: Request, res: Response) {
 export async function addToLikedVideo(req: Request, res: Response) {
     const { email, videoId } = req.body;
     try {
+
         const user = await UserModel.findOne({ email: email });
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        } else {
-            // Push the videoUrl to the history array
-            user.features?.likedVideos.push(videoId);
-            // Save the updated user object to the database
+            res.status(404).json({ message: 'User not found' });
+            return;
+        }
+
+        const videoIdString: string = String(videoId);
+
+        const index1 = user.features?.disLikedVideo.indexOf(videoIdString);
+        if (index1 !== -1 && user.features?.disLikedVideo) {
+            // If the videoId exists in disLikedVideo array, remove it
+            await UserModel.updateOne(
+                { email },
+                { $pull: { 'features.disLikedVideo': videoIdString } }
+            );
+        }
+        const index = user.features?.likedVideos.indexOf(videoIdString);
+        if (index !== -1 && user.features?.likedVideos) {
+
+            await UserModel.updateOne(
+                { email: email },
+                { $pull: { 'features.likedVideos': videoIdString } }
+            );
+
+            res.status(200).json({ message: 'Video removed from likedvideos' });
+        } else if (user.features?.likedVideos) {
+
+            user.features.likedVideos.push(videoIdString);
             await user.save();
-            return res.status(200).json({ message: 'Added to likedVideos' });
+            res.status(200).json({ message: 'Video added to likedvideos' });
+        } else {
+            console.error('User features or likedvideos are undefined');
+            res.status(500).json({ message: 'Internal Server Error' });
         }
     } catch (error) {
-        console.error('Error adding video to liked video:', error);
-        return res.status(500).json({ message: 'Internal Server Error' });
+        console.error('Error adding/removing video to/from likedvideos:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
     }
 }
 
@@ -67,59 +110,171 @@ export async function addToLikedVideo(req: Request, res: Response) {
 export async function addToWatchLater(req: Request, res: Response) {
     const { email, videoId } = req.body;
     try {
+
         const user = await UserModel.findOne({ email: email });
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        } else {
-            // Push the videoUrl to the history array
-            user.features?.watchLater.push(videoId);
-            // Save the updated user object to the database
+            res.status(404).json({ message: 'User not found' });
+            return;
+        }
+
+        const videoIdString: string = String(videoId);
+
+        const index = user.features?.watchLater.indexOf(videoIdString);
+        if (index !== -1 && user.features?.watchLater) {
+
+            await UserModel.updateOne(
+                { email: email },
+                { $pull: { 'features.watchLater': videoIdString } }
+            );
+
+            res.status(200).json({ message: 'Video removed from watchlater' });
+        } else if (user.features?.watchLater) {
+
+            user.features.watchLater.push(videoIdString);
             await user.save();
-            return res.status(200).json({ message: 'Video added to watchLater' });
+            res.status(200).json({ message: 'Video added to watchlater' });
+        } else {
+            console.error('User features or watchlater are undefined');
+            res.status(500).json({ message: 'Internal Server Error' });
         }
     } catch (error) {
-        console.error('Error adding video to watch later:', error);
-        return res.status(500).json({ message: 'Internal Server Error' });
+        console.error('Error adding/removing video to/from watchlater:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
     }
 }
 
 export async function addToMyVideos(req: Request, res: Response) {
     const { email, videoId } = req.body;
     try {
+
         const user = await UserModel.findOne({ email: email });
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        } else {
-            // Push the videoUrl to the myVideos array
-            user.features?.myVideos.push(videoId);
-            // Save the updated user object to the database
+            res.status(404).json({ message: 'User not found' });
+            return;
+        }
+
+        const videoIdString: string = String(videoId);
+
+        const index = user.features?.myVideos.indexOf(videoIdString);
+        if (index !== -1 && user.features?.myVideos) {
+
+            await UserModel.updateOne(
+                { email: email },
+                { $pull: { 'features.myVideos': videoIdString } }
+            );
+
+            res.status(200).json({ message: 'Video removed from myvideos' });
+        } else if (user.features?.myVideos) {
+
+            user.features.myVideos.push(videoIdString);
             await user.save();
-            return res.status(200).json({ message: 'Video added to myVideos' });
+            res.status(200).json({ message: 'Video added to myvideos' });
+        } else {
+            console.error('User features or myvideos are undefined');
+            res.status(500).json({ message: 'Internal Server Error' });
         }
     } catch (error) {
-        console.error('Error adding video to myVideos:', error);
-        return res.status(500).json({ message: 'Internal Server Error' });
+        console.error('Error adding/removing video to/from myvideos:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
     }
 }
 
 export async function addSubscription(req: Request, res: Response) {
-    const { email, videoUrl } = req.body;
+    const { email, videoId } = req.body;
     try {
+
         const user = await UserModel.findOne({ email: email });
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        } else {
-            // Push the subscriptionDetails to the subscriptions array
-            user.features?.subscriptions.push(videoUrl);
-            // Save the updated user object to the database
+            res.status(404).json({ message: 'User not found' });
+            return;
+        }
+
+        const videoIdString: string = String(videoId);
+
+        const index = user.features?.subscriptions.indexOf(videoIdString);
+        if (index !== -1 && user.features?.subscriptions) {
+
+            await UserModel.updateOne(
+                { email: email },
+                { $pull: { 'features.subscriptions': videoIdString } }
+            );
+
+            res.status(200).json({ message: 'Video removed from subscriptions' });
+        } else if (user.features?.subscriptions) {
+
+            user.features.subscriptions.push(videoIdString);
             await user.save();
-            return res.status(200).json({ message: 'Subscription added' });
+            res.status(200).json({ message: 'Video added to subscriptions' });
+        } else {
+            console.error('User features or subscriptions are undefined');
+            res.status(500).json({ message: 'Internal Server Error' });
         }
     } catch (error) {
-        console.error('Error adding subscription:', error);
-        return res.status(500).json({ message: 'Internal Server Error' });
+        console.error('Error adding/removing video to/from subscriptions:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
     }
 }
+
+
+export async function addToDislikedVideo(req: Request, res: Response) {
+    const { email, videoId } = req.body;
+
+    try {
+        // Check if the user exists
+        const user = await UserModel.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        // Check if features is defined in the user object
+        if (!user.features) {
+            user.features = {
+                subscriptions: [],
+                playlists: [],
+                history: [],
+                myVideos: [],
+                watchLater: [],
+                likedVideos: [],
+                disLikedVideo: [],
+                comments: []
+            };
+        }
+
+        // Check if the videoId exists in the likedVideos array
+        const likedVideoIndex = user.features.likedVideos.indexOf(videoId);
+
+        // If the videoId exists in likedVideos array, remove it and add to disLikedVideo
+        if (likedVideoIndex !== -1) {
+            user.features.likedVideos.splice(likedVideoIndex, 1);
+            user.features.disLikedVideo.push(videoId);
+        }
+
+        // Save the updated user document
+        await user.save();
+
+        return res.status(200).json({ message: "Video disliked successfully" });
+    } catch (error) {
+        console.error("Error adding disliked video:", error);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 export async function makepayment(req: Request, res: Response) {
