@@ -10,6 +10,7 @@ import { Tooltip } from "@nextui-org/tooltip";
 import { gql, useQuery } from "@apollo/client";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/configurations/firebase/config";
+import { Console } from 'console';
 
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 
@@ -62,6 +63,7 @@ const VideoPage: React.FC<Props> = ({ params }) => {
     const [isDisLikedVideo, setDisIsLikedVideo] = useState<boolean>(false);
     const [videoUrl, setVideoUrl] = useState<string>("")
     const [email, setEmail] = useState<string>("");
+    const [videoData, setVideoData] = useState<string>("");
 
     const videoId: any = decodeURIComponent(params.id)
     const { loading, error, data } = useQuery(VideoUrl, {
@@ -163,12 +165,13 @@ const VideoPage: React.FC<Props> = ({ params }) => {
             setIsAddedToPlaylist(data.getFeatures[0].haveInPlaylist)
             setIsAddedToWatchLater(data.getFeatures[0].haveInWatchLater)
             setIsLikedVideo(data.getFeatures[0].isLiked)
-
+            setVideoData(data.getVideoUrl);
+            console.log("Video data is", videoData);
         }
         if (user) {
             setEmail(user.email || "");
         }
-    }, [user, setEmail, setVideoUrl, setIsAddedToPlaylist, data, handleAddToPlaylist]);
+    }, [user, setEmail, setVideoUrl,videoData, setVideoData, setIsAddedToPlaylist, data, handleAddToPlaylist]);
 
     return (
         <>
