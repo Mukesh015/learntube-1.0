@@ -180,8 +180,29 @@ const queries = {
         const likedVideos=user.features?.likedVideos|| [];
         const hasValueLikedVideos = likedVideos.includes(videoID);
 
+        const dislikedVideos=user.features?.disLikedVideo|| [];
+
+
         return [{haveInPlaylist: hasValuePlayList,isSubsCribed: hasValueSubscriptions,hasInHistory: hasValueHistory,
             haveInMyVideos: hasValueMyVideos,haveInWatchLater: hasValueWatchLater,isLiked: hasValueLikedVideos}];
+    },
+    getSearchBarDetails:async(_:any) => {
+        try {
+            const response = await axios.post(`${process.env.server_domain}/video/getvideodetails`);
+
+            const videoTitle: string[] =response.data.videoDetails.courses.map((course: any) => course.map((video:any)=>video.videoTitle));
+
+            const videoDescription: string[] =response.data.videoDetails.courses.map((course: any) => course.map((video:any)=>video.videoDescription));
+
+            const videoTags: string[] =response.data.videoDetails.courses.map((course: any) => course.map((video:any)=>video.videoTags));
+            console.log(videoTitle)
+            return [{videoTitle: videoTitle, videoDescription: videoDescription, videoTags: videoTags}]
+
+            
+        } catch (error) {
+            console.error('Error fetching course names:', error);
+            throw new Error('Error fetching course names');
+        }
     }
 
 };

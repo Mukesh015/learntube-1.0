@@ -46,6 +46,7 @@ const Navbar: React.FC = () => {
 
     const { isOpen, onOpen, onClose } = useDisclosure();
 
+    const [showDiv, setShowDiv] = useState(false);
 
     const { loading, error, data } = useQuery(VERIFY_CREATOR, {
         variables: { email: email },
@@ -143,6 +144,10 @@ const Navbar: React.FC = () => {
         }
     }, []);
 
+    const handleInputClick = () => {
+        setShowDiv(true);
+    };
+
     useEffect(() => {
         if (user) {
             setuserName(user.displayName || "");
@@ -226,14 +231,16 @@ const Navbar: React.FC = () => {
                                 </g>
                             </svg>
                         </Tooltip>
-                        <Tooltip color="warning" delay={700} showArrow={true} content="Search a content">
-                            <input
-                                style={{ width: "600px" }}
-                                type="text"
-                                placeholder="Search here... or [ctrl+k]"
-                                className="bg-inherit border border-gray-700 rounded-medium p-2 px-10 w-96"
-                            />
-                        </Tooltip>
+                            <Tooltip color="warning" delay={700} showArrow={true} content="Search a content">
+                                <input
+                                    style={{ width: "600px" }}
+                                    type="text"
+                                    placeholder="Search here... or [ctrl+k]"
+                                    className="bg-inherit border border-gray-700 rounded-medium p-2 px-10 w-96"
+                                    onClick={handleInputClick}
+                                />
+                            </Tooltip>
+                        
                         <Tooltip color="warning" delay={700} showArrow={true} content="Click to search">
                             <Button className="font-semibold text-white ml-4" color="success">
                                 Search

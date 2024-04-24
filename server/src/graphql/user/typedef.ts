@@ -37,4 +37,9 @@ type features{
     haveInWatchLater: Boolean
     isLiked: Boolean
 }
+type searchBarDetails{
+    videoTitle: String
+    videoDescription: String
+    videoTags: [String]
+}
 `;
