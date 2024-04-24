@@ -36,6 +36,7 @@ type features{
     haveInMyVideos: Boolean
     haveInWatchLater: Boolean
     isLiked: Boolean
+    dislikedVideos: Boolean
 }
 type searchBarDetails{
     videoTitle: String

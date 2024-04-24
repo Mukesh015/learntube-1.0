@@ -20,7 +20,7 @@ export async function addToPlaylist(req: Request, res: Response){
 
         const index = user.features?.playlists.indexOf(videoIdString);
         if (index !== -1 && user.features?.playlists) {
-   
+
             await UserModel.updateOne(
                 { email: email },
                 { $pull: { 'features.playlists': videoIdString } }
@@ -74,9 +74,17 @@ export async function addToLikedVideo(req: Request, res: Response) {
 
         const videoIdString: string = String(videoId);
 
+        const index1 = user.features?.disLikedVideo.indexOf(videoIdString);
+        if (index1 !== -1 && user.features?.disLikedVideo) {
+            // If the videoId exists in disLikedVideo array, remove it
+            await UserModel.updateOne(
+                { email },
+                { $pull: { 'features.disLikedVideo': videoIdString } }
+            );
+        }
         const index = user.features?.likedVideos.indexOf(videoIdString);
         if (index !== -1 && user.features?.likedVideos) {
-   
+
             await UserModel.updateOne(
                 { email: email },
                 { $pull: { 'features.likedVideos': videoIdString } }
@@ -113,7 +121,7 @@ export async function addToWatchLater(req: Request, res: Response) {
 
         const index = user.features?.watchLater.indexOf(videoIdString);
         if (index !== -1 && user.features?.watchLater) {
-   
+
             await UserModel.updateOne(
                 { email: email },
                 { $pull: { 'features.watchLater': videoIdString } }
@@ -149,7 +157,7 @@ export async function addToMyVideos(req: Request, res: Response) {
 
         const index = user.features?.myVideos.indexOf(videoIdString);
         if (index !== -1 && user.features?.myVideos) {
-   
+
             await UserModel.updateOne(
                 { email: email },
                 { $pull: { 'features.myVideos': videoIdString } }
@@ -185,7 +193,7 @@ export async function addSubscription(req: Request, res: Response) {
 
         const index = user.features?.subscriptions.indexOf(videoIdString);
         if (index !== -1 && user.features?.subscriptions) {
-   
+
             await UserModel.updateOne(
                 { email: email },
                 { $pull: { 'features.subscriptions': videoIdString } }
@@ -206,6 +214,67 @@ export async function addSubscription(req: Request, res: Response) {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 }
+
+
+export async function addToDislikedVideo(req: Request, res: Response) {
+    const { email, videoId } = req.body;
+
+    try {
+        // Check if the user exists
+        const user = await UserModel.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        // Check if features is defined in the user object
+        if (!user.features) {
+            user.features = {
+                subscriptions: [],
+                playlists: [],
+                history: [],
+                myVideos: [],
+                watchLater: [],
+                likedVideos: [],
+                disLikedVideo: [],
+                comments: []
+            };
+        }
+
+        // Check if the videoId exists in the likedVideos array
+        const likedVideoIndex = user.features.likedVideos.indexOf(videoId);
+
+        // If the videoId exists in likedVideos array, remove it and add to disLikedVideo
+        if (likedVideoIndex !== -1) {
+            user.features.likedVideos.splice(likedVideoIndex, 1);
+            user.features.disLikedVideo.push(videoId);
+        }
+
+        // Save the updated user document
+        await user.save();
+
+        return res.status(200).json({ message: "Video disliked successfully" });
+    } catch (error) {
+        console.error("Error adding disliked video:", error);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 export async function makepayment(req: Request, res: Response) {

@@ -181,10 +181,12 @@ const queries = {
         const hasValueLikedVideos = likedVideos.includes(videoID);
 
         const dislikedVideos=user.features?.disLikedVideo|| [];
+        const hasValueDislikedVideos = dislikedVideos.includes(videoID);
+
 
 
         return [{haveInPlaylist: hasValuePlayList,isSubsCribed: hasValueSubscriptions,hasInHistory: hasValueHistory,
-            haveInMyVideos: hasValueMyVideos,haveInWatchLater: hasValueWatchLater,isLiked: hasValueLikedVideos}];
+            haveInMyVideos: hasValueMyVideos,haveInWatchLater: hasValueWatchLater,isLiked: hasValueLikedVideos,dislikedVideos:hasValueDislikedVideos}];
     },
     getSearchBarDetails:async(_:any) => {
         try {

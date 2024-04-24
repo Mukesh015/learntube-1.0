@@ -17,7 +17,7 @@ interface UserDocument extends Document {
     channelDescription?: string;
     website: { any: string, Facebook: string, Instagram: string, Twitter: string, Github: string, LinkedIn: string, Discord: string }
     address: { country: string; state: string; city: string; pincode: number; addressLine: string; phone: number };
-    features?: { subscriptions: any[], playlists: any[], history: any[], myVideos: any[], watchLater: any[], likedVideos: any[] }
+    features?: { subscriptions: any[], playlists: any[], history: any[], myVideos: any[], watchLater: any[], likedVideos: any[], disLikedVideo: any[], comments: any[] }
     history: any[];
     analytics: { date: Date; watchTime: number }[];
 
@@ -108,7 +108,9 @@ const userSchema = new mongoose.Schema<UserDocument>(
             history: [{ type: mongoose.Schema.Types.Mixed, required: false }],
             myVideos: [{ type: mongoose.Schema.Types.Mixed, required: false }],
             watchLater: [{ type: mongoose.Schema.Types.Mixed, required: false }],
-            likedVideos: [{ type: mongoose.Schema.Types.Mixed, required: false }]
+            likedVideos: [{ type: mongoose.Schema.Types.Mixed, required: false }],
+            disLikedVideo: [{ type: mongoose.Schema.Types.Mixed, required: false }],
+            comments: [{ type: mongoose.Schema.Types.Mixed, required: false }]
         },
         history: [mongoose.Schema.Types.Mixed],
         analytics: [
