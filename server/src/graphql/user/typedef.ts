@@ -22,6 +22,7 @@ type videoUrl{
 }
 type url{
     videoURl: String
+    videoTitle:String
     videoDescription: String
     channelLogo:String
     channelName:String
@@ -36,5 +37,11 @@ type features{
     haveInMyVideos: Boolean
     haveInWatchLater: Boolean
     isLiked: Boolean
+    dislikedVideos: Boolean
+}
+type searchBarDetails{
+    videoTitle: String
+    videoDescription: String
+    videoTags: [String]
 }
 `;

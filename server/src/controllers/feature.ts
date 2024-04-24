@@ -6,7 +6,7 @@ dotenv.config({ path: "./.env" });
 
 const stripe = require('stripe')(process.env.stripe_secret)
 
-export async function addToPlaylist(req: Request, res: Response) {
+export async function addToPlaylist(req: Request, res: Response){
     const { email, videoId } = req.body;
     try {
 

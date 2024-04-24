@@ -21,6 +21,7 @@ const VideoUrl = gql`
         videoDescription
         channelLogo
         channelName
+        videoTitle
         videoViews
         videoPublishedAt
         videoTags
@@ -32,6 +33,7 @@ const VideoUrl = gql`
         isLiked
         isSubsCribed
         hasInHistory
+        dislikedVideos
     }
     getAllVideoUrl {
         channelLogo
@@ -167,6 +169,7 @@ const VideoPage: React.FC<Props> = ({ params }) => {
             setIsLikedVideo(data.getFeatures[0].isLiked)
             setVideoData(data.getVideoUrl);
             console.log("Video data is", videoData);
+            setDisIsLikedVideo(data.getFeatures[0].dislikedVideos)
         }
         if (user) {
             setEmail(user.email || "");
