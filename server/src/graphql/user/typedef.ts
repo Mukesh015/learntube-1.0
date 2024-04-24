@@ -22,6 +22,7 @@ type videoUrl{
 }
 type url{
     videoURl: String
+    videoTitle:String
     videoDescription: String
     channelLogo:String
     channelName:String
