@@ -51,7 +51,7 @@ const Home: React.FC = () => {
       <div>
         <Navbar />
         <Sidebar />
-        <div className="mt-28 ml-80 ">
+        <div className=" mt-28 ml-80 ">
           <div
             id="description-container"
             className="gap-12 grid grid-cols-3 hover"

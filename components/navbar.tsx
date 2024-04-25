@@ -35,6 +35,7 @@ const Navbar: React.FC = () => {
     const [newInfo, setnewInfo] = useState<string>("");
     const [toUpdate, settoUpdate] = useState<string>("");
     const [isCreator, setIsCreator] = useState<string>("");
+    const [searchItem, setSearchItem] = useState<boolean>(false);
 
     const [spinnerButton, setspinnerButton] = useState<boolean>(false);
 
@@ -46,11 +47,19 @@ const Navbar: React.FC = () => {
 
     const { isOpen, onOpen, onClose } = useDisclosure();
 
-    const [showDiv, setShowDiv] = useState(false);
 
     const { loading, error, data } = useQuery(VERIFY_CREATOR, {
         variables: { email: email },
     });
+
+    const handleInputClick = () => {
+        toggleSearchDiv();
+    };
+
+    const toggleSearchDiv = () => {
+        setSearchItem(!searchItem);
+    }
+
 
     const handleCreateVideo = useCallback(async () => {
         if (isCreator) {
@@ -144,9 +153,6 @@ const Navbar: React.FC = () => {
         }
     }, []);
 
-    const handleInputClick = () => {
-        setShowDiv(true);
-    };
 
     useEffect(() => {
         if (user) {
@@ -231,16 +237,16 @@ const Navbar: React.FC = () => {
                                 </g>
                             </svg>
                         </Tooltip>
-                            <Tooltip color="warning" delay={700} showArrow={true} content="Search a content">
-                                <input
-                                    style={{ width: "600px" }}
-                                    type="text"
-                                    placeholder="Search here... or [ctrl+k]"
-                                    className="bg-inherit border border-gray-700 rounded-medium p-2 px-10 w-96"
-                                    onClick={handleInputClick}
-                                />
-                            </Tooltip>
-                        
+                        <Tooltip color="warning" delay={700} showArrow={true} content="Search a content">
+                            <input
+                                style={{ width: "600px" }}
+                                type="text"
+                                placeholder="Search here... or [ctrl+k]"
+                                className="bg-inherit border border-gray-700 rounded-medium p-2 px-10 w-96"
+                                onClick={handleInputClick}
+                            />
+                        </Tooltip>
+
                         <Tooltip color="warning" delay={700} showArrow={true} content="Click to search">
                             <Button className="font-semibold text-white ml-4" color="success">
                                 Search
@@ -342,6 +348,14 @@ const Navbar: React.FC = () => {
                     </li>
                 </ul>
             </nav >
+            {searchItem &&
+                <div className="mt-20 bg-gray-800 rounded-md" style={{ marginLeft: "440px", marginRight: "480px" }}>
+                    <div className="flex cursor-pointer">
+                        <p className="p-2 hover:bg-gray-600 rounded-xl">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempora</p>
+                        <svg className="ml-16 mt-2 hover:bg-gray-600 rounded-full p-1" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" /></svg>
+                    </div>
+                </div>
+            }
             <Modal
                 backdrop="opaque"
                 size="3xl"
