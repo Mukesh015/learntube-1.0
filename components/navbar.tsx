@@ -23,6 +23,11 @@ query Exam($email:String){
     getIsCreator(email: $email) {
         isCreator
       }
+      getSearchBarDetails {
+        videoDescription
+        videoTags
+        videoTitle
+      }
   }
 `
 
@@ -51,7 +56,6 @@ const Navbar: React.FC = () => {
     const { loading, error, data } = useQuery(VERIFY_CREATOR, {
         variables: { email: email },
     });
-
     const handleCreateVideo = useCallback(async () => {
         if (isCreator) {
             router.push("/creator/upload")
@@ -157,6 +161,8 @@ const Navbar: React.FC = () => {
         if (data && email !== "") {
             const verifyIsCreator = data.getIsCreator[0].isCreator
             setIsCreator(verifyIsCreator);
+            console.log("upcoming data: " , data.getSearchBarDetails);
+
             console.log("Veify creator", isCreator)
         }
         else {

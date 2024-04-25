@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 
 dotenv.config({ path: "../.env" });
 import { VideoModel, VideoDocument } from "../../models/video";
-import { UserModel,UserDocument } from "../../models/user";
+import { UserModel, UserDocument } from "../../models/user";
 interface VideoInfo {
     email: string;
     videoUrl: string;
@@ -136,6 +136,8 @@ const queries = {
             const channelLogoResponse = await queries.getChannelLogo(undefined, { email: entry.email });
             const channelLogo = channelLogoResponse.find((logo: { email: string; }) => logo.email === entry.email)?.channelLogo;
             const channelName = channelLogoResponse.find((name: { email: string; }) => name.email === entry.email)?.channelName;
+            const creatorEmail = channelLogoResponse.find((name: { email: string; }) => name.email === entry.email)?.email;
+
 
             if (!video) {
                 throw new Error("videoID not found");
@@ -147,7 +149,7 @@ const queries = {
 
             return [{
                 videoURl: video.videoUrl, videoDescription: video.videoDescription, videoTitle: video.videoTitle, videoViews: video.videoViews.length,
-                videoPublishedAt: video.videoPublishedAt, videoTags: video.videoTags, channelLogo: channelLogo, channelName: channelName,
+                videoPublishedAt: video.videoPublishedAt, videoTags: video.videoTags, channelLogo: channelLogo, channelName: channelName,creatorEmail:creatorEmail
             }];
 
         } catch (error) {
@@ -155,7 +157,7 @@ const queries = {
             throw new Error("Internal Server Error");
         }
     },
-    getFeatures: async(_: any,{ email, videoID }: { email: string, videoID: string }) => {
+    getFeatures: async (_: any, { email, videoID }: { email: string, videoID: string }) => {
         const user: UserDocument | null = await UserModel.findOne({ email });
         if (!user) {
             return "USer not found";
@@ -164,46 +166,49 @@ const queries = {
         const hasValuePlayList = playlist.includes(videoID);
 
 
-        const subscriptions=user.features?.subscriptions|| [];
+        const subscriptions = user.features?.subscriptions || [];
         const hasValueSubscriptions = subscriptions.includes(videoID);
 
-        const history=user.features?.history|| [];
+        const history = user.features?.history || [];
         const hasValueHistory = history.includes(videoID);
 
-        const myVideos=user.features?.myVideos|| [];
+        const myVideos = user.features?.myVideos || [];
         const hasValueMyVideos = myVideos.includes(videoID);
 
 
-        const watchLater=user.features?.watchLater||[];
+        const watchLater = user.features?.watchLater || [];
         const hasValueWatchLater = watchLater.includes(videoID);
 
-        const likedVideos=user.features?.likedVideos|| [];
+        const likedVideos = user.features?.likedVideos || [];
         const hasValueLikedVideos = likedVideos.includes(videoID);
 
-        const dislikedVideos=user.features?.disLikedVideo|| [];
+        const dislikedVideos = user.features?.disLikedVideo || [];
         const hasValueDislikedVideos = dislikedVideos.includes(videoID);
 
 
 
-        return [{haveInPlaylist: hasValuePlayList,isSubsCribed: hasValueSubscriptions,hasInHistory: hasValueHistory,
-            haveInMyVideos: hasValueMyVideos,haveInWatchLater: hasValueWatchLater,isLiked: hasValueLikedVideos,dislikedVideos:hasValueDislikedVideos}];
+        return [{
+            haveInPlaylist: hasValuePlayList, isSubsCribed: hasValueSubscriptions, hasInHistory: hasValueHistory,
+            haveInMyVideos: hasValueMyVideos, haveInWatchLater: hasValueWatchLater, isLiked: hasValueLikedVideos, dislikedVideos: hasValueDislikedVideos
+        }];
     },
-    getSearchBarDetails:async(_:any) => {
+    getSearchBarDetails: async (_: any) => {
         try {
             const response = await axios.post(`${process.env.server_domain}/video/getvideodetails`);
-
-            const videoTitle: string[] =response.data.videoDetails.courses.map((course: any) => course.map((video:any)=>video.videoTitle));
-
-            const videoDescription: string[] =response.data.videoDetails.courses.map((course: any) => course.map((video:any)=>video.videoDescription));
-
-            const videoTags: string[] =response.data.videoDetails.courses.map((course: any) => course.map((video:any)=>video.videoTags));
-            console.log(videoTitle)
-            return [{videoTitle: videoTitle, videoDescription: videoDescription, videoTags: videoTags}]
-
             
+            const videos = response.data.videoDetails;
+            
+            const courses = videos.flatMap((video: { courses: any; }) => video.courses);
+            const videoDetails = courses.flatMap((course: { videos: any; }) => course.videos).map((video: { videoTitle: any; videoDescription: any; videoTags: any; }) => ({
+                videoTitle: video.videoTitle,
+                videoDescription: video.videoDescription,
+                videoTags: video.videoTags
+            }));
+    
+            return videoDetails;
         } catch (error) {
-            console.error('Error fetching course names:', error);
-            throw new Error('Error fetching course names');
+            console.error('Error fetching search bar details:', error);
+            throw new Error('Error fetching search bar details');
         }
     }
 
