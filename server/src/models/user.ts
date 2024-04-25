@@ -14,6 +14,7 @@ interface UserDocument extends Document {
     recoveryEmail?: string;
     occupation?: string;
     channelId?: string;
+    subscribers?: { count: number, users: any[] };
     channelDescription?: string;
     website: { any: string, Facebook: string, Instagram: string, Twitter: string, Github: string, LinkedIn: string, Discord: string }
     address: { country: string; state: string; city: string; pincode: number; addressLine: string; phone: number };
@@ -111,6 +112,10 @@ const userSchema = new mongoose.Schema<UserDocument>(
             likedVideos: [{ type: mongoose.Schema.Types.Mixed, required: false }],
             disLikedVideo: [{ type: mongoose.Schema.Types.Mixed, required: false }],
             comments: [{ type: mongoose.Schema.Types.Mixed, required: false }]
+        },
+        subscribers: {
+            count: { type: Number, default: 0 },
+            users: [{ type: mongoose.Schema.Types.Mixed, required: false }]
         },
         history: [mongoose.Schema.Types.Mixed],
         analytics: [

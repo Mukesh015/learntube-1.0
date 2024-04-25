@@ -137,7 +137,7 @@ export async function getUserDetails(req: Request, res: Response) {
         channelLogo: user.channelLogo,
         history: user.history,
         analytics: user.analytics
-  
+
       }));
       res.status(200).json(userDetailsArray);
     } else {
@@ -195,5 +195,36 @@ export async function generateOtp(req: Request, res: Response) {
   } catch (error) {
     console.error(error);
     res.status(500).send({ message: "OTP generation failed" });
+  }
+}
+
+export async function addSubscription(req: Request, res: Response) {
+  const { email, channelId } = req.body;
+  try {
+    // Check if the user exists
+    const user = await UserModel.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Check if the channel is already subscribed
+    if (user.subscribers && user.subscribers.users.includes(channelId)) {
+      return res.status(400).json({ error: "Channel already subscribed" });
+    }
+
+    // Add the channelId to the subscribers users array
+    if (!user.subscribers) {
+      user.subscribers = { count: 0, users: [] };
+    }
+    user.subscribers.users.push(channelId);
+
+    // Save the updated user document
+    await user.save();
+
+    return res.status(200).json({ message: "Subscription added successfully" });
+  } catch (error) {
+    console.error("Error adding subscription:", error);
+    return res.status(500).json({ error: "Internal server error" });
   }
 }
