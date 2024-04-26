@@ -6,4 +6,5 @@ getAllVideoUrl:[videoUrl]
 getVideoUrl(email:String,videoID:String):[url]
 getFeatures(email:String,videoID:String,channelId:String):[features]
 getSearchBarDetails(email:String):[search]
+getSearchQueryDetails(query:String):[searchQuery]
 `;

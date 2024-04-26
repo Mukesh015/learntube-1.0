@@ -10,12 +10,10 @@ import { Tooltip } from "@nextui-org/tooltip";
 import { gql, useQuery } from "@apollo/client";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/configurations/firebase/config";
-import { Console } from 'console';
-
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 
 const VideoUrl = gql`
-  query GetVideoUrl( $email: String, $videoId: String,$channelId: String) {
+query GetVideoUrl( $email: String, $videoId: String,$channelId: String) {
     getVideoUrl(email: $email, videoID: $videoId) {
         videoURl
         videoDescription
@@ -31,9 +29,9 @@ const VideoUrl = gql`
     getFeatures(email: $email, videoID: $videoId,channelId: $channelId) {
         haveInMyVideos
         haveInPlaylist
-        haveInWatchLater
+        haveInWatchLater    
         isLiked
-        isSubsCribed
+        subscribedchannel
         hasInHistory
         dislikedVideos
 
@@ -62,11 +60,10 @@ const VideoPage: React.FC<Props> = ({ params }) => {
 
     const [user] = useAuthState(auth);
 
-    const [isFollowed, setIsFollowed] = useState<boolean>(false);
     const [isAddedToPlaylist, setIsAddedToPlaylist] = useState<boolean>(false);
     const [isAddedToWatchLater, setIsAddedToWatchLater] = useState<boolean>(false);
     const [isLikedVideo, setIsLikedVideo] = useState<boolean>(false);
-    const [isDisLikedVideo, setDisIsLikedVideo] = useState<boolean>(false);
+    const [isDisLikedVideo, setIsDisLikedVideo] = useState<boolean>(false);
     const [videoUrl, setVideoUrl] = useState<string>("")
     const [email, setEmail] = useState<string>("");
     const [allVideos, setAllVideos] = useState<any[]>([]);
@@ -76,14 +73,50 @@ const VideoPage: React.FC<Props> = ({ params }) => {
     const [channelLogo, setChannelLogo] = useState<string>("");
     const [videoViews, setVideoViews] = useState<string>("");
     const [videoPublishedAt, setVideoPublishedAt] = useState<string>("");
-    const [channelId, setChannelId] = useState<string>("");
     const [videoTags, setVideoTags] = useState<string>("");
+    const [creatorEmail, setCreatorEmail] = useState<string>("");
     const [isSubsCribed, setIsSubsribed] = useState<boolean>(false);
+    const [channelId, setChannelId] = useState<string>("");
+
+    const toggleSubscribe = () => {
+        setIsSubsribed(!isSubsCribed);
+    }
+
+    const toggleAddToPlaylist = () => {
+        setIsAddedToPlaylist(!isAddedToPlaylist);
+    }
+
+    const toggleAddToWatchLater = () => {
+        setIsAddedToWatchLater(!isAddedToWatchLater);
+    }
 
     const videoId: any = decodeURIComponent(params.id)
     const { loading, error, data } = useQuery(VideoUrl, {
-        variables: { email: email, videoId: videoId,channelId: channelId},
+        variables: { email: email, videoId: videoId, channelId: channelId },
     });
+
+    const handleSubscribe = useCallback(async () => {
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN}/api/subscribe`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    email: email,
+                    creatorEmail: creatorEmail,
+                    channelId: channelId,
+                }),
+            });
+            const data = await response.json();
+            console.log(data);
+            if (response.ok) {
+                toggleSubscribe();
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }, [email, toggleSubscribe, creatorEmail, channelId])
 
     const handleDislikeVideo = useCallback(async () => {
         try {
@@ -100,12 +133,13 @@ const VideoPage: React.FC<Props> = ({ params }) => {
             const data = await response.json();
             console.log(data);
             if (response.ok) {
-                setDisIsLikedVideo(true);
+                setIsDisLikedVideo(true);
+                setIsLikedVideo(false);
             }
         } catch (error) {
             console.error("Failed to fetch", error);
         }
-    }, [setDisIsLikedVideo, email, videoId]);
+    }, [setIsDisLikedVideo, setIsLikedVideo, email, videoId]);
 
     const handleLikedVideo = useCallback(async () => {
         try {
@@ -123,11 +157,12 @@ const VideoPage: React.FC<Props> = ({ params }) => {
             console.log(data);
             if (response.ok) {
                 setIsLikedVideo(true);
+                setIsDisLikedVideo(false);
             }
         } catch (error) {
             console.error("Failed to like this video", error)
         }
-    }, [setIsLikedVideo, email, videoId]);
+    }, [setIsLikedVideo, email, setIsDisLikedVideo, videoId]);
 
     const handleAddToWatchLater = useCallback(async () => {
         try {
@@ -144,12 +179,12 @@ const VideoPage: React.FC<Props> = ({ params }) => {
             const data = await response.json();
             console.log(data);
             if (response.ok) {
-                setIsAddedToWatchLater(true);
+                toggleAddToWatchLater();
             }
         } catch (error) {
             console.error("Failed to add watch later", error)
         }
-    }, [email, videoId, setIsAddedToWatchLater])
+    }, [email, videoId, toggleAddToWatchLater])
 
 
     const handleAddToPlaylist = useCallback(async () => {
@@ -165,27 +200,39 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                 })
             });
             if (response.ok) {
-                setIsAddedToPlaylist(true);
+                toggleAddToPlaylist();
                 console.log("video added successfully")
             }
         } catch (error) {
             console.error("Failed to add to playlist", error);
         }
-    }, [email, videoId])
+    }, [email, videoId, toggleAddToPlaylist])
+
+    const timeSinceUpload = (uploadAt: string) => {
+        const uploadDate = new Date(uploadAt);
+        const currentDate = new Date();
+        const timeDiff = Math.abs(currentDate.getTime() - uploadDate.getTime());
+        const hours = Math.floor(timeDiff / (1000 * 3600));
+        const days = Math.floor(hours / 24);
+
+        if (days >= 1) {
+            return `${days} day${days > 1 ? 's' : ''} ago`;
+        } else {
+            return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+        }
+    };
 
     useEffect(() => {
         if (data) {
             setVideoUrl(data.getVideoUrl[0].videoURl);
-            setChannelId(data.getVideoUrl[0].channelId)
-            console.log("URL is", data.getVideoUrl[0].videoUrl);
+            setChannelId(data.getVideoUrl[0].channelId);
             setIsAddedToPlaylist(data.getFeatures[0].haveInPlaylist)
             setIsAddedToWatchLater(data.getFeatures[0].haveInWatchLater)
             setIsLikedVideo(data.getFeatures[0].isLiked)
-            setDisIsLikedVideo(data.getFeatures[0].dislikedVideos)
-            setIsSubsribed(data.getFeatures[0].isSubsribed)
-            console.log(data);
+            setIsSubsribed(data.getFeatures[0].subscribedchannel)
+            setIsDisLikedVideo(data.getFeatures[0].dislikedVideos)
             setAllVideos(data.getAllVideoUrl);
-
+            setCreatorEmail(data.getVideoUrl[0].creatorEmail);
             setVideoTitle(data.getVideoUrl[0].videoTitle);
             setVideoDescription(data.getVideoUrl[0].videoDescription);
             setChannelName(data.getVideoUrl[0].channelName);
@@ -193,12 +240,13 @@ const VideoPage: React.FC<Props> = ({ params }) => {
             setVideoViews(data.getVideoUrl[0].videoViews);
             setVideoPublishedAt(data.getVideoUrl[0].videoPublishedAt);
             setVideoTags(data.getVideoUrl[0].videoTags);
-            console.log(videoDescription, videoTitle, channelLogo, channelName, videoViews)
+            console.log(data);
+            console.log(channelId);
         }
         if (user) {
             setEmail(user.email || "");
         }
-    }, [user, setEmail, setAllVideos, setVideoPublishedAt, setChannelName, setChannelLogo, setVideoViews, setVideoUrl, setVideoTitle, setVideoDescription, setVideoTags, setIsAddedToPlaylist, data, handleAddToPlaylist]);
+    }, [user, setEmail, channelId, setChannelId, setCreatorEmail, setAllVideos, setVideoPublishedAt, setChannelName, setChannelLogo, setVideoViews, setVideoUrl, setVideoTitle, setVideoDescription, setVideoTags, setIsAddedToPlaylist, data]);
 
     return (
         <>
@@ -212,7 +260,6 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                             <ul className="flex gap-4">
                                 <li>
                                     <Tooltip color="warning" delay={700} showArrow={true} content="Jane's channel">
-
                                         <User
                                             name={channelName}
                                             description="29k subscribers"
@@ -226,18 +273,18 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                                     <Tooltip color="warning" delay={700} showArrow={true} content="Subscribe">
 
                                         <Button
-                                            className={isFollowed ? "bg-transparent text-foreground border-default-200" : ""}
+                                            className={isSubsCribed ? "bg-transparent text-foreground border-default-200" : ""}
                                             color="primary"
                                             radius="full"
                                             size="md"
-                                            variant={isFollowed ? "bordered" : "solid"}
-                                            onPress={() => setIsFollowed(!isFollowed)}
+                                            variant={isSubsCribed ? "bordered" : "solid"}
+                                            onPress={() => handleSubscribe()}
                                         >
-                                            {isFollowed ? "Unsubscribe" : "Subscribe"}
+                                            {isSubsCribed ? "Unsubscribe" : "Subscribe"}
                                         </Button>
                                     </Tooltip>
                                 </li>
-                                <li className="">
+                                <li className="ml-16">
                                     <ButtonGroup variant="bordered">
                                         <Tooltip color="warning" delay={700} showArrow={true} content="Like">
                                             <Button onPress={handleLikedVideo}>
@@ -271,14 +318,14 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                                         </Button>
                                     </Tooltip>
                                 </li>
-                                <li>
+                                {/* <li>
                                     <Tooltip color="warning" delay={700} showArrow={true} content="Download this video">
                                         <Button className="flex" variant="bordered">
                                             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 7h14v2H5z" /></svg>
                                             Download
                                         </Button>
                                     </Tooltip>
-                                </li>
+                                </li> */}
                                 <li>
                                     <Tooltip color="warning" delay={700} showArrow={true} content="Add to playlist">
                                         <Button onPress={handleAddToPlaylist} className="flex" variant="bordered">
@@ -303,6 +350,10 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                                             Watch later
                                         </Button>
                                     </Tooltip>
+                                </li>
+                                <li>
+                                    <svg className='mt-2' xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" /></svg>
+
                                 </li>
                             </ul>
                         </nav>
@@ -352,8 +403,8 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                                     <img style={{ height: "130px", width: "200px" }} className="rounded-md" src={video.allThumbnailUrls} alt="" />
                                     <div className="max-w-56 ml-3">
                                         <h1>{video.allVideoTitles}</h1>
-                                        <h2 className="text-gray-500">{video.channelName}</h2>
-                                        <h3 className="text-gray-500">{video.views} views - {video.uploadAt}</h3>
+                                        <h2 className="text-gray-500 text-sm">{video.channelName}</h2>
+                                        <h3 className="text-gray-500 text-sm">{video.views} views - {timeSinceUpload(video.uploadAt)}</h3>
                                     </div>
                                 </div>
                             </Tooltip>
