@@ -43,7 +43,7 @@ type features{
     haveInWatchLater: Boolean
     isLiked: Boolean
     dislikedVideos: Boolean
-    isSubscribed: Boolean
+    subscribedchannel: Boolean
 }
 type search{
     videoTitle: String

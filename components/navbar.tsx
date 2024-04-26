@@ -60,7 +60,7 @@ const Navbar: React.FC = () => {
         variables: { email: email },
     });
 
-    console.log(searchbarDetails.map(item => item.searchHistory));
+    // console.log(searchbarDetails.map(item => item.searchHistory));
     const handleInputClick = () => {
         toggleSearchDiv();
     };
@@ -431,10 +431,14 @@ const Navbar: React.FC = () => {
                     <div className="flex cursor-pointer">
                         <div className="flex flex-col">
                             {Array.from(new Set(searchbarDetails.flatMap(item => item.searchHistory))).map((history, idx) => (
-                                <p key={idx} className="p-2 hover:bg-gray-600 rounded-xl">{history}</p>
+                                <div className="flex">
+                                    <p key={idx} className="p-2 hover:bg-gray-600 rounded-xl">{history}
+                                    </p>
+                                    <svg className="  ml-20 mt-1 hover:bg-gray-600 rounded-full p-1" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" /></svg>
+                                </div>
+
                             ))}
                         </div>
-                        <svg className="ml-16 mt-2 hover:bg-gray-600 rounded-full p-1" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" /></svg>
                     </div>
                 </div>
             )}

@@ -124,14 +124,6 @@ const userSchema = new mongoose.Schema<UserDocument>(
             count: { type: Number, default: 0 },
             channelId: [{ type: mongoose.Schema.Types.Mixed, required: false }]
         },
-        subscribers: {
-            count: { type: Number, default: 0 },
-            users: [{ type: mongoose.Schema.Types.Mixed, required: false }]
-        },
-        subscribedChnannels: {
-            count: { type: Number, default: 0 },
-            channelId: [{ type: mongoose.Schema.Types.Mixed, required: false }]
-        },
         history: [mongoose.Schema.Types.Mixed],
         analytics: [
             {

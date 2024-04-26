@@ -137,7 +137,7 @@ export async function getUserDetails(req: Request, res: Response) {
         channelLogo: user.channelLogo,
         channelId: user.channelId,
         history: user.history,
-        analytics: user.analytics  
+        analytics: user.analytics
       }));
       res.status(200).json(userDetailsArray);
     } else {
@@ -200,6 +200,7 @@ export async function generateOtp(req: Request, res: Response) {
 
 export async function subscribe(req: Request, res: Response) {
   const { email, channelId, creatorEmail } = req.body;
+  console.log(email, channelId, creatorEmail);
 
   try {
     // Check if both email and creatorEmail exist
