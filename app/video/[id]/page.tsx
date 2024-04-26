@@ -10,11 +10,12 @@ import { Tooltip } from "@nextui-org/tooltip";
 import { gql, useQuery } from "@apollo/client";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/configurations/firebase/config";
+import { Console } from 'console';
 
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 
 const VideoUrl = gql`
-  query GetVideoUrl( $email: String, $videoId: String) {
+  query GetVideoUrl( $email: String, $videoId: String,$channelId: String) {
     getVideoUrl(email: $email, videoID: $videoId) {
         videoURl
         videoDescription
@@ -25,8 +26,9 @@ const VideoUrl = gql`
         videoViews
         videoPublishedAt
         videoTags
+        channelId
     }
-    getFeatures(email: $email, videoID: $videoId) {
+    getFeatures(email: $email, videoID: $videoId,channelId: $channelId) {
         haveInMyVideos
         haveInPlaylist
         haveInWatchLater
@@ -34,9 +36,11 @@ const VideoUrl = gql`
         isSubsCribed
         hasInHistory
         dislikedVideos
+
     }
     getAllVideoUrl {
         channelLogo
+        channelName
         allEmail
         allThumbnailUrls
         allVideoTitles
@@ -65,10 +69,20 @@ const VideoPage: React.FC<Props> = ({ params }) => {
     const [isDisLikedVideo, setDisIsLikedVideo] = useState<boolean>(false);
     const [videoUrl, setVideoUrl] = useState<string>("")
     const [email, setEmail] = useState<string>("");
+    const [allVideos, setAllVideos] = useState<any[]>([]);
+    const [videoTitle, setVideoTitle] = useState<string>("");
+    const [videoDescription, setVideoDescription] = useState<string>("");
+    const [channelName, setChannelName] = useState<string>("");
+    const [channelLogo, setChannelLogo] = useState<string>("");
+    const [videoViews, setVideoViews] = useState<string>("");
+    const [videoPublishedAt, setVideoPublishedAt] = useState<string>("");
+    const [channelId, setChannelId] = useState<string>("");
+    const [videoTags, setVideoTags] = useState<string>("");
+    const [isSubsCribed, setIsSubsribed] = useState<boolean>(false);
 
     const videoId: any = decodeURIComponent(params.id)
     const { loading, error, data } = useQuery(VideoUrl, {
-        variables: { email: email, videoId: videoId },
+        variables: { email: email, videoId: videoId,channelId: channelId},
     });
 
     const handleDislikeVideo = useCallback(async () => {
@@ -162,16 +176,29 @@ const VideoPage: React.FC<Props> = ({ params }) => {
     useEffect(() => {
         if (data) {
             setVideoUrl(data.getVideoUrl[0].videoURl);
+            setChannelId(data.getVideoUrl[0].channelId)
             console.log("URL is", data.getVideoUrl[0].videoUrl);
             setIsAddedToPlaylist(data.getFeatures[0].haveInPlaylist)
             setIsAddedToWatchLater(data.getFeatures[0].haveInWatchLater)
             setIsLikedVideo(data.getFeatures[0].isLiked)
             setDisIsLikedVideo(data.getFeatures[0].dislikedVideos)
+            setIsSubsribed(data.getFeatures[0].isSubsribed)
+            console.log(data);
+            setAllVideos(data.getAllVideoUrl);
+
+            setVideoTitle(data.getVideoUrl[0].videoTitle);
+            setVideoDescription(data.getVideoUrl[0].videoDescription);
+            setChannelName(data.getVideoUrl[0].channelName);
+            setChannelLogo(data.getVideoUrl[0].channelLogo);
+            setVideoViews(data.getVideoUrl[0].videoViews);
+            setVideoPublishedAt(data.getVideoUrl[0].videoPublishedAt);
+            setVideoTags(data.getVideoUrl[0].videoTags);
+            console.log(videoDescription, videoTitle, channelLogo, channelName, videoViews)
         }
         if (user) {
             setEmail(user.email || "");
         }
-    }, [user, setEmail, setVideoUrl, setIsAddedToPlaylist, data, handleAddToPlaylist]);
+    }, [user, setEmail, setAllVideos, setVideoPublishedAt, setChannelName, setChannelLogo, setVideoViews, setVideoUrl, setVideoTitle, setVideoDescription, setVideoTags, setIsAddedToPlaylist, data, handleAddToPlaylist]);
 
     return (
         <>
@@ -180,17 +207,17 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                 <div id="video-container" style={{ maxWidth: "950px" }}>
                     <ReactPlayer width={960} height={550} controls url={videoUrl} />
                     <div>
-                        <h1 className="text-xl mb-5">Chahun Main Ya Naa - | Slowed + Reverb | Lyrics | Aashiqui 2 | Use Headphones</h1>
+                        <h1 className="text-xl mb-5">{videoTitle}</h1>
                         <nav className="mb-5">
                             <ul className="flex gap-4">
                                 <li>
                                     <Tooltip color="warning" delay={700} showArrow={true} content="Jane's channel">
 
                                         <User
-                                            name="Jane Doe"
+                                            name={channelName}
                                             description="29k subscribers"
                                             avatarProps={{
-                                                src: "https://i.pravatar.cc/150?u=a04258114e29026702d"
+                                                src: channelLogo
                                             }}
                                         />
                                     </Tooltip>
@@ -282,76 +309,12 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                         <Tooltip color="warning" delay={700} showArrow={true} content="Video details">
                             <Accordion variant="shadow">
                                 <AccordionItem className="text-gray-300" key="1" aria-label="Accordion 1" title="Video Description">
-                                    <h1 className="mb-5">52,78,027 views  7 Jul 2021  #slowedandreverbsong #indianlofi #bollywoodlofi</h1>
+                                    <h1 className="mb-5">{videoViews} views  {videoPublishedAt} - {videoTags}</h1>
                                     <h2 className="mb-5">
-                                        Chahun Main Ya Naa - | Slowed + Reverb | Lyrics | Aashiqui 2 | Use Headphones🎧🎧
+                                        {videoTitle}
                                     </h2>
                                     <p>
-                                        Song Credits :
-
-                                        Song Title : Chahun Main Ya Na
-                                        Movie : Aashiqui 2
-                                        Singer : Arijit Singh, Palak Muchhal
-                                        Lyrics : Irshad Kamil
-                                        Music : Jeet Ganguly
-                                        Music Label : T-Series
-
-                                        Song Lyrics :
-
-                                        Tu hi ye mujhko bata de
-                                        Chahun main ya naa
-                                        Apne tu dil ka pata de
-                                        Chahun main ya naa
-
-                                        Tu hi ye mujhko bata de
-                                        Chahun main ya naa
-                                        Apne tu dil ka pata de
-                                        Chahun main ya naa
-
-                                        Itna bata doon tujhko
-                                        Chaahat pe apni mujhko
-                                        Yun tto nahi ikhtiyaar
-                                        Phir bhi yeh socha dil ne
-                                        Ab jo laga hoon milne
-                                        Poochhu tujhe ek baar
-
-                                        Tu hi ye mujhko bata de
-                                        Chahun main ya naa
-                                        Apne tu dil ka pata de
-                                        Chahun main ya naa
-
-                                        Aisi kabhi pehle hui naa thi khwaahishein
-                                        O.. kisi se bhi milne ki
-                                        Naa ki thi koshishein
-                                        Uljhan meri suljha de
-                                        Chaahun main ya naa
-                                        Aankhon aankhon mein jataa de
-                                        Chaahun main ya naa
-
-                                        Mere chhote chhote khwaab hain
-                                        Khwabon mein geet hain
-                                        Geeton mein zindagi hai
-                                        Chaahat hai, preet hai
-                                        Abhi main na dekhoon khwaab woo
-                                        Jin mein na tu mile
-                                        Le khole honth maine
-                                        Ab tak the jo sile
-
-                                        Mujhko na jitna mujh pe
-                                        Utna iss dil ko tujh pe
-                                        Hone laga aitbaar
-                                        Tanha lamhon mein apne
-                                        Bunti hoon tere sapne
-                                        Tujhse hua mujhko pyaar o o...
-                                        Poochungi tujhko kabhi naa
-                                        Chaahun main ya naa
-                                        Tere khaabon mein ab jeena
-                                        Chaahun main kyun naa!
-
-                                        Tu hi yeh mujhko bata de
-                                        Chahun main ya naa
-                                        Apne tu dil ka pata de
-                                        Chahun main ya naa
+                                        {videoDescription}
                                     </p>
                                 </AccordionItem>
                             </Accordion>
@@ -382,72 +345,20 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                     </div>
                 </div >
                 <div>
-                    <Tooltip color="warning" delay={700} showArrow={true} content="Video title here">
-                        <div className="ml-10 flex mb-5">
-                            <img className="h-36 rounded-md" src="https://cdn.pixabay.com/photo/2012/03/01/00/55/flowers-19830_640.jpg" alt="" />
-                            <div className="max-w-56 ml-3">
-                                {/* Video title should be in 15 words */}
-                                <h1>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Omnis cupiditate, fugiat quam quaerat at nobis.</h1>
-                                <h2 className="text-gray-500">Gaming aura</h2>
-                                <h3 className="text-gray-500">2.4 laks views - 3 month ago</h3>
-                            </div>
-                        </div>
-                    </Tooltip>
-                    <Tooltip color="warning" delay={700} showArrow={true} content="Video title here">
-                        <div className="ml-10 flex mb-5">
-                            <img className="h-36 rounded-md" src="https://cdn.pixabay.com/photo/2012/03/01/00/55/flowers-19830_640.jpg" alt="" />
-                            <div className="max-w-56 ml-3">
-                                {/* Video title should be in 15 words */}
-                                <h1>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Omnis cupiditate, fugiat quam quaerat at nobis.</h1>
-                                <h2 className="text-gray-500">Gaming aura</h2>
-                                <h3 className="text-gray-500">2.4 laks views - 3 month ago</h3>
-                            </div>
-                        </div>
-                    </Tooltip>
-                    <Tooltip color="warning" delay={700} showArrow={true} content="Video title here">
-                        <div className="ml-10 flex mb-5">
-                            <img className="h-36 rounded-md" src="https://cdn.pixabay.com/photo/2012/03/01/00/55/flowers-19830_640.jpg" alt="" />
-                            <div className="max-w-56 ml-3">
-                                {/* Video title should be in 15 words */}
-                                <h1>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Omnis cupiditate, fugiat quam quaerat at nobis.</h1>
-                                <h2 className="text-gray-500">Gaming aura</h2>
-                                <h3 className="text-gray-500">2.4 laks views - 3 month ago</h3>
-                            </div>
-                        </div>
-                    </Tooltip>
-                    <Tooltip color="warning" delay={700} showArrow={true} content="Video title here">
-                        <div className="ml-10 flex mb-5">
-                            <img className="h-36 rounded-md" src="https://cdn.pixabay.com/photo/2012/03/01/00/55/flowers-19830_640.jpg" alt="" />
-                            <div className="max-w-56 ml-3">
-                                {/* Video title should be in 15 words */}
-                                <h1>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Omnis cupiditate, fugiat quam quaerat at nobis.</h1>
-                                <h2 className="text-gray-500">Gaming aura</h2>
-                                <h3 className="text-gray-500">2.4 laks views - 3 month ago</h3>
-                            </div>
-                        </div>
-                    </Tooltip>
-                    <Tooltip color="warning" delay={700} showArrow={true} content="Video title here">
-                        <div className="ml-10 flex mb-5">
-                            <img className="h-36 rounded-md" src="https://cdn.pixabay.com/photo/2012/03/01/00/55/flowers-19830_640.jpg" alt="" />
-                            <div className="max-w-56 ml-3">
-                                {/* Video title should be in 15 words */}
-                                <h1>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Omnis cupiditate, fugiat quam quaerat at nobis.</h1>
-                                <h2 className="text-gray-500">Gaming aura</h2>
-                                <h3 className="text-gray-500">2.4 laks views - 3 month ago</h3>
-                            </div>
-                        </div>
-                    </Tooltip>
-                    <Tooltip color="warning" delay={700} showArrow={true} content="Video title here">
-                        <div className="ml-10 flex mb-5">
-                            <img className="h-36 rounded-md" src="https://cdn.pixabay.com/photo/2012/03/01/00/55/flowers-19830_640.jpg" alt="" />
-                            <div className="max-w-56 ml-3">
-                                {/* Video title should be in 15 words */}
-                                <h1>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Omnis cupiditate, fugiat quam quaerat at nobis.</h1>
-                                <h2 className="text-gray-500">Gaming aura</h2>
-                                <h3 className="text-gray-500">2.4 laks views - 3 month ago</h3>
-                            </div>
-                        </div>
-                    </Tooltip>
+                    <div>
+                        {allVideos.map((video, index) => (
+                            <Tooltip color="warning" delay={700} showArrow={true} content={video.allVideoTitles} key={index}>
+                                <div className="ml-10 flex mb-5">
+                                    <img style={{ height: "130px", width: "200px" }} className="rounded-md" src={video.allThumbnailUrls} alt="" />
+                                    <div className="max-w-56 ml-3">
+                                        <h1>{video.allVideoTitles}</h1>
+                                        <h2 className="text-gray-500">{video.channelName}</h2>
+                                        <h3 className="text-gray-500">{video.views} views - {video.uploadAt}</h3>
+                                    </div>
+                                </div>
+                            </Tooltip>
+                        ))}
+                    </div>
                 </div>
             </div >
         </>

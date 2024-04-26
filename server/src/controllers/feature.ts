@@ -52,9 +52,54 @@ export async function addToHistory(req: Request, res: Response) {
         } else {
             // Push the videoUrl to the history array
             user.features?.history.push(videoUrl);
-            // Save the updated user object to the database
+
             await user.save();
             return res.status(200).json({ message: 'Video added to history' });
+        }
+    } catch (error) {
+        console.error('Error adding video to history:', error);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
+
+
+export async function addSearchHistory(req: Request, res: Response) {
+    const { email, searchString } = req.body;
+    try {
+        const user = await UserModel.findOne({ email: email });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        } else {
+    
+            user.features?.searchHistory.push(searchString);
+
+            await user.save();
+            return res.status(200).json({ message: 'searchString added to searchHistory' });
+        }
+    } catch (error) {
+        console.error('Error adding video to history:', error);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
+
+export async function removeSearchHistory(req: Request, res: Response) {
+    const { email, searchString } = req.body;
+    try {
+        const user = await UserModel.findOne({ email: email });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        } else {
+            const SearchString: string = String(searchString);
+
+            const index = user.features?.searchHistory.indexOf(SearchString);
+            if (index !== -1 && user.features?.searchHistory) {
+    
+                await UserModel.updateOne(
+                    { email: email },
+                    { $pull: { 'features.searchHistory': searchString } }
+                );
+                return res.status(200).json({ message: 'searchString removed from searchHistory' });
+            }
         }
     } catch (error) {
         console.error('Error adding video to history:', error);
@@ -237,7 +282,8 @@ export async function addToDislikedVideo(req: Request, res: Response) {
                 watchLater: [],
                 likedVideos: [],
                 disLikedVideo: [],
-                comments: []
+                comments: [],
+                searchHistory:[]
             };
         }
 
