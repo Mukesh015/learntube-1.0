@@ -202,7 +202,7 @@ const queries = {
         return [{
             haveInPlaylist: hasValuePlayList, isSubsCribed: hasValueSubscriptions, hasInHistory: hasValueHistory,
             haveInMyVideos: hasValueMyVideos, haveInWatchLater: hasValueWatchLater, isLiked: hasValueLikedVideos, 
-            dislikedVideos: hasValueDislikedVideos,isSubscribed:hasValueSubscribed
+            dislikedVideos: hasValueDislikedVideos,SubscribedChannels:hasValueSubscribed
         }];
     },
     getSearchBarDetails: async (_: any, { email }: { email: string }) => {
