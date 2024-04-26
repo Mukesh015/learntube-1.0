@@ -13,7 +13,7 @@ import { auth } from "@/configurations/firebase/config";
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 
 const VideoUrl = gql`
-  query GetVideoUrl( $email: String, $videoId: String) {
+  query GetVideoUrl( $email: String, $videoId: String,$channelId: String) {
     getVideoUrl(email: $email, videoID: $videoId) {
         videoURl
         videoDescription
@@ -24,8 +24,9 @@ const VideoUrl = gql`
         videoViews
         videoPublishedAt
         videoTags
+        channelId
     }
-    getFeatures(email: $email, videoID: $videoId) {
+    getFeatures(email: $email, videoID: $videoId,channelId: $channelId) {
         haveInMyVideos
         haveInPlaylist
         haveInWatchLater
@@ -33,9 +34,11 @@ const VideoUrl = gql`
         isSubsCribed
         hasInHistory
         dislikedVideos
+
     }
     getAllVideoUrl {
         channelLogo
+        channelName
         allEmail
         allThumbnailUrls
         allVideoTitles
@@ -70,26 +73,13 @@ const VideoPage: React.FC<Props> = ({ params }) => {
     const [channelLogo, setChannelLogo] = useState<string>("");
     const [videoViews, setVideoViews] = useState<string>("");
     const [videoPublishedAt, setVideoPublishedAt] = useState<string>("");
+    const [channelId, setChannelId] = useState<string>("");
     const [videoTags, setVideoTags] = useState<string>("");
-    const [creatorEmail, setCreatorEmail] = useState<string>("");
     const [isSubsCribed, setIsSubsribed] = useState<boolean>(false);
-    const [channlId, setChannlId] = useState<string>("");
-
-    const toggleSubscribe = () => {
-        setIsSubsribed(!isSubsCribed);
-    }
-
-    const toggleAddToPlaylist = () => {
-        setIsAddedToPlaylist(!isAddedToPlaylist);
-    }
-
-    const toggleAddToWatchLater = () => {
-        setIsAddedToWatchLater(!isAddedToWatchLater);
-    }
 
     const videoId: any = decodeURIComponent(params.id)
     const { loading, error, data } = useQuery(VideoUrl, {
-        variables: { email: email, videoId: videoId },
+        variables: { email: email, videoId: videoId,channelId: channelId},
     });
 
     const handleSubscribe = useCallback(async () => {
@@ -222,10 +212,14 @@ const VideoPage: React.FC<Props> = ({ params }) => {
     useEffect(() => {
         if (data) {
             setVideoUrl(data.getVideoUrl[0].videoURl);
+            setChannelId(data.getVideoUrl[0].channelId)
+            console.log("URL is", data.getVideoUrl[0].videoUrl);
             setIsAddedToPlaylist(data.getFeatures[0].haveInPlaylist)
             setIsAddedToWatchLater(data.getFeatures[0].haveInWatchLater)
             setIsLikedVideo(data.getFeatures[0].isLiked)
-            setIsDisLikedVideo(data.getFeatures[0].dislikedVideos)
+            setDisIsLikedVideo(data.getFeatures[0].dislikedVideos)
+            setIsSubsribed(data.getFeatures[0].isSubsribed)
+            console.log(data);
             setAllVideos(data.getAllVideoUrl);
             setCreatorEmail(data.getVideoUrl[0].creatorEmail);
             setVideoTitle(data.getVideoUrl[0].videoTitle);

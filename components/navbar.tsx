@@ -23,7 +23,8 @@ query Exam($email:String){
     getIsCreator(email: $email) {
         isCreator
       }
-      getSearchBarDetails {
+      getSearchBarDetails(email: $email) {
+        searchHistory
         videoDescription
         videoTags
         videoTitle
@@ -32,7 +33,7 @@ query Exam($email:String){
 `
 
 const Navbar: React.FC = () => {
-    // React components
+
     const [userName, setuserName] = useState<string>("");
     const [email, setEmail] = useState<string>("");
     const [avatar, setavatar] = useState<string>("");
@@ -43,6 +44,8 @@ const Navbar: React.FC = () => {
     const [searchItem, setSearchItem] = useState<boolean>(false);
 
     const [spinnerButton, setspinnerButton] = useState<boolean>(false);
+    const [searchString, setsearchString] = useState<string>("");
+    const [searchbarDetails, setSearchBarDetails] = useState<any[]>([]);
 
     const router = useRouter();
     const [user] = useAuthState(auth);
@@ -57,6 +60,7 @@ const Navbar: React.FC = () => {
         variables: { email: email },
     });
 
+    console.log(searchbarDetails.map(item => item.searchHistory));
     const handleInputClick = () => {
         toggleSearchDiv();
     };
@@ -168,14 +172,78 @@ const Navbar: React.FC = () => {
         if (data && email !== "") {
             const verifyIsCreator = data.getIsCreator[0].isCreator
             setIsCreator(verifyIsCreator);
-            console.log("upcoming data: " , data.getSearchBarDetails);
-
+            setSearchBarDetails(data.getSearchBarDetails)
             console.log("Veify creator", isCreator)
         }
         else {
             console.log("User is not available");
         }
-    }, [user, isCreator, data]);
+    }, [user, setIsCreator, data, setSearchBarDetails]);
+
+    const handleSearch = async () => {
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN}/features/addtosearchhistory`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email: email,
+                    searchString: searchString
+                })
+            });
+            const data = await response.json();
+            console.log(data);
+            if (response.ok) {
+                console.log("search String saved successfully")
+            }
+        } catch (error) {
+            console.error("Failed to fetch", error);
+        }
+    }
+
+    useEffect(() => {
+        const handleSearchChange = (e: Event) => {
+            const input = e.target as HTMLInputElement;
+            const value = input.value.toLowerCase(); // Convert input value to lowercase for case-insensitive search
+            setsearchString(value);
+            console.log(value);
+        }
+        //         //   const filteredShortIds = data.shortId.filter((shortId: string | number, index: string | number) => {
+        //         //     const shortIdLower =
+        //         //       `${process.env.NEXT_PUBLIC_SERVER_DOMAIN}/redirect/${shortId}`.toLowerCase(); // Convert shortId to lowercase
+        //         //     const redirectURLLower = data.redirectURL[index].toLowerCase(); // Convert redirectURL to lowercase
+        //         //     const shortIdCountLower = data.shortIdCounts[shortId]
+        //         //       .toString()
+        //         //       .toLowerCase(); // Convert shortIdCount to lowercase
+        //         //     const formattedCreatedAtLower =
+        //         //       data.formattedCreatedAt[index].toLowerCase(); // Convert formattedCreatedAt to lowercase
+        //         //     return (
+        //         //       shortIdLower.includes(value) ||
+        //         //       redirectURLLower.includes(value) ||
+        //         //       shortIdCountLower.includes(value) ||
+        //         //       formattedCreatedAtLower.includes(value)
+        //         //     );
+        //         //   });
+
+        //         //   // Based on filteredShortIds, filter the elements to hide or show
+        //         //   const rows = document.querySelectorAll("[data-row]");
+        //         //   rows.forEach((row, index) => {
+        //         //     const isVisible = filteredShortIds.includes(data.shortId[index]);
+        //         //     row.classList.toggle("hidden", !isVisible);
+        //         //   });
+        // };
+
+        const searchInput = document.querySelector<HTMLInputElement>("[data-search-content]");
+        if (searchInput) {
+            searchInput.addEventListener("input", handleSearchChange);
+
+            return () => {
+                searchInput.removeEventListener("input", handleSearchChange);
+            };
+        }
+    }, [setsearchString]);
+
 
     return (
         <>
@@ -247,15 +315,18 @@ const Navbar: React.FC = () => {
                         <Tooltip color="warning" delay={700} showArrow={true} content="Search a content">
                             <input
                                 style={{ width: "600px" }}
-                                type="text"
+
+                                type="search"
+                                id="search-content"
                                 placeholder="Search here... or [ctrl+k]"
                                 className="bg-inherit border border-gray-700 rounded-medium p-2 px-10 w-96"
                                 onClick={handleInputClick}
+                                data-search-content
                             />
                         </Tooltip>
 
                         <Tooltip color="warning" delay={700} showArrow={true} content="Click to search">
-                            <Button className="font-semibold text-white ml-4" color="success">
+                            <Button className="font-semibold text-white ml-4" color="success" onClick={handleSearch}>
                                 Search
                             </Button>
                         </Tooltip>
@@ -355,14 +426,18 @@ const Navbar: React.FC = () => {
                     </li>
                 </ul>
             </nav >
-            {searchItem &&
+            {searchItem && searchbarDetails && (
                 <div className="mt-20 bg-gray-800 rounded-md" style={{ marginLeft: "440px", marginRight: "480px" }}>
                     <div className="flex cursor-pointer">
-                        <p className="p-2 hover:bg-gray-600 rounded-xl">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempora</p>
+                        <div className="flex flex-col">
+                            {Array.from(new Set(searchbarDetails.flatMap(item => item.searchHistory))).map((history, idx) => (
+                                <p key={idx} className="p-2 hover:bg-gray-600 rounded-xl">{history}</p>
+                            ))}
+                        </div>
                         <svg className="ml-16 mt-2 hover:bg-gray-600 rounded-full p-1" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" /></svg>
                     </div>
                 </div>
-            }
+            )}
             <Modal
                 backdrop="opaque"
                 size="3xl"

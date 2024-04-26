@@ -135,9 +135,9 @@ export async function getUserDetails(req: Request, res: Response) {
         isCreator: user.isCreator,
         channelName: user.channelName,
         channelLogo: user.channelLogo,
+        channelId: user.channelId,
         history: user.history,
-        analytics: user.analytics
-
+        analytics: user.analytics  
       }));
       res.status(200).json(userDetailsArray);
     } else {

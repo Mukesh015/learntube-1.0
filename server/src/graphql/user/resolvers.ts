@@ -13,8 +13,10 @@ interface VideoInfo {
     videoId: string;
     videoViews: number;
     channelLogo: string | undefined;
+    channelName: string| undefined;
 }
 interface User {
+    channelId: any;
     email: string;
     username: string;
     password: string;
@@ -48,7 +50,10 @@ const queries = {
             const response = await axios.post(`${process.env.server_domain}/api/getuserdetails`);
             const userDetails: User[] = response.data;
             const creators = userDetails.filter(user => user.isCreator);
-            return creators.map(creator => ({ channelLogo: creator.channelLogo, email: creator.email, channelName: creator.channelName }));
+            return creators.map(creator => ({
+                channelLogo: creator.channelLogo, email: creator.email, channelName: creator.channelName,
+                channelId: creator.channelId
+            }));
         } catch (error) {
             console.error('Error fetching channellogo:', error);
             throw new Error('Error fetching channellogo');
@@ -81,6 +86,8 @@ const queries = {
                     for (const Video of course.videos) {
                         const channelLogoResponse = await queries.getChannelLogo(undefined, { email: video.email });
                         const channelLogo = channelLogoResponse.find((logo: { email: string; }) => logo.email === video.email)?.channelLogo;
+                        const channelName = channelLogoResponse.find((logo: { email: string; }) => logo.email === video.email)?.channelName;
+
                         allVideoThumbUrls.push({
                             email: video.email,
                             videoUrl: Video.videoUrl,
@@ -90,6 +97,7 @@ const queries = {
                             videoId: Video.videoID,
                             videoViews: Video.videoViewCount,
                             channelLogo: channelLogo,
+                            channelName: channelName,
                         });
                     }
                 }
@@ -102,7 +110,8 @@ const queries = {
                 uploadAt: videothumb.uploadAt,
                 videoId: videothumb.videoId,
                 views: videothumb.videoViews,
-                channelLogo: videothumb.channelLogo
+                channelLogo: videothumb.channelLogo,
+                channelName: videothumb.channelName
             }));
         } catch (error) {
             console.error('Error fetching video URLs:', error);
@@ -137,7 +146,7 @@ const queries = {
             const channelLogo = channelLogoResponse.find((logo: { email: string; }) => logo.email === entry.email)?.channelLogo;
             const channelName = channelLogoResponse.find((name: { email: string; }) => name.email === entry.email)?.channelName;
             const creatorEmail = channelLogoResponse.find((name: { email: string; }) => name.email === entry.email)?.email;
-
+            const channelId = channelLogoResponse.find((name: { email: string; }) => name.email === entry.email)?.channelId;
 
             if (!video) {
                 throw new Error("videoID not found");
@@ -148,8 +157,9 @@ const queries = {
             }
 
             return [{
-                videoURl: video.videoUrl, videoDescription: video.videoDescription, videoTitle: video.videoTitle, videoViews: video.videoViews.length,
-                videoPublishedAt: video.videoPublishedAt, videoTags: video.videoTags, channelLogo: channelLogo, channelName: channelName,creatorEmail:creatorEmail
+                videoURl: video.videoUrl, videoDescription: video.videoDescription, videoTitle: video.videoTitle,
+                videoViews: video.videoViews.length, videoPublishedAt: video.videoPublishedAt, videoTags: video.videoTags,
+                channelLogo: channelLogo, channelName: channelName, creatorEmail: creatorEmail, channelId: channelId,
             }];
 
         } catch (error) {
@@ -157,7 +167,7 @@ const queries = {
             throw new Error("Internal Server Error");
         }
     },
-    getFeatures: async (_: any, { email, videoID }: { email: string, videoID: string }) => {
+    getFeatures: async (_: any, { email, videoID,channelId }: { email: string, videoID: string,channelId:string }) => {
         const user: UserDocument | null = await UserModel.findOne({ email });
         if (!user) {
             return "USer not found";
@@ -185,27 +195,42 @@ const queries = {
         const dislikedVideos = user.features?.disLikedVideo || [];
         const hasValueDislikedVideos = dislikedVideos.includes(videoID);
 
+        const subsCribed=user.subscribedChnannels?.channelId || [];
+        const hasValueSubscribed=subsCribed.includes(channelId);
 
 
         return [{
             haveInPlaylist: hasValuePlayList, isSubsCribed: hasValueSubscriptions, hasInHistory: hasValueHistory,
-            haveInMyVideos: hasValueMyVideos, haveInWatchLater: hasValueWatchLater, isLiked: hasValueLikedVideos, dislikedVideos: hasValueDislikedVideos
+            haveInMyVideos: hasValueMyVideos, haveInWatchLater: hasValueWatchLater, isLiked: hasValueLikedVideos, 
+            dislikedVideos: hasValueDislikedVideos,isSubscribed:hasValueSubscribed
         }];
     },
-    getSearchBarDetails: async (_: any) => {
+    getSearchBarDetails: async (_: any, { email }: { email: string }) => {
         try {
             const response = await axios.post(`${process.env.server_domain}/video/getvideodetails`);
-            
             const videos = response.data.videoDetails;
-            
             const courses = videos.flatMap((video: { courses: any; }) => video.courses);
             const videoDetails = courses.flatMap((course: { videos: any; }) => course.videos).map((video: { videoTitle: any; videoDescription: any; videoTags: any; }) => ({
                 videoTitle: video.videoTitle,
                 videoDescription: video.videoDescription,
                 videoTags: video.videoTags
             }));
-    
-            return videoDetails;
+
+
+            const users = await UserModel.find({ email });
+            if (users) {
+                const searchHistory = users.map(user => user.features?.searchHistory).filter(history => history);
+                const flattenedSearchHistory = searchHistory.flat();
+                return videoDetails.map((videoDetail: any) => ({
+                    ...videoDetail,
+                    searchHistory: flattenedSearchHistory
+                }));
+            }
+
+            return videoDetails.map((videoDetail: any) => ({
+                ...videoDetail,
+                searchHistory: []
+            }));
         } catch (error) {
             console.error('Error fetching search bar details:', error);
             throw new Error('Error fetching search bar details');
