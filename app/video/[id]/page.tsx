@@ -21,6 +21,7 @@ const VideoUrl = gql`
         videoDescription
         channelLogo
         channelName
+        creatorEmail
         videoTitle
         videoViews
         videoPublishedAt

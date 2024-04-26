@@ -26,6 +26,7 @@ type url{
     videoDescription: String
     channelLogo:String
     channelName:String
+    creatorEmail:String
     videoViews:String
     videoPublishedAt:String
     videoTags:[String]
@@ -39,7 +40,7 @@ type features{
     isLiked: Boolean
     dislikedVideos: Boolean
 }
-type searchBarDetails{
+type search{
     videoTitle: String
     videoDescription: String
     videoTags: [String]
