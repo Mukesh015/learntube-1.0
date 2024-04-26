@@ -15,6 +15,7 @@ interface UserDocument extends Document {
     occupation?: string;
     channelId?: string;
     subscribers?: { count: number, users: any[] };
+    subscribedChnannels?: { count: number, channelId: any[] };
     channelDescription?: string;
     website: { any: string, Facebook: string, Instagram: string, Twitter: string, Github: string, LinkedIn: string, Discord: string }
     address: { country: string; state: string; city: string; pincode: number; addressLine: string; phone: number };
@@ -116,6 +117,10 @@ const userSchema = new mongoose.Schema<UserDocument>(
         subscribers: {
             count: { type: Number, default: 0 },
             users: [{ type: mongoose.Schema.Types.Mixed, required: false }]
+        },
+        subscribedChnannels: {
+            count: { type: Number, default: 0 },
+            channelId: [{ type: mongoose.Schema.Types.Mixed, required: false }]
         },
         history: [mongoose.Schema.Types.Mixed],
         analytics: [

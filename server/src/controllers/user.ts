@@ -198,10 +198,16 @@ export async function generateOtp(req: Request, res: Response) {
   }
 }
 
-export async function addSubscription(req: Request, res: Response) {
-  const { email, channelId } = req.body;
+export async function subscribe(req: Request, res: Response) {
+  const { email, channelId, creatorEmail } = req.body;
+
   try {
-    // Check if the user exists
+    // Check if both email and creatorEmail exist
+    if (!email || !creatorEmail) {
+      return res.status(400).json({ error: "Email and creatorEmail are required" });
+    }
+
+    // Find the user by email
     const user = await UserModel.findOne({ email });
 
     if (!user) {
@@ -209,18 +215,62 @@ export async function addSubscription(req: Request, res: Response) {
     }
 
     // Check if the channel is already subscribed
-    if (user.subscribers && user.subscribers.users.includes(channelId)) {
-      return res.status(400).json({ error: "Channel already subscribed" });
+    if (user.subscribedChnannels && user.subscribedChnannels.channelId.includes(channelId)) {
+      // Remove the channelId from subscribedChannels and decrement the count
+      const index = user.subscribedChnannels.channelId.indexOf(channelId);
+      user.subscribedChnannels.channelId.splice(index, 1);
+      user.subscribedChnannels.count--;
+
+      // Save the updated user document
+      await user.save();
+
+      // Find the creator user by creatorEmail
+      const creatorUser = await UserModel.findOne({ email: creatorEmail });
+
+      if (!creatorUser) {
+        return res.status(404).json({ error: "Creator user not found" });
+      }
+
+      // Remove the email from the creatorUser's subscribers users array and decrement the count
+      // @ts-ignore
+      const subscriberIndex = creatorUser.subscribers.users.indexOf(email);
+      if (creatorUser.subscribers) {
+        creatorUser.subscribers.users.splice(subscriberIndex, 1);
+        creatorUser.subscribers.count--;
+      }
+
+      // Save the updated creatorUser document
+      await creatorUser.save();
+
+      return res.status(200).json({ message: "Unsubscribed successfully" });
     }
 
-    // Add the channelId to the subscribers users array
-    if (!user.subscribers) {
-      user.subscribers = { count: 0, users: [] };
+    // Add the channelId to the subscribedChannels channelId array and increment the count
+    if (!user.subscribedChnannels) {
+      user.subscribedChnannels = { count: 0, channelId: [] };
     }
-    user.subscribers.users.push(channelId);
+    user.subscribedChnannels.channelId.push(channelId);
+    user.subscribedChnannels.count++;
 
     // Save the updated user document
     await user.save();
+
+    // Find the creator user by creatorEmail
+    const creatorUser = await UserModel.findOne({ email: creatorEmail });
+
+    if (!creatorUser) {
+      return res.status(404).json({ error: "Creator user not found" });
+    }
+
+    // Add the email to the creatorUser's subscribers users array and increment the count
+    if (!creatorUser.subscribers) {
+      creatorUser.subscribers = { count: 0, users: [] };
+    }
+    creatorUser.subscribers.users.push(email);
+    creatorUser.subscribers.count++;
+
+    // Save the updated creatorUser document
+    await creatorUser.save();
 
     return res.status(200).json({ message: "Subscription added successfully" });
   } catch (error) {

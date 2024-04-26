@@ -1,5 +1,5 @@
 import express from 'express';
-import { register, createChannel, getUserDetails, generateOtp, userValidation } from '../controllers/user';
+import { register, createChannel, getUserDetails, generateOtp, userValidation, subscribe } from '../controllers/user';
 import multer from 'multer';
 const UserRouter = express.Router();
 
@@ -14,6 +14,7 @@ UserRouter.post('/createchannel', upload.array('image', 2), createChannel);
 UserRouter.post('/getuserdetails', getUserDetails);
 UserRouter.post("/generateotp", generateOtp)
 UserRouter.post("/validation", userValidation)
+UserRouter.post("/subscribe", subscribe)
 
 
 export default UserRouter;
