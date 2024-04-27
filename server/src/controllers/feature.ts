@@ -65,7 +65,6 @@ export async function addToHistory(req: Request, res: Response) {
 
 export async function addSearchHistory(req: Request, res: Response) {
     const { email, searchString } = req.body;
-    console.log(email);
     try {
         const user = await UserModel.findOne({ email: email });
         if (!user) {

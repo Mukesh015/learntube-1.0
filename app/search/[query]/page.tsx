@@ -33,6 +33,7 @@ const SerachResult: React.FC <Props> = ({ params }) => {
 
 
     const query: any = decodeURIComponent(params.query)
+
     const { loading, error, data } = useQuery(searchQuery, {
         variables: { query: query},
     });
