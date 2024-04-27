@@ -1,9 +1,54 @@
-import React from "react";
+"use client"
+import React, { useState,useEffect } from "react";
 import Navbar from "@/components/navbar";
 import Sidebar from "@/components/sidebar";
 import { Tooltip } from "@nextui-org/react";
+import { auth } from "@/configurations/firebase/config";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { gql, useQuery } from "@apollo/client";
+
+const playListDetails=gql`
+
+query playlist($email: String) {
+    getPlaylist(email: $email) {
+      videoId
+      videoTitle
+      channelLogo
+      videoPublishedAt
+      videoViews
+      videoThumbnail
+    }
+  }
+
+`
+
 
 const Playlist: React.FC = () => {
+
+    
+    const [email, setEmail] = useState<string>("");
+    const [playList, setPlayList] = useState<any[]>([]);
+
+    const [user] = useAuthState(auth);
+
+
+    const { loading, error, data } = useQuery(playListDetails, {
+        variables: { email: email },
+    });
+
+    
+
+    useEffect(() => {
+        if (user) {
+            setEmail(user.email || "");
+        }
+        if(data && email ){
+            setPlayList(data.getPlaylist);
+        }
+
+    },[ setEmail,user,setPlayList]);
+
+
     return (
         <>
             <Navbar />
@@ -171,3 +216,7 @@ const Playlist: React.FC = () => {
 }
 
 export default Playlist;
+
+function useEffects(arg0: () => void, arg1: never[]) {
+    throw new Error("Function not implemented.");
+}

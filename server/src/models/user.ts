@@ -1,12 +1,14 @@
 import mongoose, { Document, Model } from "mongoose";
 
 interface UserDocument extends Document {
+    courses: any;
     email: string;
     username: string;
     password: string;
     avatar?: string;
     isCreator: boolean;
     channelName?: string;
+    channelCreatedAt?: number;
     channelLogo?: string;
     coverPhoto?: string;
     gender?: string;
@@ -19,8 +21,10 @@ interface UserDocument extends Document {
     channelDescription?: string;
     website: { any: string, Facebook: string, Instagram: string, Twitter: string, Github: string, LinkedIn: string, Discord: string }
     address: { country: string; state: string; city: string; pincode: number; addressLine: string; phone: number };
-    features?: { subscriptions: any[], playlists: any[], history: any[], myVideos: any[], watchLater: any[], likedVideos: any[],
-         disLikedVideo: any[], comments: any[],searchHistory: any[],}
+    features?: {
+        subscriptions: any[], playlists: any[], history: any[], myVideos: any[], watchLater: any[], likedVideos: any[],
+        disLikedVideo: any[], comments: any[], searchHistory: any[],
+    }
     history: any[];
     analytics: { date: Date; watchTime: number }[];
 
@@ -51,6 +55,10 @@ const userSchema = new mongoose.Schema<UserDocument>(
         },
         channelName: {
             type: String,
+            required: false
+        },
+        channelCreatedAt: {
+            type: Date,
             required: false
         },
         channelId: {

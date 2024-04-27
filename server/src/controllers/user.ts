@@ -94,6 +94,7 @@ export async function createChannel(req: Request, res: Response) {
     user.isCreator = true;
     user.channelName = channelName;
     user.channelLogo = channelLogo;
+    user.channelCreatedAt = Date.now();
     user.coverPhoto = coverPhoto;
     user.firstname = firstName;
     user.gender = gender;

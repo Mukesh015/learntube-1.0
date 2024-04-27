@@ -1,8 +1,50 @@
-import React from "react";
+"use client"
+import React, { useEffect, useState } from "react";
 import Navbar from "@/components/navbar";
 import Sidebar from "@/components/sidebar";
+import { auth } from "@/configurations/firebase/config";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { gql, useQuery } from "@apollo/client";
 
+
+const watchLaterDetails=gql`
+
+query likedVideos($email: String) {
+    getLikedVideos(email: $email) {
+      videoId
+      videoTitle
+      channelLogo
+      videoPublishedAt
+      videoViews
+      videoThumbnail
+    }
+  }
+`
 const Likedvideo: React.FC = () => {
+
+    const [email, setEmail] = useState<string>("");
+    const [likedVideos, setLikedVideo] = useState<any[]>([]);
+
+    const [user] = useAuthState(auth);
+
+
+    const { loading, error, data } = useQuery(watchLaterDetails, {
+        variables: { email: email },
+    });
+
+    
+
+    useEffect(() => {
+        if (user) {
+            setEmail(user.email || "");
+        }
+        if(data && email ){
+            setLikedVideo(data.getLikedVideos);
+        }
+
+    },[ setEmail,user,setLikedVideo]);
+
+    
     return (
         <>
             <Navbar />

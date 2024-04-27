@@ -44,12 +44,13 @@ export async function uploadVideo(req: Request, res: Response) {
 
         courseName,
         courseThumbUrl: courseThumbUrl,
+        courseId:`@${Date.now()}${courseName.slice(0, 4)}`.replace(/\s/g, ''),
         courseDescription,
         courseFees: { price },
         videos: [{
           videoUrl: videoUrl,
           videoTitle,
-          videoID: `@${Date.now()}${videoTitle.slice(0, 4)}`,
+          videoID: `@${Date.now()}${videoTitle.slice(0, 4)}`.replace(/\s/g, ''),
           videoDescription,
           videoThumbnail: videoThumbnail,
           videoPublishedAt: new Date(),
