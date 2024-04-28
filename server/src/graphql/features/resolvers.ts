@@ -2,6 +2,7 @@ import { VideoModel, VideoDocument } from "../../models/video";
 import { UserModel, UserDocument } from "../../models/user";
 import axios from "axios";
 import dotenv from "dotenv";
+import { timeStamp } from "console";
 
 dotenv.config({ path: "../.env" });
 
@@ -95,7 +96,7 @@ const queries = {
 
             const playlist = user.features?.playlists || [];
 
-            const playlistDetails: { videoId: any; videoTitle: any; videoViews: any;channelLogo:any;videoPublishedAt:any;videoThumbnail:any }[] = [];
+            const playlistDetails: { videoId: any; videoTitle: any; videoViews: any; channelLogo: any; videoPublishedAt: any; videoThumbnail: any }[] = [];
 
             videos.forEach(video => {
                 video.courses.forEach(course => {
@@ -136,7 +137,7 @@ const queries = {
 
             const watchLater = user.features?.watchLater || [];
 
-            const watchLaterDetails: { videoId: any; videoTitle: any; videoViews: any;channelLogo:any;videoPublishedAt:any;videoThumbnail:any }[] = [];
+            const watchLaterDetails: { videoId: any; videoTitle: any; videoViews: any; channelLogo: any; videoPublishedAt: any; videoThumbnail: any }[] = [];
 
             videos.forEach(video => {
                 video.courses.forEach(course => {
@@ -177,7 +178,7 @@ const queries = {
 
             const likedVideos = user.features?.likedVideos || [];
 
-            const likedVideosDetails: { videoId: any; videoTitle: any; videoViews: any;channelLogo:any;videoPublishedAt:any;videoThumbnail:any }[] = [];
+            const likedVideosDetails: { videoId: any; videoTitle: any; videoViews: any; channelLogo: any; videoPublishedAt: any; videoThumbnail: any }[] = [];
 
             videos.forEach(video => {
                 video.courses.forEach(course => {
@@ -202,23 +203,77 @@ const queries = {
             throw new Error("An error occurred while fetching user playlist.");
         }
     },
-    // getchannelDetails: async(_: any, { email }: { email: string }) =>{
-    //     try {
-    //         const user: UserDocument | null = await UserModel.findOne({ email });
-    //         if (!user) {
-    //             return "User not found";
-    //         }
-    //         return [
-    //             {
-    //                 Name:
-
-    //             }
-    //         ]
-    //     }
-    //     catch(error) {
-    //         console.log(error);
-    //         throw new Error("An error occurred while fetching getchannelDetails");
-    //     }
-    // }
+    getchannelDetails: async(_: any, { email }: { email: string }) =>{
+        try {
+            const user: UserDocument | null = await UserModel.findOne({ email });
+            if (!user) {
+                return "User not found";
+            }
+    
+            const { any, Facebook, Instagram, Twitter, Github, LinkedIn, Discord } = user.website || {};
+    
+            return [
+                {
+                    Name: user.username,
+                    email: user.email,
+                    phoneNumber: user.address.phone,
+                    Gender: user.gender,
+                    addressLine: user.address.addressLine,
+                    city: user.address.city,
+                    state: user.address.state,
+                    country: user.address.country,
+                    PinCode: user.address.pincode,
+                    channelName: user.channelName,
+                    RecoveryEmail: user.recoveryEmail,
+                    channelDescription: user.channelDescription,
+                    websiteURL: any || "",
+                    Facebook: Facebook || "",
+                    Instagram: Instagram || "",
+                    Twitter: Twitter || "",
+                    Github: Github || "",
+                    LinkedIn: LinkedIn || "",
+                    Discord: Discord || "",
+                    coverPhotoURL: user.coverPhoto,
+                    channelLogo: user.channelLogo,
+                    channelId: user.channelId,
+                }
+            ];
+        } catch (error) {
+            console.log(error);
+            throw new Error("An error occurred while fetching getchannelDetails");
+        }
+    },
+    getComments: async (_: any, { videoID }: { videoID: string }) => {
+        try {
+            const video = await VideoModel.findOne({ "courses.videos.videoID": videoID });
+            if (!video) {
+                throw new Error('Video not found');
+            }
+    
+            const courseWithVideo = video.courses.find(course =>
+                course.videos.some(video => video.videoID === videoID)
+            );
+    
+            if (!courseWithVideo || !courseWithVideo.videos) {
+                return [];
+            }
+    
+            const videoComments = courseWithVideo.videos.map(video => video.videoComments);
+    
+            const comments = videoComments.flatMap(comment => comment?.comments.comment || []);
+            const logos = videoComments.flatMap(comment => comment?.comments.logo || []);
+            const timestamps = videoComments.flatMap(comment => comment?.comments.timestamp || []);
+    
+            const result = comments.map((comment, index) => ({
+                comment: comment || "",
+                logo: logos[index] || "",
+                timestamp: timestamps[index] || ""
+            }));
+            return result;
+        } catch (error) {
+            console.error('Error fetching video comments:', error);
+            throw error;
+        }
+    }
 }
 export const resolvers = { queries };

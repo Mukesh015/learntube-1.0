@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import { VideoModel, VideoDocument } from "../models/video";
 import dotenv from "dotenv";
+import { log } from 'console';
 
 dotenv.config({ path: "./.env" });
 
@@ -36,7 +37,15 @@ export async function uploadVideo(req: Request, res: Response) {
         videoViews: [{ user: email, timestamp: Date.now() }],
         videoLikeCount: 0,
         videoDislikeCount: 0,
-        videoComment: 0
+        videoComments: {
+          count: 0,
+          comments: {
+            user: [],
+            comment: [],
+            timestamp: [],
+            logo: []
+          }
+        }
       });
     } else {
 
@@ -44,7 +53,7 @@ export async function uploadVideo(req: Request, res: Response) {
 
         courseName,
         courseThumbUrl: courseThumbUrl,
-        courseId:`@${Date.now()}${courseName.slice(0, 4)}`.replace(/\s/g, ''),
+        courseId: `@${Date.now()}${courseName.slice(0, 4)}`.replace(/\s/g, ''),
         courseDescription,
         courseFees: { price },
         videos: [{
@@ -58,7 +67,15 @@ export async function uploadVideo(req: Request, res: Response) {
           videoViews: [{ user: '', timestamp: Date.now() }],
           videoLikeCount: 0,
           videoDislikeCount: 0,
-          videoComment: 0
+          videoComments: {
+            count: 0,
+            comments: {
+              user: [],
+              comment: [],
+              timestamp: [],
+              logo: []
+            }
+          }
         }]
       };
       user.courses.push(course);
@@ -99,10 +116,18 @@ export async function getVideoDetails(req: Request, res: Response) {
           videoPublishedAt: video.videoPublishedAt,
           videoTags: video.videoTags,
           videoViews: video.videoViews,
-          videoViewCount:video.videoViews.length,
+          videoViewCount: video.videoViews.length,
           videoLikeCount: video.videoLikeCount,
           videoDislikeCount: video.videoDislikeCount,
-          videoComment: video.videoComment
+          videoComments: {
+            count: 0,
+            comments: {
+              user: [],
+              comment: [],
+              timestamp: [],
+              logo: []
+            }
+          }
         }))
       }))
     }));
@@ -125,7 +150,7 @@ export async function redirect(req: Request, res: Response) {
           "courses.$[course].videos.$[video].videoViews": {
             user: email,
             timestamp: Date.now(),
-    
+
           }
         },
       },
@@ -149,10 +174,45 @@ export async function redirect(req: Request, res: Response) {
       return res.status(404).json({ error: "videoUrl not found" });
     }
 
-    res.send({videoURl:video.videoUrl});
+    res.send({ videoURl: video.videoUrl });
 
   } catch (error) {
     console.error("Error redirecting:", error);
     return res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
+export async function addComment(req: Request, res: Response) {
+  const { user, logo, comment, videoId, email } = req.body;
+  try {
+    // Find the video by email and videoId
+    const video = await VideoModel.findOne({ email: email, "courses.videos.videoID": videoId });
+
+    if (!video) {
+      return res.status(404).json({ error: 'Video not found' });
+    }
+
+    // Update the video with the new comment
+    video.courses.forEach(course => {
+      course.videos.forEach(video => {
+        if (video.videoID === videoId) {
+          if (video.videoComments) {
+            video.videoComments.count += 1;
+            video.videoComments.comments.user.push(user);
+            video.videoComments.comments.logo.push(logo);
+            video.videoComments.comments.comment.push(comment);
+            video.videoComments.comments.timestamp.push(Date.now());
+          }
+        }
+      });
+    });
+
+    // Save the updated video document
+    await video.save();
+
+    return res.status(200).json({ message: 'Comment added successfully' });
+  } catch (error) {
+    console.log("Add comment failed:", error);
+    return res.status(500).json({ error: 'Internal Server Error' });
   }
 }

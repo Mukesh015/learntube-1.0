@@ -6,7 +6,7 @@ dotenv.config({ path: "./.env" });
 
 const stripe = require('stripe')(process.env.stripe_secret)
 
-export async function addToPlaylist(req: Request, res: Response){
+export async function addToPlaylist(req: Request, res: Response) {
     const { email, videoId } = req.body;
     try {
 
@@ -70,7 +70,7 @@ export async function addSearchHistory(req: Request, res: Response) {
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         } else {
-    
+
             user.features?.searchHistory.push(searchString);
 
             await user.save();
@@ -93,7 +93,7 @@ export async function removeSearchHistory(req: Request, res: Response) {
 
             const index = user.features?.searchHistory.indexOf(SearchString);
             if (index !== -1 && user.features?.searchHistory) {
-    
+
                 await UserModel.updateOne(
                     { email: email },
                     { $pull: { 'features.searchHistory': searchString } }
@@ -283,7 +283,7 @@ export async function addToDislikedVideo(req: Request, res: Response) {
                 likedVideos: [],
                 disLikedVideo: [],
                 comments: [],
-                searchHistory:[]
+                searchHistory: []
             };
         }
 
@@ -308,7 +308,31 @@ export async function addToDislikedVideo(req: Request, res: Response) {
 }
 
 
+export async function calculateWatchTime(req: Request, res: Response) {
+    const { email, watchTime } = req.body;
+    console.log(email);
+    try {
 
+        const parsedWatchTime = parseFloat(watchTime);
+        if (isNaN(parsedWatchTime)) {
+            return res.status(400).json({ error: 'Invalid watch time value' });
+        }
+
+        const user = await UserModel.findOne({ email: email });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        user.WatchTime = (user.WatchTime || 0) + parsedWatchTime;
+
+        await user.save();
+
+        res.status(200).json({ message: 'Watch time updated successfully' });
+    } catch (error) {
+        console.error("Error calculating watch time:", error);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+}
 
 
 
