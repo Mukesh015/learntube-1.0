@@ -4,6 +4,8 @@ import React, { useEffect, useState } from "react";
 import Navbar from "@/components/navbar";
 import Sidebar from "@/components/sidebar";
 import { gql, useQuery } from "@apollo/client";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "@/configurations/firebase/config";
 
 
 const HOMEPAGE_DETAILS = gql`
@@ -17,20 +19,68 @@ const HOMEPAGE_DETAILS = gql`
       uploadAt
       videoId
       views
+      courseFees
+      courseId
     }
   }
 `;
 
 const Home: React.FC = () => {
   const [homePageDetails, setHomePageDetails] = useState<any[]>([]);
+  const [email, setEmail] = useState<string>("");
 
   const { loading, error, data } = useQuery(HOMEPAGE_DETAILS);
+  const [user] = useAuthState(auth);
+
+
+  const handleRedirect = async (videoId: any, courseFees: any, courseId: any) => {
+    console.log(courseId)
+    if (courseFees === null) {
+      const url = `/video/${videoId}`;
+      window.location.href = url;
+    } else {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN}/api/isenroll`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            email: email,
+            courseId: courseId
+          })
+        });
+        const data = await response.json();
+        console.log(data);
+        if (data.isEnrolled === true) {
+          console.log("hello")
+          const url = `/video/${videoId}`;
+          window.location.href = url;
+        }
+        else {
+          const url = `/payment/${courseId}`;
+          window.location.href = url;
+        }
+      } catch (error) {
+        console.error("Failed to fetch", error);
+      }
+
+    }
+  }
 
   useEffect(() => {
+
+
+    if (user) {
+
+      setEmail(user.email || "");
+    }
+
+
     if (data) {
       setHomePageDetails(data.getAllVideoUrl);
     }
-  }, [data]);
+  }, [data, setHomePageDetails, user, setEmail]);
 
   const timeSinceUpload = (uploadAt: string) => {
     const uploadDate = new Date(uploadAt);
@@ -59,16 +109,22 @@ const Home: React.FC = () => {
           >
             {homePageDetails.map((video: any, index: number) => (
               <div key={index} id={`video-${index}`} className="video-card">
-                <img
-                  className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-150 rounded-md"
-                  style={{ height: '250px', width: '350px' }}
-                  src={video.allThumbnailUrls}
-                  onClick={() => {
-                    const url = `${process.env.NEXT_PUBLIC_CLIENT_DOMAIN}/video/${video.videoId}`;
-                    window.location.href = url;
-                  }}
-                  alt=""
-                />
+                <div className="relative">
+                  <img
+                    className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-150 rounded-md"
+                    style={{ height: '250px', width: '350px', filter: video.courseFees !== null ? 'blur(2px)' : 'none' }}
+                    src={video.allThumbnailUrls}
+                    onClick={() => {
+                      handleRedirect(video.videoId, video.courseFees, video.courseId)
+                    }}
+                    alt=""
+                  />
+                  {video.courseFees !== null && (
+                    <div className="absolute top-0 left-0 m-2 bg-white bg-opacity-75 rounded-md p-1">
+                      <p className="text-black font-semibold">Price: ${video.courseFees}</p>
+                    </div>
+                  )}
+                </div>
                 <div className="flex mt-3 justify-center">
                   <div>
                     <img
@@ -76,7 +132,6 @@ const Home: React.FC = () => {
                       width={30}
                       className="rounded-full m-1"
                       src={video.channelLogo}
-
                       alt=""
                     />
                   </div>
