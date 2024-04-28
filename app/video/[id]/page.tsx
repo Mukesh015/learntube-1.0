@@ -17,7 +17,7 @@ query GetVideoUrl( $email: String, $videoId: String,$channelId: String) {
     getVideoUrl(email: $email, videoID: $videoId) {
         videoURl
         videoDescription
-        channelLogo
+        channelLogo 
         channelName
         creatorEmail
         videoTitle
