@@ -128,6 +128,7 @@ const Navbar: React.FC = () => {
         }
 
     }, [newInfo, toUpdate])
+
     const handleModelOpen = useCallback(async (modelName: string) => {
         if (modelName === "nameChange") {
             settoUpdate("name");
@@ -160,26 +161,7 @@ const Navbar: React.FC = () => {
         }
     }, []);
 
-
-
-    useEffect(() => {
-        if (user) {
-            setuserName(user.displayName || "");
-            setavatar(user.photoURL || "");
-            setEmail(user.email || "");
-        }
-        if (data && email !== "") {
-            const verifyIsCreator = data.getIsCreator[0].isCreator
-            setIsCreator(verifyIsCreator);
-            setSearchBarDetails(data.getSearchBarDetails)
-            console.log("Veify creator", isCreator)
-        }
-        else {
-            console.log("User is not available");
-        }
-    }, [user, setIsCreator, data, setSearchBarDetails]);
-
-    const handleSearch = async () => {
+    const handleSearch = useCallback(async () => {
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN}/features/addtosearchhistory`, {
                 method: "POST",
@@ -201,8 +183,9 @@ const Navbar: React.FC = () => {
         } catch (error) {
             console.error("Failed to fetch", error);
         }
-    }
-    const deleteSearchString = async (history: any) => {
+    }, [email, searchString]);
+
+    const deleteSearchString = useCallback(async (history: any) => {
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN}/features/removefromsearchHistory`, {
                 method: "POST",
@@ -216,14 +199,32 @@ const Navbar: React.FC = () => {
             });
             const data = await response.json();
             console.log(data);
-          
+
             if (response.ok) {
                 console.log("search String deleted successfully")
             }
         } catch (error) {
             console.error("Failed to fetch", error);
         }
-    };
+    }, [email]);
+
+    useEffect(() => {
+        if (user) {
+            setuserName(user.displayName || "");
+            setavatar(user.photoURL || "");
+            setEmail(user.email || "");
+        }
+        if (data && email !== "") {
+            const verifyIsCreator = data.getIsCreator[0].isCreator
+            setIsCreator(verifyIsCreator);
+            setSearchBarDetails(data.getSearchBarDetails)
+            console.log("Veify creator", isCreator)
+        }
+        else {
+            console.log("User is not available");
+        }
+    }, [user, setIsCreator, data, setSearchBarDetails]);
+
     useEffect(() => {
         const handleSearchChange = (e: Event) => {
             const input = e.target as HTMLInputElement;

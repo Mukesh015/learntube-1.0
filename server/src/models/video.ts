@@ -10,22 +10,30 @@ interface Course {
     courseThumbUrl: string;
     courseDescription: string;
     courseId: string;
-    courseFees: {price: number}; 
+    courseFees: { price: number };
     videos: Video[];
 }
 
 interface Video {
     videoUrl: string;
     videoTitle: string;
-    videoID:string;
+    videoID: string;
     videoDescription: string;
     videoThumbnail: string;
     videoPublishedAt: Date;
     videoTags: [];
-    videoViews: [{user: string,timestamp: number}];
+    videoViews: [{ user: string, timestamp: number }];
     videoLikeCount: number;
     videoDislikeCount: number;
-    videoComment: number;
+    videoComments?: {
+        count: number,
+        comments: {
+            user: any[],
+            logo: any[],
+            comment: any[],
+            timestamp: any[]
+        }
+    };
 }
 
 const videoSchema = new mongoose.Schema<VideoDocument>(
@@ -39,23 +47,34 @@ const videoSchema = new mongoose.Schema<VideoDocument>(
                 courseName: { type: String },
                 courseThumbUrl: { type: String },
                 courseDescription: { type: String },
-                courseId:{ type: String },
+                courseId: { type: String },
                 courseFees: {
-                    price: { type: Number,default:0 }, 
+                    price: { type: Number, default: 0 },
                 },
                 videos: [
                     {
                         videoUrl: { type: String },
                         videoTitle: { type: String },
-                        videoID:{ type: String },
+                        videoID: { type: String },
                         videoDescription: { type: String },
                         videoThumbnail: { type: String },
                         videoPublishedAt: { type: Date },
                         videoTags: { type: Array<String> },
-                        videoViews: [{ user:String,timestamp: Number }],
-                        videoLikeCount: { type: Number, default:0},
-                        videoDislikeCount: { type: Number, default:0},
-                        videoComment: { type: Number, default:0},
+                        videoViews: [{ user: String, timestamp: Number }],
+                        videoLikeCount: { type: Number, default: 0 },
+                        videoDislikeCount: { type: Number, default: 0 },
+                        videoComments: {
+                            count: {
+                                type: Number,
+                                default: 0,
+                            },
+                            comments: {
+                                user: [{ type: mongoose.Schema.Types.Mixed, required: false }],
+                                logo: [{ type: mongoose.Schema.Types.Mixed, required: false }],
+                                comment: [{ type: mongoose.Schema.Types.Mixed, required: false }],
+                                timestamp: [{ type: mongoose.Schema.Types.Mixed, required: false }]
+                            }
+                        },
                     }
                 ]
             }

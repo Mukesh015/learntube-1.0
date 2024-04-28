@@ -77,6 +77,8 @@ const VideoPage: React.FC<Props> = ({ params }) => {
     const [creatorEmail, setCreatorEmail] = useState<string>("");
     const [isSubsCribed, setIsSubsribed] = useState<boolean>(false);
     const [channelId, setChannelId] = useState<string>("");
+    const [comment, setComment] = useState<string>("");
+    const [logo, setLogo] = useState<string>("");
 
     const toggleSubscribe = () => {
         setIsSubsribed(!isSubsCribed);
@@ -222,6 +224,29 @@ const VideoPage: React.FC<Props> = ({ params }) => {
         }
     };
 
+
+    const handleAddComment = useCallback(async () => {
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN}/video/addcomment`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email: creatorEmail,
+                    videoId: videoId,
+                    comment: comment,
+                    logo: logo,
+                    user: email
+                })
+            });
+            const data = await response.json();
+            console.log(data);
+        } catch (error) {
+            console.error("Failed to add comment, server error", error);
+        }
+    }, [creatorEmail, videoId, comment, logo, email]);
+
     useEffect(() => {
         if (data) {
             setVideoUrl(data.getVideoUrl[0].videoURl);
@@ -240,13 +265,12 @@ const VideoPage: React.FC<Props> = ({ params }) => {
             setVideoViews(data.getVideoUrl[0].videoViews);
             setVideoPublishedAt(data.getVideoUrl[0].videoPublishedAt);
             setVideoTags(data.getVideoUrl[0].videoTags);
-            console.log(data);
-            console.log(channelId);
         }
         if (user) {
             setEmail(user.email || "");
+            setLogo(user.photoURL || "");
         }
-    }, [user, setEmail, channelId, setChannelId, setCreatorEmail, setAllVideos, setVideoPublishedAt, setChannelName, setChannelLogo, setVideoViews, setVideoUrl, setVideoTitle, setVideoDescription, setVideoTags, setIsAddedToPlaylist, data]);
+    }, [user, setLogo, setEmail, channelId, setChannelId, setCreatorEmail, setAllVideos, setVideoPublishedAt, setChannelName, setChannelLogo, setVideoViews, setVideoUrl, setVideoTitle, setVideoDescription, setVideoTags, setIsAddedToPlaylist, data]);
 
     return (
         <>
@@ -381,7 +405,10 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                         </div>
                         <div className="flex gap-7 mb-10">
                             <img className="h-10 mt-3 rounded-full" src="https://i.pravatar.cc/150?u=a04258114e29026702d" alt="" />
-                            <Input type="text" variant="underlined" label="Add a comment" />
+                            <Input type="text" onChange={(e) => setComment(e.target.value)} variant="underlined" label="Add a comment" />
+                            <Button onPress={() => handleAddComment()} className="ml-10" variant="bordered">
+                                Add
+                            </Button>
                         </div>
                         <div>
                             <div className="flex">
@@ -399,7 +426,10 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                     <div>
                         {allVideos.map((video, index) => (
                             <Tooltip color="warning" delay={700} showArrow={true} content={video.allVideoTitles} key={index}>
-                                <div className="ml-10 flex mb-5">
+                                <div className="ml-10 flex mb-5 cursor-pointer" onClick={() => {
+                                    const url = `${process.env.NEXT_PUBLIC_CLIENT_DOMAIN}/video/${video.videoId}`;
+                                    window.location.href = url;
+                                }}>
                                     <img style={{ height: "130px", width: "200px" }} className="rounded-md" src={video.allThumbnailUrls} alt="" />
                                     <div className="max-w-56 ml-3">
                                         <h1>{video.allVideoTitles}</h1>

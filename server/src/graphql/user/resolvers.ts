@@ -160,7 +160,6 @@ const queries = {
                 videoViews: video.videoViews.length, videoPublishedAt: video.videoPublishedAt, videoTags: video.videoTags,
                 channelLogo: channelLogo, channelName: channelName, creatorEmail: creatorEmail, channelId: channelId,
             }];
-
         } catch (error) {
             console.error("Error redirecting:", error);
             throw new Error("Internal Server Error");
