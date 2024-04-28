@@ -9,6 +9,7 @@ interface Course {
     courseName: string;
     courseThumbUrl: string;
     courseDescription: string;
+    courseId: string;
     courseFees: {price: number}; 
     videos: Video[];
 }
@@ -38,6 +39,7 @@ const videoSchema = new mongoose.Schema<VideoDocument>(
                 courseName: { type: String },
                 courseThumbUrl: { type: String },
                 courseDescription: { type: String },
+                courseId:{ type: String },
                 courseFees: {
                     price: { type: Number,default:0 }, 
                 },

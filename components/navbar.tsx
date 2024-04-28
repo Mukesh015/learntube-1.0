@@ -60,7 +60,6 @@ const Navbar: React.FC = () => {
         variables: { email: email },
     });
 
-    // console.log(searchbarDetails.map(item => item.searchHistory));
     const handleInputClick = () => {
         toggleSearchDiv();
     };
@@ -129,7 +128,6 @@ const Navbar: React.FC = () => {
         }
 
     }, [newInfo, toUpdate])
-
     const handleModelOpen = useCallback(async (modelName: string) => {
         if (modelName === "nameChange") {
             settoUpdate("name");
@@ -163,6 +161,7 @@ const Navbar: React.FC = () => {
     }, []);
 
 
+
     useEffect(() => {
         if (user) {
             setuserName(user.displayName || "");
@@ -193,6 +192,8 @@ const Navbar: React.FC = () => {
                 })
             });
             const data = await response.json();
+            const url = `${process.env.NEXT_PUBLIC_CLIENT_DOMAIN}/search/${searchString}`;
+            window.location.href = url;
             console.log(data);
             if (response.ok) {
                 console.log("search String saved successfully")
@@ -201,38 +202,35 @@ const Navbar: React.FC = () => {
             console.error("Failed to fetch", error);
         }
     }
-
+    const deleteSearchString = async (history: any) => {
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN}/features/removefromsearchHistory`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email: email,
+                    searchString: history
+                })
+            });
+            const data = await response.json();
+            console.log(data);
+          
+            if (response.ok) {
+                console.log("search String deleted successfully")
+            }
+        } catch (error) {
+            console.error("Failed to fetch", error);
+        }
+    };
     useEffect(() => {
         const handleSearchChange = (e: Event) => {
             const input = e.target as HTMLInputElement;
-            const value = input.value.toLowerCase(); // Convert input value to lowercase for case-insensitive search
+            const value = input.value.toLowerCase();
             setsearchString(value);
             console.log(value);
-        }
-        //         //   const filteredShortIds = data.shortId.filter((shortId: string | number, index: string | number) => {
-        //         //     const shortIdLower =
-        //         //       `${process.env.NEXT_PUBLIC_SERVER_DOMAIN}/redirect/${shortId}`.toLowerCase(); // Convert shortId to lowercase
-        //         //     const redirectURLLower = data.redirectURL[index].toLowerCase(); // Convert redirectURL to lowercase
-        //         //     const shortIdCountLower = data.shortIdCounts[shortId]
-        //         //       .toString()
-        //         //       .toLowerCase(); // Convert shortIdCount to lowercase
-        //         //     const formattedCreatedAtLower =
-        //         //       data.formattedCreatedAt[index].toLowerCase(); // Convert formattedCreatedAt to lowercase
-        //         //     return (
-        //         //       shortIdLower.includes(value) ||
-        //         //       redirectURLLower.includes(value) ||
-        //         //       shortIdCountLower.includes(value) ||
-        //         //       formattedCreatedAtLower.includes(value)
-        //         //     );
-        //         //   });
-
-        //         //   // Based on filteredShortIds, filter the elements to hide or show
-        //         //   const rows = document.querySelectorAll("[data-row]");
-        //         //   rows.forEach((row, index) => {
-        //         //     const isVisible = filteredShortIds.includes(data.shortId[index]);
-        //         //     row.classList.toggle("hidden", !isVisible);
-        //         //   });
-        // };
+        };
 
         const searchInput = document.querySelector<HTMLInputElement>("[data-search-content]");
         if (searchInput) {
@@ -430,14 +428,32 @@ const Navbar: React.FC = () => {
                 <div className="mt-20 bg-gray-800 rounded-md" style={{ marginLeft: "440px", marginRight: "480px" }}>
                     <div className="flex cursor-pointer">
                         <div className="flex flex-col">
-                            {Array.from(new Set(searchbarDetails.flatMap(item => item.searchHistory))).map((history, idx) => (
-                                <div className="flex">
-                                    <p key={idx} className="p-2 hover:bg-gray-600 rounded-xl">{history}
-                                    </p>
-                                    <svg className="  ml-20 mt-1 hover:bg-gray-600 rounded-full p-1" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" /></svg>
-                                </div>
+                            {searchString === '' ? (
 
-                            ))}
+                                Array.from(new Set(searchbarDetails.flatMap(item => item.searchHistory))).map((history, idx) => (
+                                    <div className="flex">
+                                        <p key={idx} className="p-2 hover:bg-gray-600 rounded-xl">{history}
+                                        </p>
+                                        <svg onClick={() => { deleteSearchString(history) }} className="  ml-20 mt-1 hover:bg-gray-600 rounded-full p-1" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" /></svg>
+                                    </div>
+
+                                ))
+                            ) : (
+                                searchbarDetails
+                                    .filter(item =>
+                                        item.videoTitle.toLowerCase().includes(searchString.toLowerCase()) ||
+                                        item.videoDescription.toLowerCase().includes(searchString.toLowerCase()) ||
+                                        item.videoTags.some((tag: string) => tag.toLowerCase().includes(searchString.toLowerCase()))
+                                    )
+                                    .map((item, idx) => (
+                                        <div key={idx}>
+                                            <div className="flex">
+                                                <p className="p-2 hover:bg-gray-600 rounded-xl">{item.videoTitle}</p>
+                                            </div>
+                                            <hr className="border-gray-600" />
+                                        </div>
+                                    ))
+                            )}
                         </div>
                     </div>
                 </div>

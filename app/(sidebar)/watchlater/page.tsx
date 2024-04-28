@@ -1,10 +1,51 @@
-import React from "react";
+"use client"
+import React, { useEffect, useState } from "react";
 import Navbar from "@/components/navbar";
 import Sidebar from "@/components/sidebar";
 import { Switch, cn } from "@nextui-org/react";
 import { Tooltip } from "@nextui-org/react";
+import { auth } from "@/configurations/firebase/config";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { gql, useQuery } from "@apollo/client";
 
+const watchLaterDetails=gql`
+
+query playlist($email: String) {
+    getWatchLater(email: $email) {
+      videoId
+      videoTitle
+      channelLogo
+      videoPublishedAt
+      videoViews
+      videoThumbnail
+    }
+  }
+
+`
 const WatchLater: React.FC = () => {
+
+    const [email, setEmail] = useState<string>("");
+    const [watchLater, setWatchLater] = useState<any[]>([]);
+
+    const [user] = useAuthState(auth);
+
+
+    const { loading, error, data } = useQuery(watchLaterDetails, {
+        variables: { email: email },
+    });
+
+    
+
+    useEffect(() => {
+        if (user) {
+            setEmail(user.email || "");
+        }
+        if(data && email ){
+            setWatchLater(data.getWatchLater);
+        }
+
+    },[ setEmail,user,setWatchLater]);
+
     return (
         <>
             <Navbar />

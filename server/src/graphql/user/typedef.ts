@@ -35,20 +35,23 @@ type url{
 
 
 }
-type features{
-    haveInPlaylist: Boolean
-    isSubsCribed: Boolean
-    hasInHistory: Boolean
-    haveInMyVideos: Boolean
-    haveInWatchLater: Boolean
-    isLiked: Boolean
-    dislikedVideos: Boolean
-    subscribedchannel: Boolean
-}
+
 type search{
     videoTitle: String
     videoDescription: String
     videoTags: [String]
     searchHistory:[String]
+}
+type searchQuery{
+    videoUrl: String
+    videoID: String
+    videoDescription: String
+    videoTags :[String]
+    videoTitle: String
+    channelName: String
+    channelLogo: String
+    videoPublishedAt: String
+    videoViews: String
+    videoThumbnail: String
 }
 `;

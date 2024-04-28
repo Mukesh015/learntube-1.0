@@ -119,7 +119,6 @@ const queries = {
         }
     },
     getVideoUrl: async (_: any, { email, videoID }: { email: string, videoID: string }) => {
-        console.log("Getting video URL", videoID)
         try {
             const entry: VideoDocument | null = await VideoModel.findOneAndUpdate(
                 { "courses.videos.videoID": videoID },
@@ -167,44 +166,7 @@ const queries = {
             throw new Error("Internal Server Error");
         }
     },
-    getFeatures: async (_: any, { email, videoID,channelId }: { email: string, videoID: string,channelId:string }) => {
-        const user: UserDocument | null = await UserModel.findOne({ email });
-        if (!user) {
-            return "USer not found";
-        }
-        const playlist = user.features?.playlists || [];
-        const hasValuePlayList = playlist.includes(videoID);
-
-
-        const subscriptions = user.features?.subscriptions || [];
-        const hasValueSubscriptions = subscriptions.includes(videoID);
-
-        const history = user.features?.history || [];
-        const hasValueHistory = history.includes(videoID);
-
-        const myVideos = user.features?.myVideos || [];
-        const hasValueMyVideos = myVideos.includes(videoID);
-
-
-        const watchLater = user.features?.watchLater || [];
-        const hasValueWatchLater = watchLater.includes(videoID);
-
-        const likedVideos = user.features?.likedVideos || [];
-        const hasValueLikedVideos = likedVideos.includes(videoID);
-
-        const dislikedVideos = user.features?.disLikedVideo || [];
-        const hasValueDislikedVideos = dislikedVideos.includes(videoID);
-
-        const subsCribed=user.subscribedChnannels?.channelId || [];
-        const hasValueSubscribed=subsCribed.includes(channelId);
-
-
-        return [{
-            haveInPlaylist: hasValuePlayList, isSubsCribed: hasValueSubscriptions, hasInHistory: hasValueHistory,
-            haveInMyVideos: hasValueMyVideos, haveInWatchLater: hasValueWatchLater, isLiked: hasValueLikedVideos, 
-            dislikedVideos: hasValueDislikedVideos,subscribedchannel:hasValueSubscribed
-        }];
-    },
+    
     getSearchBarDetails: async (_: any, { email }: { email: string }) => {
         try {
             const response = await axios.post(`${process.env.server_domain}/video/getvideodetails`);
@@ -234,6 +196,50 @@ const queries = {
         } catch (error) {
             console.error('Error fetching search bar details:', error);
             throw new Error('Error fetching search bar details');
+        }
+    },
+    getSearchQueryDetails:async(_: any,{query}:{query:string}) =>{
+        try {
+            const videos: VideoDocument[] = await VideoModel.find({
+                $or: [
+                    { 'courses.videos.videoTitle': { $regex: new RegExp(query, 'i') } },
+                    { 'courses.videos.videoDescription': { $regex: new RegExp(query, 'i') } },
+                    { 'courses.videos.videoTags': { $in: [query] } } 
+                ]
+            });
+            const channelLogoResponse = await queries.getChannelLogo(undefined, { email: videos.map(item=>item.email) });
+  
+
+            const searchResults = videos.flatMap(Video =>
+                Video.courses.flatMap(course =>
+                    course.videos.map(video => ({
+                        videoUrl: video.videoUrl,
+                        videoID: video.videoID,
+                        videoDescription: video.videoDescription,
+                        videoTags: video.videoTags,
+                        videoTitle: video.videoTitle,
+                        channelName: channelLogoResponse.find((name: { email: string; }) => name.email === Video.email)?.channelName,
+                        channelLogo: channelLogoResponse.find((name: { email: string; }) => name.email === Video.email)?.channelLogo,
+                        email: Video.email,
+                        videoPublishedAt: video.videoPublishedAt,
+                        videoThumbnail: video.videoThumbnail,
+                        videoViews: video.videoViews.length,
+                    }))
+                )
+            );
+    
+            const sortedResults = searchResults.sort((a, b) => {
+                if (a.videoTitle.toLowerCase().includes(query.toLowerCase())) return -1;
+                if (b.videoTitle.toLowerCase().includes(query.toLowerCase())) return 1;
+                if ((a.videoTags as string[]).includes(query)) return -1;
+                if ((b.videoTags as string[]).includes(query)) return 1;
+                return 0;
+            });
+    
+            return sortedResults;
+        } catch (error) {
+            console.error('Error fetching search query details:', error);
+            throw new Error('Error fetching search query details');
         }
     }
 
