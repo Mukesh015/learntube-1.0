@@ -5,6 +5,8 @@ dotenv.config({ path: "../.env" });
 import { VideoModel, VideoDocument } from "../../models/video";
 import { UserModel, UserDocument } from "../../models/user";
 interface VideoInfo {
+    courseId:any;
+    courseFees: any;
     email: string;
     videoUrl: string;
     thumbnail: string;
@@ -13,7 +15,7 @@ interface VideoInfo {
     videoId: string;
     videoViews: number;
     channelLogo: string | undefined;
-    channelName: string| undefined;
+    channelName: string | undefined;
 }
 interface User {
     channelId: any;
@@ -87,7 +89,8 @@ const queries = {
                         const channelLogoResponse = await queries.getChannelLogo(undefined, { email: video.email });
                         const channelLogo = channelLogoResponse.find((logo: { email: string; }) => logo.email === video.email)?.channelLogo;
                         const channelName = channelLogoResponse.find((logo: { email: string; }) => logo.email === video.email)?.channelName;
-
+                        const courseFees = course.courseFess.price === null ? null : course.courseFess.price;
+                        const courseId = course.courseId
                         allVideoThumbUrls.push({
                             email: video.email,
                             videoUrl: Video.videoUrl,
@@ -98,6 +101,8 @@ const queries = {
                             videoViews: Video.videoViewCount,
                             channelLogo: channelLogo,
                             channelName: channelName,
+                            courseFees: courseFees,
+                            courseId:courseId
                         });
                     }
                 }
@@ -111,7 +116,9 @@ const queries = {
                 videoId: videothumb.videoId,
                 views: videothumb.videoViews,
                 channelLogo: videothumb.channelLogo,
-                channelName: videothumb.channelName
+                channelName: videothumb.channelName,
+                courseFees: videothumb.courseFees ,
+                courseId:videothumb.courseId
             }));
         } catch (error) {
             console.error('Error fetching video URLs:', error);
@@ -166,7 +173,7 @@ const queries = {
             throw new Error("Internal Server Error");
         }
     },
-    
+
     getSearchBarDetails: async (_: any, { email }: { email: string }) => {
         try {
             const response = await axios.post(`${process.env.server_domain}/video/getvideodetails`);
@@ -198,17 +205,17 @@ const queries = {
             throw new Error('Error fetching search bar details');
         }
     },
-    getSearchQueryDetails:async(_: any,{query}:{query:string}) =>{
+    getSearchQueryDetails: async (_: any, { query }: { query: string }) => {
         try {
             const videos: VideoDocument[] = await VideoModel.find({
                 $or: [
                     { 'courses.videos.videoTitle': { $regex: new RegExp(query, 'i') } },
                     { 'courses.videos.videoDescription': { $regex: new RegExp(query, 'i') } },
-                    { 'courses.videos.videoTags': { $in: [query] } } 
+                    { 'courses.videos.videoTags': { $in: [query] } }
                 ]
             });
-            const channelLogoResponse = await queries.getChannelLogo(undefined, { email: videos.map(item=>item.email) });
-  
+            const channelLogoResponse = await queries.getChannelLogo(undefined, { email: videos.map(item => item.email) });
+
 
             const searchResults = videos.flatMap(Video =>
                 Video.courses.flatMap(course =>
@@ -227,7 +234,7 @@ const queries = {
                     }))
                 )
             );
-    
+
             const sortedResults = searchResults.sort((a, b) => {
                 if (a.videoTitle.toLowerCase().includes(query.toLowerCase())) return -1;
                 if (b.videoTitle.toLowerCase().includes(query.toLowerCase())) return 1;
@@ -235,7 +242,7 @@ const queries = {
                 if ((b.videoTags as string[]).includes(query)) return 1;
                 return 0;
             });
-    
+
             return sortedResults;
         } catch (error) {
             console.error('Error fetching search query details:', error);

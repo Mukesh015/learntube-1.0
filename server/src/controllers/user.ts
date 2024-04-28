@@ -223,10 +223,8 @@ export async function subscribe(req: Request, res: Response) {
       user.subscribedChnannels.channelId.splice(index, 1);
       user.subscribedChnannels.count--;
 
-      // Save the updated user document
       await user.save();
 
-      // Find the creator user by creatorEmail
       const creatorUser = await UserModel.findOne({ email: creatorEmail });
 
       if (!creatorUser) {
@@ -278,5 +276,41 @@ export async function subscribe(req: Request, res: Response) {
   } catch (error) {
     console.error("Error adding subscription:", error);
     return res.status(500).json({ error: "Internal server error" });
+  }
+}
+
+export async function courseEnrollment(req: Request, res: Response) {
+  const { email, courseId } = req.body;
+  try {
+
+    const user = await UserModel.findOne({ email: email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    user.EnrolledCourses?.push(courseId);
+    await user.save();
+    return res.status(200).json({ message: "course Enrolled sucessfully" });
+  }
+  catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+
+}
+
+export async function isEnrolled(req: Request, res: Response) {
+  try {
+      const { email, courseId } = req.body;
+      const user = await UserModel.findOne({ email: email });
+
+      if (!user) {
+          return res.status(404).json({ message: "User not found" });
+      }
+
+      const isEnrolled = user.EnrolledCourses?.includes(courseId);
+      return res.status(200).json({ isEnrolled: isEnrolled });
+  } catch (error) {
+      console.error("Error checking enrollment:", error);
+      return res.status(500).json({ message: "Internal Server Error" });
   }
 }

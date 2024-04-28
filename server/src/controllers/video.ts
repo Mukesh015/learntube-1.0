@@ -89,6 +89,7 @@ export async function getVideoDetails(req: Request, res: Response) {
         courseThumbUrl: course.courseThumbUrl,
         courseDescription: course.courseDescription,
         courseFess: course.courseFees,
+        courseId: course.courseId,
         videos: course.videos.map(video => ({
           videoUrl: video.videoUrl,
           videoID: video.videoID,
