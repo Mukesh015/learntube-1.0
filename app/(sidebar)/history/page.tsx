@@ -26,10 +26,10 @@ query history($email: String) {
   }
 
 `
+
 const History: React.FC = () => {
     const [email, setEmail] = useState<string>("");
     const [history, setHistory] = useState<any[]>([]);
-
     const [user] = useAuthState(auth);
 
     const { loading, error, data } = useQuery(historyDetails, {
