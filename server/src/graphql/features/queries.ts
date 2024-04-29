@@ -8,4 +8,5 @@ getComments(videoID:String):[comments]
 getchannelDetails(email:String):[channelDetails]
 getYourVideo(email:String):[yourVideo]
 getCreatorCard(email:String):[creatorCard]
+getYourCourse(email:String):[yourCourse]
 `

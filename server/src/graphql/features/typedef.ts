@@ -90,4 +90,21 @@ type creatorCard{
     watchTime: String
     totalComments:String
 }
+type Video {
+    videoUrl: String
+    videoThumbnail: String
+    videoId: String
+    videoTitle: String
+    videoViews: Int
+    videoPublishedAt: String
+  }
+  
+  type yourCourse {
+    courseId: String
+    courseName: String
+    courseThumbUrl: String
+    courseDescription: String
+    videos: [Video]
+    totalNoOfVideos: Int
+  }
 `;

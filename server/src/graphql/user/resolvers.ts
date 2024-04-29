@@ -219,6 +219,8 @@ const queries = {
             const searchResults = videos.flatMap(Video =>
                 Video.courses.flatMap(course =>
                     course.videos.map(video => ({
+                        courseID:course.courseId,
+                        courseFees:course.courseFees.price,
                         videoUrl: video.videoUrl,
                         videoID: video.videoID,
                         videoDescription: video.videoDescription,
