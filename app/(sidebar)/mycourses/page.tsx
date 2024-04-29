@@ -1,9 +1,17 @@
-import React from "react";
+"use client"
+import React, { useState } from "react";
 import Navbar from "@/components/navbar";
 import Sidebar from "@/components/sidebar";
 import { Tooltip } from "@nextui-org/react";
 
+
 const mycourses: React.FC = () => {
+
+    const [showDropdown, setShowDropdown] = useState<boolean>(false);
+
+    const handleShowDropdown = () => {
+        setShowDropdown(!showDropdown);
+    }
     return (
         <>
             <Navbar />
@@ -27,34 +35,65 @@ const mycourses: React.FC = () => {
                 </ul>
             </nav>
             <div className="ml-80 ">
-                <div
-                    id="description-container"
-                    className=""
-                    style={{ marginTop: "40px" }}
-                >
-                    <div id="video-content" className="flex mb-10">
-                        {/* video content here*/}
-                        <img
-                            className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-150 rounded-md"
-                            height={200}
-                            width={200}
-                            src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg"
-                            alt=""
-                        />
-                        <div className="flex mt-10 ml-5 justify-center mr-10">
-                            <div>
-                                {/* Profile picture here */}
-                                <img height={30} width={30} className="rounded-full m-1" src="https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png" alt="" />
+                <Tooltip color="warning" delay={700} showArrow={true} content="Click to show playlist">
+                    <div
+                        onClick={handleShowDropdown}
+                        id="description-container"
+                        className="cursor-pointer"
+                        style={{ marginTop: "40px" }}
+                    >
+                        <div>
+                            <div id="video-content" className="flex mb-10">
+                                {/* video content here*/}
+                                <img
+                                    className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-150 rounded-md"
+                                    height={200}
+                                    width={200}
+                                    src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg"
+                                    alt=""
+                                />
+                                <div className="flex mt-10 ml-5 justify-center mr-10">
+                                    <div>
+                                        {/* Profile picture here */}
+                                        <img height={30} width={30} className="rounded-full m-1" src="https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png" alt="" />
+                                    </div>
+                                    <div className="ml-3">
+                                        <h1 className="">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magni facere voluptate, eos blanditiis aliquam, dolor beatae neque odit dolore repellendus unde sequi eveniet maxime quas ad omnis. Dignissimos, saepe nulla.</h1> {/* video title here*/}
+                                        <p className="text-gray-500">
+                                            20k views - 4 hours ago {/*Content details/analitics*/}
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="ml-3">
-                                <h1 className="">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magni facere voluptate, eos blanditiis aliquam, dolor beatae neque odit dolore repellendus unde sequi eveniet maxime quas ad omnis. Dignissimos, saepe nulla.</h1> {/* video title here*/}
-                                <p className="text-gray-500">
-                                    20k views - 4 hours ago {/*Content details/analitics*/}
-                                </p>
-                            </div>
+                            {showDropdown &&
+                                <Tooltip color="warning" delay={700} showArrow={true} content="Click to play">
+                                    <div className="flex ml-20 mb-10 transition scale-75 skew-y-3 md:transform-none translate-y-6 duration-700 ease-in-out delay-700">
+                                        {/* video content here*/}
+                                        <img
+                                            className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-150 rounded-md"
+                                            height={200}
+                                            width={200}
+                                            src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg"
+                                            alt=""
+                                        />
+                                        <div className="flex mt-10 ml-5 justify-center mr-10">
+                                            <div>
+                                                {/* Profile picture here */}
+                                                <img height={30} width={30} className="rounded-full m-1" src="https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png" alt="" />
+                                            </div>
+                                            <div className="ml-3">
+                                                <h1 className="">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magni facere voluptate, eos blanditiis aliquam, dolor beatae neque odit dolore repellendus unde sequi eveniet maxime quas ad omnis. Dignissimos, saepe nulla.</h1> {/* video title here*/}
+                                                <p className="text-gray-500">
+                                                    20k views - 4 hours ago {/*Content details/analitics*/}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Tooltip>
+                            }
                         </div>
                     </div>
-                </div>
+                </Tooltip>
             </div>
         </>
     )
