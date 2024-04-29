@@ -96,8 +96,10 @@ const queries = {
 
             const playlist = user.features?.playlists || [];
 
-            const playlistDetails: { videoId: any; videoTitle: any; videoViews: any; channelLogo: any; videoPublishedAt: any; 
-                videoThumbnail: any;courseID:any,courseFees:any }[] = [];
+            const playlistDetails: {
+                videoId: any; videoTitle: any; videoViews: any; channelLogo: any; videoPublishedAt: any;
+                videoThumbnail: any; courseID: any, courseFees: any
+            }[] = [];
 
             videos.forEach(video => {
                 video.courses.forEach(course => {
@@ -181,8 +183,10 @@ const queries = {
 
             const history = user.features?.history || [];
 
-            const historyDetails: { videoId: any; videoTitle: any; videoViews: any; channelLogo: any; videoPublishedAt: any; 
-                videoThumbnail: any;courseID:any,courseFees:any }[] = [];
+            const historyDetails: {
+                videoId: any; videoTitle: any; videoViews: any; channelLogo: any; videoPublishedAt: any;
+                videoThumbnail: any; courseID: any, courseFees: any
+            }[] = [];
 
             videos.forEach(video => {
                 video.courses.forEach(course => {
@@ -250,15 +254,15 @@ const queries = {
             throw new Error("An error occurred while fetching user playlist.");
         }
     },
-    getchannelDetails: async(_: any, { email }: { email: string }) =>{
+    getchannelDetails: async (_: any, { email }: { email: string }) => {
         try {
             const user: UserDocument | null = await UserModel.findOne({ email });
             if (!user) {
                 return "User not found";
             }
-    
+
             const { any, Facebook, Instagram, Twitter, Github, LinkedIn, Discord } = user.website || {};
-    
+
             return [
                 {
                     Name: user.username,
@@ -290,28 +294,29 @@ const queries = {
             throw new Error("An error occurred while fetching getchannelDetails");
         }
     },
-    getYourVideo:async(_:any,{email}:{email:string})=>{
+    getYourVideo: async (_: any, { email }: { email: string }) => {
         try {
             const videos = await VideoModel.findOne({ email });
-    
+
             if (!videos || !videos.courses) {
                 return [];
             }
-    
+
             const formattedVideos = videos.courses.reduce((acc: any[], course) => {
                 course.videos.forEach(video => {
                     acc.push({
                         videoId: video.videoID,
                         videoTitle: video.videoTitle,
                         viewsCount: video.videoViews.length,
-                        videoPublishedAt: video.videoPublishedAt
+                        videoPublishedAt: video.videoPublishedAt,
+                        videoThumbnail: video.videoThumbnail,
                     });
                 });
                 return acc;
             }, []);
-    
+
             formattedVideos.sort((a, b) => (b.videoPublishedAt.getTime() - a.videoPublishedAt.getTime()));
-    
+
             return formattedVideos;
         } catch (error) {
             console.error('Error fetching videos:', error);
@@ -319,27 +324,62 @@ const queries = {
         }
 
     },
+    getCreatorCard: async (_: any, { email }: { email: string }) => {
+        try {
+            const user: UserDocument | null = await UserModel.findOne({ email });
+            if (!user) {
+                return "User not found";
+            }
+
+            const videos: VideoDocument[] | null = await VideoModel.find({ email });
+            if (!videos) {
+                return "Videos not found";
+            }
+
+            let totalComments = 0;
+            videos.forEach(video => {
+                video.courses.forEach(course => {
+                    if (course.videos) {
+                        course.videos.forEach(video => {
+                            if (video.videoComments) {
+                                totalComments += video.videoComments.count;
+                            }
+                        });
+                    }
+                });
+            });
+
+            return [{
+                subscriber: user.subscribers?.count,
+                watchTime: user.WatchTime,
+                totalComments: totalComments
+            }];
+        } catch (error) {
+            console.log(error);
+            throw new Error("An error occurred while fetching getCreatorCard");
+        }
+    },
     getComments: async (_: any, { videoID }: { videoID: string }) => {
         try {
             const video = await VideoModel.findOne({ "courses.videos.videoID": videoID });
             if (!video) {
                 throw new Error('Video not found');
             }
-    
+
             const courseWithVideo = video.courses.find(course =>
                 course.videos.some(video => video.videoID === videoID)
             );
-    
+
             if (!courseWithVideo || !courseWithVideo.videos) {
                 return [];
             }
-    
+
             const videoComments = courseWithVideo.videos.map(video => video.videoComments);
-    
+
             const comments = videoComments.flatMap(comment => comment?.comments.comment || []);
             const logos = videoComments.flatMap(comment => comment?.comments.logo || []);
             const timestamps = videoComments.flatMap(comment => comment?.comments.timestamp || []);
-            const users=videoComments.flatMap(comment => comment?.comments.user || []);
+            const users = videoComments.flatMap(comment => comment?.comments.user || []);
             const result = comments.map((comment, index) => ({
                 comment: comment || "",
                 logo: logos[index] || "",

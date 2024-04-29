@@ -7,4 +7,5 @@ getHistory(email:String):[history]
 getComments(videoID:String):[comments]
 getchannelDetails(email:String):[channelDetails]
 getYourVideo(email:String):[yourVideo]
+getCreatorCard(email:String):[creatorCard]
 `

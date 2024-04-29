@@ -79,5 +79,11 @@ type yourVideo{
     videoTitle: String
     viewsCount: String
     videoPublishedAt: String
+    videoThumbnail:  String
+}
+type creatorCard{
+    subscriber:String
+    watchTime: String
+    totalComments:String
 }
 `;

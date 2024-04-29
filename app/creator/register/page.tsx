@@ -143,7 +143,8 @@ const CreatorRegisterForm: React.FC = () => {
         catch (error: any) {
             console.log("Internal server error", error);
         }
-    }, [name, email, gender, contactNumber, addressLine, city, state, pinCode, country, channelName, channelAdminName, channelDescription, recoveryEmail, mediaLinks, logo, cover]);
+    }, [name, email, gender, contactNumber, addressLine, city, state, pinCode, country, channelName, channelAdminName, 
+        channelDescription, recoveryEmail, mediaLinks, logo, cover]);
 
     const handleLogo = (e: React.ChangeEvent<HTMLInputElement>) => {
         const fileInput = e.target;

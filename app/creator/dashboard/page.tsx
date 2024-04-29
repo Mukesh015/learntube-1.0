@@ -1,9 +1,78 @@
 "use client"
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Tabs, Tab, Chip } from "@nextui-org/react";
 import { Accordion, AccordionItem } from "@nextui-org/react";
+import { gql, useQuery } from '@apollo/client';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '@/configurations/firebase/config';
+
+const CREATOR_DETAILS = gql`
+query GetAllVideoUrl ($email: String){
+    getYourVideo(email: $email) {
+        videoId
+        videoPublishedAt
+        videoTitle
+        viewsCount
+        videoThumbnail
+      }
+      getchannelDetails(email: $email) {
+        Discord
+        Facebook
+        Gender
+        Github
+        Instagram
+        LinkedIn
+        Name
+        PinCode
+        RecoveryEmail
+        Twitter
+        addressLine
+        channelDescription
+        channelId
+        channelLogo
+        channelName
+        city
+        country
+        coverPhotoURL
+        email
+        phoneNumber
+        state
+        websiteURL
+      }
+      getCreatorCard(email: $email) {
+        subscriber
+        totalComments
+        watchTime
+      }
+}
+`
 
 const CardGrid: React.FC = () => {
+
+    const [email, setEmail] = useState<string>("");
+    const [home, setHome] = useState<any[]>([]);
+    const [creatorCard, setCreatorCard] = useState<any[]>([]);
+
+    const [channelDeatails, setChannelDetails] = useState<any[]>([]);
+
+    const [user] = useAuthState(auth);
+
+    const { loading, error, data } = useQuery(CREATOR_DETAILS, {
+        variables: { email: email },
+    });
+
+
+    useEffect(() => {
+        if (user) {
+            setEmail(user.email || "");
+        }
+        if (data && email) {
+            setHome(data.getYourVideo)
+            setCreatorCard(data.getCreatorCard)
+            setChannelDetails(data.getchannelDetails)
+        }
+
+    }, [setEmail, user, data, setHome, setCreatorCard, setChannelDetails]);
     const defaultContent =
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
 
