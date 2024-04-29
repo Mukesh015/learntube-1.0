@@ -10,10 +10,10 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/configurations/firebase/config";
 
 
-const playListDetails = gql`
+const historyDetails = gql`
 
-query playlist($email: String) {
-    getPlaylist(email: $email) {
+query history($email: String) {
+    getHistory(email: $email) {
         courseID
         courseFees
         videoId
@@ -28,10 +28,11 @@ query playlist($email: String) {
 `
 const History: React.FC = () => {
     const [email, setEmail] = useState<string>("");
+    const [history, setHistory] = useState<any[]>([]);
 
     const [user] = useAuthState(auth);
 
-    const { loading, error, data } = useQuery(playListDetails, {
+    const { loading, error, data } = useQuery(historyDetails, {
         variables: { email: email },
     });
 
@@ -39,8 +40,12 @@ const History: React.FC = () => {
         if (user) {
             setEmail(user.email || "");
         }
+        if (data && email) {
+            setHistory(data.getHistory);
+            console.table(data.getHistory)
+        }
 
-    }, [setEmail, user]);
+    }, [setEmail,data,setHistory, user]);
     return (
         <>
             <Navbar />
