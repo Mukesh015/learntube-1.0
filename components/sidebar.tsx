@@ -191,7 +191,7 @@ const Sidebar: React.FC = () => {
 
                     <li className="hs-accordion" id="account-accordion">
                         <button
-                            onClick={() => router.push("/creator/dashboard")}
+                            onClick={() => router.push("/mycourses")}
                             type="button"
                             className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-150 hs-accordion-toggle hs-accordion-active:text-blue-600 hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-medium font-semibold rounded-lg hover:bg-gray-700"
                         >
@@ -205,7 +205,7 @@ const Sidebar: React.FC = () => {
                                 <path d="M0 0h24v24H0V0z" fill="none" />
                                 <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12zM12 5.5v9l6-4.5z" />
                             </svg>
-                            Your videos
+                            Your courses
                         </button>
                     </li>
                     <li className="hs-accordion" id="account-accordion">
