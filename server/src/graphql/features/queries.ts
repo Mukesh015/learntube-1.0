@@ -5,4 +5,5 @@ getWatchLater(email:String):[watchLater]
 getLikedVideos(email:String):[likedVideo]
 getComments(videoID:String):[comments]
 getchannelDetails(email:String):[channelDetails]
+getYourVideo(email:String):[yourVideo]
 `

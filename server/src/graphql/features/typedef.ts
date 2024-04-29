@@ -33,9 +33,10 @@ type likedVideo{
     videoThumbnail : String
 }
 type comments{
-    comment: String,
-    logo: String,
+    comment: String
+    logo: String
     timestamp: String
+    users:String
 }
 type channelDetails{
     Name: String
@@ -60,5 +61,11 @@ type channelDetails{
     coverPhotoURL:String
     channelLogo:String
     channelId:String
+}
+type yourVideo{
+    videoId: String
+    videoTitle: String
+    viewsCount: String
+    videoPublishedAt: String
 }
 `;

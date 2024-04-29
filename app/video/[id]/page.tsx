@@ -39,6 +39,7 @@ query GetVideoUrl( $email: String, $videoId: String,$channelId: String) {
     getComments(videoID: $videoId) {
         logo
         comment
+        users
         timestamp
       }
     getAllVideoUrl {

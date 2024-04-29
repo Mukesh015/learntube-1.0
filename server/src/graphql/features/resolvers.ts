@@ -243,6 +243,35 @@ const queries = {
             throw new Error("An error occurred while fetching getchannelDetails");
         }
     },
+    getYourVideo:async(_:any,{email}:{email:string})=>{
+        try {
+            const videos = await VideoModel.findOne({ email });
+    
+            if (!videos || !videos.courses) {
+                return [];
+            }
+    
+            const formattedVideos = videos.courses.reduce((acc: any[], course) => {
+                course.videos.forEach(video => {
+                    acc.push({
+                        videoId: video.videoID,
+                        videoTitle: video.videoTitle,
+                        viewsCount: video.videoViews.length,
+                        videoPublishedAt: video.videoPublishedAt
+                    });
+                });
+                return acc;
+            }, []);
+    
+            formattedVideos.sort((a, b) => (b.videoPublishedAt.getTime() - a.videoPublishedAt.getTime()));
+    
+            return formattedVideos;
+        } catch (error) {
+            console.error('Error fetching videos:', error);
+            throw error;
+        }
+
+    },
     getComments: async (_: any, { videoID }: { videoID: string }) => {
         try {
             const video = await VideoModel.findOne({ "courses.videos.videoID": videoID });
@@ -263,11 +292,12 @@ const queries = {
             const comments = videoComments.flatMap(comment => comment?.comments.comment || []);
             const logos = videoComments.flatMap(comment => comment?.comments.logo || []);
             const timestamps = videoComments.flatMap(comment => comment?.comments.timestamp || []);
-    
+            const users=videoComments.flatMap(comment => comment?.comments.user || []);
             const result = comments.map((comment, index) => ({
                 comment: comment || "",
                 logo: logos[index] || "",
-                timestamp: timestamps[index] || ""
+                timestamp: timestamps[index] || "",
+                users: users[index] || ""
             }));
             return result;
         } catch (error) {
