@@ -96,13 +96,16 @@ const queries = {
 
             const playlist = user.features?.playlists || [];
 
-            const playlistDetails: { videoId: any; videoTitle: any; videoViews: any; channelLogo: any; videoPublishedAt: any; videoThumbnail: any }[] = [];
+            const playlistDetails: { videoId: any; videoTitle: any; videoViews: any; channelLogo: any; videoPublishedAt: any; 
+                videoThumbnail: any;courseID:any,courseFees:any }[] = [];
 
             videos.forEach(video => {
                 video.courses.forEach(course => {
                     course.videos.forEach((vid: any) => {
                         if (playlist.includes(vid.videoID)) {
                             playlistDetails.push({
+                                courseID: course.courseId,
+                                courseFees: course.courseFees.price,
                                 videoId: vid.videoID,
                                 videoTitle: vid.videoTitle,
                                 videoViews: vid.videoViews.length,
@@ -157,6 +160,50 @@ const queries = {
             });
 
             return watchLaterDetails;
+        } catch (error) {
+            console.log(error);
+            throw new Error("An error occurred while fetching user playlist.");
+        }
+    },
+    getHistory: async (_: any, { email }: { email: string }) => {
+        try {
+            const user: UserDocument | null = await UserModel.findOne({ email });
+            if (!user) {
+                return "User not found";
+            }
+
+            const videos: VideoDocument[] | null = await VideoModel.find();
+
+            if (!videos) {
+                throw new Error("Videos not found");
+            }
+            const channelLogoResponse = await queries.getChannelLogo(undefined, { email: videos.map(email => email.email) });
+
+            const history = user.features?.history || [];
+
+            const historyDetails: { videoId: any; videoTitle: any; videoViews: any; channelLogo: any; videoPublishedAt: any; 
+                videoThumbnail: any;courseID:any,courseFees:any }[] = [];
+
+            videos.forEach(video => {
+                video.courses.forEach(course => {
+                    course.videos.forEach((vid: any) => {
+                        if (history.includes(vid.videoID)) {
+                            historyDetails.push({
+                                courseID: course.courseId,
+                                courseFees: course.courseFees.price,
+                                videoId: vid.videoID,
+                                videoTitle: vid.videoTitle,
+                                videoViews: vid.videoViews.length,
+                                videoPublishedAt: vid.videoPublishedAt,
+                                videoThumbnail: vid.videoThumbnail,
+                                channelLogo: channelLogoResponse.find((logo: { email: string; }) => logo.email === video.email)?.channelLogo,
+                            });
+                        }
+                    });
+                });
+            });
+
+            return historyDetails;
         } catch (error) {
             console.log(error);
             throw new Error("An error occurred while fetching user playlist.");

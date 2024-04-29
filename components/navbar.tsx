@@ -218,10 +218,6 @@ const Navbar: React.FC = () => {
             const verifyIsCreator = data.getIsCreator[0].isCreator
             setIsCreator(verifyIsCreator);
             setSearchBarDetails(data.getSearchBarDetails)
-            console.log("Veify creator", isCreator)
-        }
-        else {
-            console.log("User is not available");
         }
     }, [user, setIsCreator, data, setSearchBarDetails]);
 
@@ -230,7 +226,6 @@ const Navbar: React.FC = () => {
             const input = e.target as HTMLInputElement;
             const value = input.value.toLowerCase();
             setsearchString(value);
-            console.log(value);
         };
 
         const searchInput = document.querySelector<HTMLInputElement>("[data-search-content]");

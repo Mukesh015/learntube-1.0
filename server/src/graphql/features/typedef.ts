@@ -9,6 +9,18 @@ type features{
     subscribedchannel: Boolean
 }
 type playlist{
+    courseID:String
+    courseFees:String
+    videoId : String
+    videoTitle : String
+    videoViews : String
+    videoPublishedAt : String
+    channelLogo : String
+    videoThumbnail : String
+}
+type history{
+    courseID:String
+    courseFees:String
     videoId : String
     videoTitle : String
     videoViews : String

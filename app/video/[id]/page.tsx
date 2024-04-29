@@ -41,7 +41,7 @@ query GetVideoUrl( $email: String, $videoId: String,$channelId: String) {
         comment
         users
         timestamp
-      }
+    }
     getAllVideoUrl {
         channelLogo
         channelName
@@ -52,6 +52,8 @@ query GetVideoUrl( $email: String, $videoId: String,$channelId: String) {
         uploadAt
         videoId
         views
+        courseFees
+        courseId
         }
     }
 `;
@@ -256,13 +258,47 @@ const VideoPage: React.FC<Props> = ({ params }) => {
             console.error("Failed to add comment, server error", error);
         }
     }, [creatorEmail, videoId, comment, logo, email]);
+    const handleRedirect = async (videoId: any, courseFees: any, courseId: any) => {
+        //  console.log(courseFees, courseId, videoId );
+            if (courseFees === null) {
+                const url = `/video/${videoId}`;
+                window.location.href = url;
+            } else {
+                try {
+                    const response = await fetch(`${process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN}/api/isenroll`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            email: email,
+                            courseId: courseId
+                        })
+                    });
+                    const data = await response.json();
+                    console.log(data);
+                    if (data.isEnrolled === true) {
+                        console.log("hello")
+                        const url = `/video/${videoId}`;
+                        window.location.href = url;
+                    }
+                    else {
+                        const url = `/payment/${courseId}`;
+                        window.location.href = url;
+                    }
+                } catch (error) {
+                    console.error("Failed to fetch", error);
+                }
+    
+            }
+        }
 
     const startWatchTime = () => {
         const startTime = Date.now();
         setWatchTime(startTime);
     };
 
-    const stopWatchTime = async() => {
+    const stopWatchTime = async () => {
         if (watchTime !== 0) {
             const endTime = Date.now();
             const duration = endTime - watchTime;
@@ -276,7 +312,7 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                     },
                     body: JSON.stringify({
                         email: creatorEmail,
-                        watchTime:duration
+                        watchTime: duration
                     })
                 });
                 const data = await response.json();
@@ -446,7 +482,7 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                             </Accordion>
                         </Tooltip>
                         <div className="mt-5 flex">
-                            <h3>90k comments</h3>
+                            <h3>{comments.length} comments</h3>
                             <Tooltip color="warning" delay={700} showArrow={true} content="Filter to read">
                                 <Button className="flex ml-10" variant="bordered">
                                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M3 18h6v-2H3v2zM3 6v2h18V6H3zm0 7h12v-2H3v2z" /></svg>
@@ -461,16 +497,17 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                                 Add
                             </Button>
                         </div>
-                        <div>
-                            <div className="flex">
-                                <img className="h-10 mr-5 rounded-full" src="https://i.pravatar.cc/150?u=a04258114e29026702d" alt="" />
-                                <p>
-                                    @gaming aura - 3 months ago
-                                </p>
+                        {comments.map((comment, index) => (
+                            <div key={index} className='mb-3'>
+                                <div className="flex">
+                                    <img className="h-10 mr-5 rounded-full" src={comment.logo} alt="" />
+                                    <p className='text-sm'>
+                                        @chulka - 3h ago
+                                    </p>
+                                </div>
+                                <p className="ml-16">{comment.comment}</p>
                             </div>
-                            <p className="ml-16">Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum vitae enim architecto error, minus quam, corrupti, quisquam dicta et reiciendis neque molestias vel nesciunt. Illo, tenetur vero. Sint, consequuntur esse?</p>
-
-                        </div>
+                        ))}
                     </div>
                 </div >
                 <div>
@@ -478,8 +515,7 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                         {allVideos.map((video, index) => (
                             <Tooltip color="warning" delay={700} showArrow={true} content={video.allVideoTitles} key={index}>
                                 <div className="ml-10 flex mb-5 cursor-pointer" onClick={() => {
-                                    const url = `${process.env.NEXT_PUBLIC_CLIENT_DOMAIN}/video/${video.videoId}`;
-                                    window.location.href = url;
+                                   handleRedirect(video.videoId, video.courseFees, video.courseId)
                                 }}>
                                     <img style={{ height: "130px", width: "200px" }} className="rounded-md" src={video.allThumbnailUrls} alt="" />
                                     <div className="max-w-56 ml-3">
