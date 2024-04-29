@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { UserModel } from "../models/user";
+import { VideoModel } from '../models/video';
 import dotenv from "dotenv";
 
 dotenv.config({ path: "./.env" });
@@ -44,15 +45,14 @@ export async function addToPlaylist(req: Request, res: Response) {
 
 
 export async function addToHistory(req: Request, res: Response) {
-    const { email, videoUrl } = req.body;
+    const { email, videoID } = req.body;
     try {
         const user = await UserModel.findOne({ email: email });
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         } else {
             // Push the videoUrl to the history array
-            user.features?.history.push(videoUrl);
-
+            user.features?.history.push(videoID);
             await user.save();
             return res.status(200).json({ message: 'Video added to history' });
         }
@@ -110,11 +110,9 @@ export async function removeSearchHistory(req: Request, res: Response) {
 export async function addToLikedVideo(req: Request, res: Response) {
     const { email, videoId } = req.body;
     try {
-
         const user = await UserModel.findOne({ email: email });
         if (!user) {
-            res.status(404).json({ message: 'User not found' });
-            return;
+            return res.status(404).json({ message: 'User not found' });
         }
 
         const videoIdString: string = String(videoId);
@@ -127,19 +125,27 @@ export async function addToLikedVideo(req: Request, res: Response) {
                 { $pull: { 'features.disLikedVideo': videoIdString } }
             );
         }
+
         const index = user.features?.likedVideos.indexOf(videoIdString);
         if (index !== -1 && user.features?.likedVideos) {
-
             await UserModel.updateOne(
                 { email: email },
                 { $pull: { 'features.likedVideos': videoIdString } }
             );
-
             res.status(200).json({ message: 'Video removed from likedvideos' });
         } else if (user.features?.likedVideos) {
+            await UserModel.updateOne(
+                { email: email },
+                { $push: { 'features.likedVideos': videoIdString } }
+            );
 
-            user.features.likedVideos.push(videoIdString);
-            await user.save();
+            // Increase the videoLikeCount by 1 in the video document
+            await VideoModel.updateOne(
+                { "courses.videos.videoID": videoIdString },
+                { $inc: { "courses.$[].videos.$[video].videoLikeCount": 1 } },
+                { arrayFilters: [{ "video.videoID": videoIdString }] }
+            );
+
             res.status(200).json({ message: 'Video added to likedvideos' });
         } else {
             console.error('User features or likedvideos are undefined');
@@ -150,7 +156,6 @@ export async function addToLikedVideo(req: Request, res: Response) {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 }
-
 
 export async function addToWatchLater(req: Request, res: Response) {
     const { email, videoId } = req.body;
@@ -263,7 +268,6 @@ export async function addSubscription(req: Request, res: Response) {
 
 export async function addToDislikedVideo(req: Request, res: Response) {
     const { email, videoId } = req.body;
-
     try {
         // Check if the user exists
         const user = await UserModel.findOne({ email });
@@ -290,21 +294,37 @@ export async function addToDislikedVideo(req: Request, res: Response) {
         // Check if the videoId exists in the likedVideos array
         const likedVideoIndex = user.features.likedVideos.indexOf(videoId);
 
-        // If the videoId exists in likedVideos array, remove it and add to disLikedVideo
+        // If the videoId exists in likedVideos array, decrease the count of likedVideos
+        // before adding it to disLikedVideo
         if (likedVideoIndex !== -1) {
             user.features.likedVideos.splice(likedVideoIndex, 1);
-            user.features.disLikedVideo.push(videoId);
+
+            // Decrease the videoLikeCount by 1 in the video document
+            await VideoModel.updateOne(
+                { "courses.videos.videoID": videoId },
+                { $inc: { "courses.$[].videos.$[video].videoLikeCount": -1 } },
+                { arrayFilters: [{ "video.videoID": videoId }] }
+            );
         }
+
+        // Add the videoId to disLikedVideo array
+        user.features.disLikedVideo.push(videoId);
 
         // Save the updated user document
         await user.save();
+
+        // Increase the videoDislikeCount by 1 in the video document
+        await VideoModel.updateOne(
+            { "courses.videos.videoID": videoId },
+            { $inc: { "courses.$[].videos.$[video].videoDislikeCount": 1 } },
+            { arrayFilters: [{ "video.videoID": videoId }] }
+        );
 
         return res.status(200).json({ message: "Video disliked successfully" });
     } catch (error) {
         console.error("Error adding disliked video:", error);
         return res.status(500).json({ error: "Internal server error" });
     }
-
 }
 
 
@@ -333,8 +353,6 @@ export async function calculateWatchTime(req: Request, res: Response) {
         return res.status(500).json({ error: "Internal server error" });
     }
 }
-
-
 
 
 

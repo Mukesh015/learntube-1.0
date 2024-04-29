@@ -15,7 +15,6 @@ cloudinary.v2.config({
 
 export async function register(req: Request, res: Response) {
   const { email, username, password } = req.body;
-  console.log(email, username, password);
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     let avatar = null;
