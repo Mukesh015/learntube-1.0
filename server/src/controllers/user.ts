@@ -295,22 +295,22 @@ export async function courseEnrollment(req: Request, res: Response) {
     console.error(error);
     return res.status(500).json({ message: "Internal server error" });
   }
-
 }
 
 export async function isEnrolled(req: Request, res: Response) {
   try {
-      const { email, courseId } = req.body;
-      const user = await UserModel.findOne({ email: email });
+    const { email, courseId } = req.body;
+    console.log(email);
+    const user = await UserModel.findOne({ email: email });
 
-      if (!user) {
-          return res.status(404).json({ message: "User not found" });
-      }
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-      const isEnrolled = user.EnrolledCourses?.includes(courseId);
-      return res.status(200).json({ isEnrolled: isEnrolled });
+    const isEnrolled = user.EnrolledCourses?.includes(courseId);
+    return res.status(200).json({ isEnrolled: isEnrolled });
   } catch (error) {
-      console.error("Error checking enrollment:", error);
-      return res.status(500).json({ message: "Internal Server Error" });
+    console.error("Error checking enrollment:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 }
