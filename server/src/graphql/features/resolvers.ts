@@ -142,7 +142,8 @@ const queries = {
 
             const watchLater = user.features?.watchLater || [];
 
-            const watchLaterDetails: { videoId: any; videoTitle: any; videoViews: any; channelLogo: any; videoPublishedAt: any; videoThumbnail: any }[] = [];
+            const watchLaterDetails: { videoId: any; videoTitle: any; videoViews: any; channelLogo: any; videoPublishedAt: any; 
+                videoThumbnail: any;courseId:any,courseFees:any }[] = [];
 
             videos.forEach(video => {
                 video.courses.forEach(course => {
@@ -154,7 +155,10 @@ const queries = {
                                 videoViews: vid.videoViews.length,
                                 videoPublishedAt: vid.videoPublishedAt,
                                 videoThumbnail: vid.videoThumbnail,
+                                courseId:course.courseId,
+                                courseFees:course.courseFees.price,
                                 channelLogo: channelLogoResponse.find((logo: { email: string; }) => logo.email === video.email)?.channelLogo,
+
                             });
                         }
                     });
@@ -229,7 +233,8 @@ const queries = {
 
             const likedVideos = user.features?.likedVideos || [];
 
-            const likedVideosDetails: { videoId: any; videoTitle: any; videoViews: any; channelLogo: any; videoPublishedAt: any; videoThumbnail: any }[] = [];
+            const likedVideosDetails: { videoId: any; videoTitle: any; videoViews: any; channelLogo: any; videoPublishedAt: any; 
+                videoThumbnail: any; courseId:any;courseFees:any}[] = [];
 
             videos.forEach(video => {
                 video.courses.forEach(course => {
@@ -241,6 +246,8 @@ const queries = {
                                 videoViews: vid.videoViews.length,
                                 videoPublishedAt: vid.videoPublishedAt,
                                 videoThumbnail: vid.videoThumbnail,
+                                courseId: course.courseId,
+                                courseFees:course.courseFees.price,
                                 channelLogo: channelLogoResponse.find((logo: { email: string; }) => logo.email === video.email)?.channelLogo,
                             });
                         }

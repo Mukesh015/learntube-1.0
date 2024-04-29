@@ -34,6 +34,8 @@ type watchLater{
     videoViews : String
     videoPublishedAt : String
     channelLogo : String
+    courseFees:String
+    courseID : String
     videoThumbnail : String
 }
 type likedVideo{
@@ -42,6 +44,8 @@ type likedVideo{
     videoViews : String
     videoPublishedAt : String
     channelLogo : String
+    courseId:String
+    courseFees:String
     videoThumbnail : String
 }
 type comments{
