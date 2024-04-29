@@ -26,6 +26,7 @@ interface UserDocument extends Document {
         disLikedVideo: any[], comments: any[], searchHistory: any[],
     };
     EnrolledCourses?:string[];
+    WatchTime?: number;
     history: any[];
     analytics: { date: Date; watchTime: number }[];
 
@@ -140,7 +141,11 @@ const userSchema = new mongoose.Schema<UserDocument>(
                 watchTime: { type: Number, }
             }
         ],
-        EnrolledCourses:[{type:String}]
+        EnrolledCourses:[{type:String}],
+        WatchTime: { 
+            type: Number,
+            required: false
+         },
     }
 );
 

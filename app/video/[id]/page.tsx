@@ -17,7 +17,7 @@ query GetVideoUrl( $email: String, $videoId: String,$channelId: String) {
     getVideoUrl(email: $email, videoID: $videoId) {
         videoURl
         videoDescription
-        channelLogo
+        channelLogo 
         channelName
         creatorEmail
         videoTitle
@@ -36,6 +36,11 @@ query GetVideoUrl( $email: String, $videoId: String,$channelId: String) {
         dislikedVideos
 
     }
+    getComments(videoID: $videoId) {
+        logo
+        comment
+        timestamp
+      }
     getAllVideoUrl {
         channelLogo
         channelName
@@ -67,6 +72,8 @@ const VideoPage: React.FC<Props> = ({ params }) => {
     const [videoUrl, setVideoUrl] = useState<string>("")
     const [email, setEmail] = useState<string>("");
     const [allVideos, setAllVideos] = useState<any[]>([]);
+    const [comments, setComments] = useState<any[]>([]);
+
     const [videoTitle, setVideoTitle] = useState<string>("");
     const [videoDescription, setVideoDescription] = useState<string>("");
     const [channelName, setChannelName] = useState<string>("");
@@ -79,6 +86,8 @@ const VideoPage: React.FC<Props> = ({ params }) => {
     const [channelId, setChannelId] = useState<string>("");
     const [comment, setComment] = useState<string>("");
     const [logo, setLogo] = useState<string>("");
+    const [watchTime, setWatchTime] = useState<number>(0);
+
 
     const toggleSubscribe = () => {
         setIsSubsribed(!isSubsCribed);
@@ -247,6 +256,44 @@ const VideoPage: React.FC<Props> = ({ params }) => {
         }
     }, [creatorEmail, videoId, comment, logo, email]);
 
+    const startWatchTime = () => {
+        const startTime = Date.now();
+        setWatchTime(startTime);
+    };
+
+    const stopWatchTime = async() => {
+        if (watchTime !== 0) {
+            const endTime = Date.now();
+            const duration = endTime - watchTime;
+            console.log(`Watch time: ${duration} milliseconds:${email}`);
+            setWatchTime(0);
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN}/features/calculatewatchtime`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        email: creatorEmail,
+                        watchTime:duration
+                    })
+                });
+                const data = await response.json();
+                console.log(data);
+            } catch (error) {
+                console.error("Failed to add comment, server error", error);
+            }
+        }
+    };
+
+    useEffect(() => {
+        startWatchTime();
+        return () => {
+            stopWatchTime();
+        };
+    }, []);
+
+
     useEffect(() => {
         if (data) {
             setVideoUrl(data.getVideoUrl[0].videoURl);
@@ -265,19 +312,22 @@ const VideoPage: React.FC<Props> = ({ params }) => {
             setVideoViews(data.getVideoUrl[0].videoViews);
             setVideoPublishedAt(data.getVideoUrl[0].videoPublishedAt);
             setVideoTags(data.getVideoUrl[0].videoTags);
+            setComments(data.getComments)
         }
         if (user) {
             setEmail(user.email || "");
             setLogo(user.photoURL || "");
         }
-    }, [user, setLogo, setEmail, channelId, setChannelId, setCreatorEmail, setAllVideos, setVideoPublishedAt, setChannelName, setChannelLogo, setVideoViews, setVideoUrl, setVideoTitle, setVideoDescription, setVideoTags, setIsAddedToPlaylist, data]);
+    }, [user, setLogo, setEmail, channelId, setChannelId, setCreatorEmail, setAllVideos, setVideoPublishedAt, setChannelName, setChannelLogo,
+        setVideoViews, setVideoUrl, setVideoTitle, setVideoDescription, setVideoTags, setIsAddedToPlaylist, data, setComments]);
 
     return (
         <>
             <Navbar />
             <div className="mt-24 ml-10 mr-10 flex">
                 <div id="video-container" style={{ maxWidth: "950px" }}>
-                    <ReactPlayer width={960} height={550} controls url={videoUrl} />
+                    <ReactPlayer width={960} height={550} controls url={videoUrl} onPlay={startWatchTime}
+                        onPause={stopWatchTime} />
                     <div>
                         <h1 className="text-xl mb-5">{videoTitle}</h1>
                         <nav className="mb-5">

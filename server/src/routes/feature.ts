@@ -1,6 +1,6 @@
 import express from 'express';
 import { addToPlaylist, addSubscription, addToHistory, addToLikedVideo, addToMyVideos, addToWatchLater,addToDislikedVideo,addSearchHistory,
-    removeSearchHistory } from '../controllers/feature';
+    removeSearchHistory,calculateWatchTime } from '../controllers/feature';
 const FeatureRouter = express.Router();
 
 FeatureRouter.post("/addtoplaylist", addToPlaylist)
@@ -13,6 +13,8 @@ FeatureRouter.post("/addtodislikevideo", addToDislikedVideo)
 FeatureRouter.post("/addtodislikevideo",addToDislikedVideo)
 FeatureRouter.post("/addtosearchhistory",addSearchHistory)
 FeatureRouter.post("/removefromsearchHistory",removeSearchHistory)
+FeatureRouter.post("/calculatewatchtime",calculateWatchTime)
+
 
 
 export default FeatureRouter;
