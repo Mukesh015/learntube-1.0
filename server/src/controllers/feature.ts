@@ -45,14 +45,17 @@ export async function addToPlaylist(req: Request, res: Response) {
 
 
 export async function addToHistory(req: Request, res: Response) {
-    const { email, videoID } = req.body;
+    const { email, videoId } = req.body;
     try {
         const user = await UserModel.findOne({ email: email });
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         } else {
+            if (user.features?.history.includes(videoId)) {
+                return res.status(200).json({ message: 'Video already exists in history' });
+            }
             // Push the videoUrl to the history array
-            user.features?.history.push(videoID);
+            user.features?.history.push(videoId);
             await user.save();
             return res.status(200).json({ message: 'Video added to history' });
         }

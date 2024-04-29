@@ -156,8 +156,8 @@ const Home: React.FC = () => {
                   </div>
                   <div className="ml-3">
                     <h1>{video.allVideoTitles}</h1>
-                    <p className="text-gray-500">
-                      {timeSinceUpload(video.uploadAt)}
+                    <p className="text-gray-500 text-sm">
+                      {timeSinceUpload(video.uploadAt)} - {video.views} views
                     </p>
                   </div>
                 </div>

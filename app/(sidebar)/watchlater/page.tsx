@@ -8,7 +8,7 @@ import { auth } from "@/configurations/firebase/config";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { gql, useQuery } from "@apollo/client";
 
-const watchLaterDetails=gql`
+const watchLaterDetails = gql`
 
 query playlist($email: String) {
     getWatchLater(email: $email) {
@@ -34,17 +34,48 @@ const WatchLater: React.FC = () => {
         variables: { email: email },
     });
 
-    
+    const formatTime = (timestampString: string) => {
+        // Convert the string timestamp to a number
+        const timestamp = parseInt(timestampString, 10);
+
+        // Check if the converted timestamp is a valid number
+        if (isNaN(timestamp)) {
+            return "Invalid timestamp";
+        }
+
+        const currentDate = new Date();
+        const publishedDate = new Date(timestamp);
+        const diffInMs = currentDate.getTime() - publishedDate.getTime();
+        const diffInSec = Math.floor(diffInMs / 1000);
+
+        // Handle case where timestamp is in the future
+        if (diffInSec < 0) {
+            return "Future timestamp";
+        }
+
+        // Convert timestamp to readable format
+        if (diffInSec < 60) {
+            return `${diffInSec} seconds ago`;
+        } else if (diffInSec < 3600) {
+            return `${Math.floor(diffInSec / 60)} minutes ago`;
+        } else if (diffInSec < 86400) {
+            return `${Math.floor(diffInSec / 3600)} hours ago`;
+        } else {
+            return `${Math.floor(diffInSec / 86400)} days ago`;
+        }
+    };
+
 
     useEffect(() => {
         if (user) {
             setEmail(user.email || "");
         }
-        if(data && email ){
+        if (data && email) {
             setWatchLater(data.getWatchLater);
+            console.log(data.getWatchLater);
         }
 
-    },[ setEmail,user,setWatchLater]);
+    }, [setEmail, data, user, setWatchLater]);
 
     return (
         <>
@@ -68,138 +99,30 @@ const WatchLater: React.FC = () => {
                     className=""
                     style={{ marginTop: "40px" }}
                 >
-                    <div id="video-content" className="flex mb-10">
-                        {/* video content here*/}
-                        <img
-                            className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-150 rounded-md"
-                            height={200}
-                            width={200}
-                            src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg"
-                            alt=""
-                        />
-                        <div className="flex mt-10 ml-5 justify-center mr-10">
-                            <div>
-                                {/* Profile picture here */}
-                                <img height={30} width={30} className="rounded-full m-1" src="https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png" alt="" />
-                            </div>
-                            <div className="ml-3">
-                                <h1 className="">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magni facere voluptate, eos blanditiis aliquam, dolor beatae neque odit dolore repellendus unde sequi eveniet maxime quas ad omnis. Dignissimos, saepe nulla.</h1> {/* video title here*/}
-                                <p className="text-gray-500">
-                                    20k views - 4 hours ago {/*Content details/analitics*/}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="video-content" className="flex mb-10">
-                        {/* video content here*/}
-                        <img
-                            className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-150 rounded-md"
-                            height={200}
-                            width={200}
-                            src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg"
-                            alt=""
-                        />
-                        <div className="flex mt-10 ml-5 justify-center mr-10">
-                            <div>
-                                {/* Profile picture here */}
-                                <img height={30} width={30} className="rounded-full m-1" src="https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png" alt="" />
-                            </div>
-                            <div className="ml-3">
-                                <h1 className="">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magni facere voluptate, eos blanditiis aliquam, dolor beatae neque odit dolore repellendus unde sequi eveniet maxime quas ad omnis. Dignissimos, saepe nulla.</h1> {/* video title here*/}
-                                <p className="text-gray-500">
-                                    20k views - 4 hours ago {/*Content details/analitics*/}
-                                </p>
+                    {watchLater.map((item, index) => (
+                        <div id="video-content" className="flex mb-10">
+                            {/* video content here*/}
+                            <img
+                                className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-150 rounded-md"
+                                height={200}
+                                width={200}
+                                src={item.videoThumbnail}
+                                alt=""
+                            />
+                            <div className="flex mt-10 ml-5 justify-center mr-10">
+                                <div>
+                                    {/* Profile picture here */}
+                                    <img height={30} width={30} className="rounded-full m-1" src={item.channelLogo} alt="" />
+                                </div>
+                                <div className="ml-3">
+                                    <h1 className="">{item.videoTitle}</h1> {/* video title here*/}
+                                    <p className="text-gray-500">
+                                        {item.videoViews} views - {formatTime(item.videoPublishedAt)} {/*Content details/analitics*/}
+                                    </p>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div id="video-content" className="flex mb-10">
-                        {/* video content here*/}
-                        <img
-                            className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-150 rounded-md"
-                            height={200}
-                            width={200}
-                            src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg"
-                            alt=""
-                        />
-                        <div className="flex mt-10 ml-5 justify-center mr-10">
-                            <div>
-                                {/* Profile picture here */}
-                                <img height={30} width={30} className="rounded-full m-1" src="https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png" alt="" />
-                            </div>
-                            <div className="ml-3">
-                                <h1 className="">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magni facere voluptate, eos blanditiis aliquam, dolor beatae neque odit dolore repellendus unde sequi eveniet maxime quas ad omnis. Dignissimos, saepe nulla.</h1> {/* video title here*/}
-                                <p className="text-gray-500">
-                                    20k views - 4 hours ago {/*Content details/analitics*/}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="video-content" className="flex mb-10">
-                        {/* video content here*/}
-                        <img
-                            className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-150 rounded-md"
-                            height={200}
-                            width={200}
-                            src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg"
-                            alt=""
-                        />
-                        <div className="flex mt-10 ml-5 justify-center mr-10">
-                            <div>
-                                {/* Profile picture here */}
-                                <img height={30} width={30} className="rounded-full m-1" src="https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png" alt="" />
-                            </div>
-                            <div className="ml-3">
-                                <h1 className="">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magni facere voluptate, eos blanditiis aliquam, dolor beatae neque odit dolore repellendus unde sequi eveniet maxime quas ad omnis. Dignissimos, saepe nulla.</h1> {/* video title here*/}
-                                <p className="text-gray-500">
-                                    20k views - 4 hours ago {/*Content details/analitics*/}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="video-content" className="flex mb-10">
-                        {/* video content here*/}
-                        <img
-                            className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-150 rounded-md"
-                            height={200}
-                            width={200}
-                            src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg"
-                            alt=""
-                        />
-                        <div className="flex mt-10 ml-5 justify-center mr-10">
-                            <div>
-                                {/* Profile picture here */}
-                                <img height={30} width={30} className="rounded-full m-1" src="https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png" alt="" />
-                            </div>
-                            <div className="ml-3">
-                                <h1 className="">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magni facere voluptate, eos blanditiis aliquam, dolor beatae neque odit dolore repellendus unde sequi eveniet maxime quas ad omnis. Dignissimos, saepe nulla.</h1> {/* video title here*/}
-                                <p className="text-gray-500">
-                                    20k views - 4 hours ago {/*Content details/analitics*/}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="video-content" className="flex mb-10">
-                        {/* video content here*/}
-                        <img
-                            className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-150 rounded-md"
-                            height={200}
-                            width={200}
-                            src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg"
-                            alt=""
-                        />
-                        <div className="flex mt-10 ml-5 justify-center mr-10">
-                            <div>
-                                {/* Profile picture here */}
-                                <img height={30} width={30} className="rounded-full m-1" src="https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png" alt="" />
-                            </div>
-                            <div className="ml-3">
-                                <h1 className="">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magni facere voluptate, eos blanditiis aliquam, dolor beatae neque odit dolore repellendus unde sequi eveniet maxime quas ad omnis. Dignissimos, saepe nulla.</h1> {/* video title here*/}
-                                <p className="text-gray-500">
-                                    20k views - 4 hours ago {/*Content details/analitics*/}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+                    ))}
                 </div>
             </div>
         </>
