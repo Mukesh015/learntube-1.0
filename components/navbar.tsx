@@ -17,7 +17,6 @@ import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-o
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Input } from "@nextui-org/react";
 import { gql, useQuery } from "@apollo/client";
 
-
 const VERIFY_CREATOR = gql`
 query Exam($email:String){
     getIsCreator(email: $email) {
@@ -32,9 +31,7 @@ query Exam($email:String){
   }
 `
 
-
-
-const Navbar: React.FC=() => {
+const Navbar: React.FC = () => {
 
     const [userName, setuserName] = useState<string>("");
     const [email, setEmail] = useState<string>("");
@@ -44,6 +41,7 @@ const Navbar: React.FC=() => {
     const [toUpdate, settoUpdate] = useState<string>("");
     const [isCreator, setIsCreator] = useState<string>("");
     const [searchItem, setSearchItem] = useState<boolean>(false);
+    const [toggleVoiceSearches, settoggleVoiceSearches] = useState<boolean>(false);
 
     const [spinnerButton, setspinnerButton] = useState<boolean>(false);
     const [searchString, setsearchString] = useState<string>("");
@@ -60,7 +58,7 @@ const Navbar: React.FC=() => {
     const [updatePassword] = useUpdatePassword(auth);
 
 
-    const { isOpen, onOpen, onClose } = useDisclosure();
+    const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
 
 
     const { loading, error, data } = useQuery(VERIFY_CREATOR, {
@@ -252,6 +250,30 @@ const Navbar: React.FC=() => {
         }
     }, [setsearchString]);
 
+    const startListening = async () => {
+        setText("");
+        setIsListening(true);
+        if (recognition) {
+            await recognition.start();
+        }
+    };
+
+    const stopListening = async () => {
+        setIsListening(false);
+        handleSearch(text)
+        if (recognition) {
+            await recognition.stop();
+        }
+    };
+
+    const handleOpenVoiceSearchModel = useCallback(async () => {
+        settoggleVoiceSearches(!toggleVoiceSearches);
+        if (isListening) {
+            stopListening();
+        }
+        startListening();
+    }, [isListening, startListening, stopListening]);
+
     useEffect(() => {
         if (!recognition) {
             if ("webkitSpeechRecognition" in window) {
@@ -269,27 +291,15 @@ const Navbar: React.FC=() => {
                 console.log("onresult:", event);
                 recognition.stop();
                 setText(event.results[0][0].transcript);
-                handleSearch(event.results[0][0].transcript);
+                setTimeout(() => {
+                    handleSearch(event.results[0][0].transcript);
+                }, 1500);
                 setIsListening(false);
             };
         }
     }, [recognition, setText, setIsListening]);
 
-    const startListening = () => {
-        setText("");
-        setIsListening(true);
-        if (recognition) {
-            recognition.start();
-        }
-    };
 
-    const stopListening = () => {
-        setIsListening(false);
-        handleSearch(text)
-        if (recognition) {
-            recognition.stop();
-        }
-    };
 
     return (
         <>
@@ -322,24 +332,24 @@ const Navbar: React.FC=() => {
                         />
                         <p className="font-semibold text-xl">LearnTube</p>
                     </li>
-                    <div>
+                    {/* <div>
                         {
-                            recognition?(
+                            recognition ? (
                                 <>
-                                <div>
-                                <button onClick={startListening}>Start Listening</button>
-                                </div>
-                                <div>
-                                <button onClick={stopListening}>Stop Listening</button>
-                                </div>
-                                {
-                                    isListening? <div>Your browser currently Listening</div>:null
-                                }{text}
+                                    <div>
+                                        <button onClick={startListening}>Start Listening</button>
+                                    </div>
+                                    <div>
+                                        <button onClick={stopListening}>Stop Listening</button>
+                                    </div>
+                                    {
+                                        isListening ? <div>Your browser currently Listening</div> : null
+                                    }{text}
                                 </>
-                            ):(
+                            ) : (
                                 <h1>your browser does not support speechrecognition</h1>
-                            ) }
-                    </div>
+                            )}
+                    </div> */}
                     <li className="flex ml-32 mr-20">
                         <svg
                             className="absolute mt-2.5 ml-2"
@@ -353,7 +363,8 @@ const Navbar: React.FC=() => {
                             <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
                         </svg>
                         <Tooltip color="warning" delay={700} showArrow={true} content="Search with voice">
-                            <svg 
+                            <svg
+                                onClick={() => handleOpenVoiceSearchModel()}
                                 className="absolute mt-2.5 hover:bg-gray-500 rounded-full hover:p-1"
                                 style={{ marginLeft: "560px" }}
                                 xmlns="http://www.w3.org/2000/svg"
@@ -362,9 +373,8 @@ const Navbar: React.FC=() => {
                                 viewBox="0 0 24 24"
                                 width="24px"
                                 fill="#FFFFFF"
-                               
                             >
-                 
+
                                 <g>
                                     <rect fill="none" height="24" width="24" />
                                     <rect fill="none" height="24" width="24" />
@@ -378,11 +388,11 @@ const Navbar: React.FC=() => {
                                     </g>
                                 </g>
                             </svg>
+
                         </Tooltip>
                         <Tooltip color="warning" delay={700} showArrow={true} content="Search a content">
                             <input
                                 style={{ width: "600px" }}
-
                                 type="search"
                                 id="search-content"
                                 placeholder="Search here... or [ctrl+k]"
@@ -523,7 +533,8 @@ const Navbar: React.FC=() => {
                         </div>
                     </div>
                 </div>
-            )}
+            )
+            }
             <Modal
                 backdrop="opaque"
                 size="3xl"
@@ -584,12 +595,23 @@ const Navbar: React.FC=() => {
                                         Changing...
                                     </Button>
                                 )}
-
                             </ModalFooter>
                         </>
                     )}
                 </ModalContent>
             </Modal>
+            {toggleVoiceSearches && recognition &&
+                <div id="hs-custom-backdrop-modal" style={{ width: "900px", height: "500px", marginLeft: "400px" }} className="hs-overlay z-50 fixed top-32 overflow-x-hidden overflow-y-auto pointer-events-none rounded-xl bg-black">
+                    <div className="flex mr-10 mt-28 ml-10">
+                        {isListening ? (
+                            <svg xmlns="http://www.w3.org/2000/svg" height="240" fill="#eb4034" viewBox="0 -960 960 960" width="240"><path d="M480.12-400q-51.04 0-86.58-35.46Q358-470.91 358-522v-242q0-51.09 35.42-86.54Q428.84-886 479.88-886q51.04 0 86.58 35.46Q602-815.09 602-764v242q0 51.09-35.42 86.54Q531.16-400 480.12-400ZM436-96v-128.85q-113-13.31-185.5-98.42Q178-408.39 178-522h86q0 90 63.18 152T480-308q89.64 0 152.82-62Q696-432 696-522h86q0 114.39-73.5 199.12Q635-238.16 522-224.85V-96h-86Z" /></svg>
+                        ) : (
+                            <svg xmlns="http://www.w3.org/2000/svg" height="240" fill="#FFFFFF" viewBox="0 -960 960 960" width="240"><path d="M480.12-400q-51.04 0-86.58-35.46Q358-470.91 358-522v-242q0-51.09 35.42-86.54Q428.84-886 479.88-886q51.04 0 86.58 35.46Q602-815.09 602-764v242q0 51.09-35.42 86.54Q531.16-400 480.12-400ZM436-96v-128.85q-113-13.31-185.5-98.42Q178-408.39 178-522h86q0 90 63.18 152T480-308q89.64 0 152.82-62Q696-432 696-522h86q0 114.39-73.5 199.12Q635-238.16 522-224.85V-96h-86Z" /></svg>
+                        )}
+                        <p className="text-4xl mt-20 ml-20">{text ? text : "Listening ..."}</p>
+                    </div>
+                </div>
+            }
         </>
     )
 }
