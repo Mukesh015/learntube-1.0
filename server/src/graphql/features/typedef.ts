@@ -104,6 +104,8 @@ type Video {
     courseName: String
     courseThumbUrl: String
     courseDescription: String
+    channelLogo: String
+    channelName : String
     videos: [Video]
     totalNoOfVideos: Int
   }

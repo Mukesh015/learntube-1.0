@@ -16,6 +16,8 @@ import { auth } from "@/configurations/firebase/config";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/react";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Input } from "@nextui-org/react";
 import { gql, useQuery } from "@apollo/client";
+import googleSpeech from "google-speech-api"
+import readline from "readline"
 
 
 const VERIFY_CREATOR = gql`
@@ -213,6 +215,25 @@ const Navbar: React.FC = () => {
             console.error("Failed to fetch", error);
         }
     }, [email]);
+    const handleVoiceInput=() {
+        const rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout
+        });
+    
+        rl.question("Please speak your search query: ", async function(query) {
+            try {
+                console.log("Searching for:", query);
+                // Convert speech to text
+                const speechResult = await googleSpeech.getSpeech(query);
+                const speechText = speechResult[0].results[0].alternatives[0].transcript;
+            }
+            catch (err) {
+                console.error(err);
+            }
+        }
+    )
+}
 
     useEffect(() => {
         if (user) {

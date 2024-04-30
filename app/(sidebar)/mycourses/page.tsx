@@ -16,6 +16,8 @@ query yourCourses( $email: String){
         courseName
         courseThumbUrl
         totalNoOfVideos
+        channelName
+        channelLogo
         videos {
           videoId
           videoPublishedAt
