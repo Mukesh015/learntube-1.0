@@ -34,6 +34,8 @@ type watchLater{
     videoViews : String
     videoPublishedAt : String
     channelLogo : String
+    courseFees:String
+    courseID : String
     videoThumbnail : String
 }
 type likedVideo{
@@ -42,6 +44,8 @@ type likedVideo{
     videoViews : String
     videoPublishedAt : String
     channelLogo : String
+    courseId:String
+    courseFees:String
     videoThumbnail : String
 }
 type comments{
@@ -86,4 +90,21 @@ type creatorCard{
     watchTime: String
     totalComments:String
 }
+type Video {
+    videoUrl: String
+    videoThumbnail: String
+    videoId: String
+    videoTitle: String
+    videoViews: Int
+    videoPublishedAt: String
+  }
+  
+  type yourCourse {
+    courseId: String
+    courseName: String
+    courseThumbUrl: String
+    courseDescription: String
+    videos: [Video]
+    totalNoOfVideos: Int
+  }
 `;

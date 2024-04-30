@@ -46,6 +46,8 @@ type search{
 }
 type searchQuery{
     videoUrl: String
+    courseID: String
+    courseFees: String
     videoID: String
     videoDescription: String
     videoTags :[String]

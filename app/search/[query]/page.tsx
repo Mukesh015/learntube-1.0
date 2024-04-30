@@ -1,8 +1,10 @@
 "use client"
 import Navbar from "@/components/navbar";
 import Sidebar from "@/components/sidebar";
+import { auth } from "@/configurations/firebase/config";
 import { gql, useQuery } from "@apollo/client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useAuthState } from "react-firebase-hooks/auth";
 
 
 
@@ -10,6 +12,8 @@ const searchQuery = gql`
 query searchQuery( $query: String){
     getSearchQueryDetails(query: $query) {
         videoDescription
+        courseID
+        courseFees
         videoID
         videoTags
         videoUrl
@@ -28,9 +32,10 @@ interface Props {
 }
 const SerachResult: React.FC<Props> = ({ params }) => {
 
+    const [email, setEmail] = useState<string>("");
 
     const [searQuery, setSearchQuery] = useState<any[]>([]);
-
+    const [user] = useAuthState(auth);
 
     const query: any = decodeURIComponent(params.query)
 
@@ -40,14 +45,68 @@ const SerachResult: React.FC<Props> = ({ params }) => {
 
 
     console.log(searQuery)
+    const handleRedirect = useCallback(async (videoId: string, courseFees: any, courseId: string) => {
+        try {
+            // Add video to history
+            const historyResponse = await fetch(`${process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN}/features/addtohistory`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email: email,
+                    videoId: videoId
+                })
+            });
+            const historyData = await historyResponse.json();
+            console.log("Video added to history:", historyData);
+        } catch (historyError) {
+            console.error("Failed to add video to history:", historyError);
+        }
 
+        // Check if course is free
+        if (courseFees === null) {
+            const videoUrl = `/video/${videoId}`;
+            window.location.href = videoUrl;
+            return;
+        }
+
+        try {
+            // Check if user is enrolled in the course
+            const enrollResponse = await fetch(`${process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN}/api/isenroll`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email: email,
+                    courseId: courseId
+                })
+            });
+            const enrollData = await enrollResponse.json();
+
+            // Redirect based on enrollment status
+            if (enrollData.isEnrolled === true) {
+                const videoUrl = `/video/${videoId}`;
+                window.location.href = videoUrl;
+            } else {
+                const paymentUrl = `/payment/${courseId}`;
+                window.location.href = paymentUrl;
+            }
+        } catch (enrollError) {
+            console.error("Failed to fetch enrollment status:", enrollError);
+        }
+    }, [email]);
     useEffect(() => {
+        if (user) {
+            setEmail(user.email || "");
+        }
         if (data) {
             setSearchQuery(data.getSearchQueryDetails);
             console.log(data.getSearchQueryDetails)
 
         }
-    }, [setSearchQuery, data]);
+    }, [setSearchQuery, data,setEmail,user]);
     return (
         <>
             <Navbar />
@@ -64,6 +123,9 @@ const SerachResult: React.FC<Props> = ({ params }) => {
                             className="rounded-lg"
                             src={video.videoThumbnail}
                             alt=""
+                            onClick={() => {
+                                handleRedirect(video.videoID, video.courseFees, video.courseID)
+                            }}
                         />
                         <div className="ml-6">
                             {/* Video title */}

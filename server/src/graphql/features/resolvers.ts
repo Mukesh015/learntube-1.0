@@ -142,7 +142,8 @@ const queries = {
 
             const watchLater = user.features?.watchLater || [];
 
-            const watchLaterDetails: { videoId: any; videoTitle: any; videoViews: any; channelLogo: any; videoPublishedAt: any; videoThumbnail: any }[] = [];
+            const watchLaterDetails: { videoId: any; videoTitle: any; videoViews: any; channelLogo: any; videoPublishedAt: any; 
+                videoThumbnail: any;courseId:any,courseFees:any }[] = [];
 
             videos.forEach(video => {
                 video.courses.forEach(course => {
@@ -154,7 +155,10 @@ const queries = {
                                 videoViews: vid.videoViews.length,
                                 videoPublishedAt: vid.videoPublishedAt,
                                 videoThumbnail: vid.videoThumbnail,
+                                courseId:course.courseId,
+                                courseFees:course.courseFees.price,
                                 channelLogo: channelLogoResponse.find((logo: { email: string; }) => logo.email === video.email)?.channelLogo,
+
                             });
                         }
                     });
@@ -229,7 +233,8 @@ const queries = {
 
             const likedVideos = user.features?.likedVideos || [];
 
-            const likedVideosDetails: { videoId: any; videoTitle: any; videoViews: any; channelLogo: any; videoPublishedAt: any; videoThumbnail: any }[] = [];
+            const likedVideosDetails: { videoId: any; videoTitle: any; videoViews: any; channelLogo: any; videoPublishedAt: any; 
+                videoThumbnail: any; courseId:any;courseFees:any}[] = [];
 
             videos.forEach(video => {
                 video.courses.forEach(course => {
@@ -241,6 +246,8 @@ const queries = {
                                 videoViews: vid.videoViews.length,
                                 videoPublishedAt: vid.videoPublishedAt,
                                 videoThumbnail: vid.videoThumbnail,
+                                courseId: course.courseId,
+                                courseFees:course.courseFees.price,
                                 channelLogo: channelLogoResponse.find((logo: { email: string; }) => logo.email === video.email)?.channelLogo,
                             });
                         }
@@ -390,6 +397,59 @@ const queries = {
         } catch (error) {
             console.error('Error fetching video comments:', error);
             throw error;
+        }
+    },
+    getYourCourse:async(_:any,{email}:{email:string}) =>{
+        try {
+            const user = await UserModel.findOne({ email });
+            if (!user) {
+                return "User not found";
+            }
+    
+            const enrolledCourses = user.EnrolledCourses || [];
+            const courseDetails = [];
+    
+
+            for (const courseId of enrolledCourses) {
+ 
+                const course = await VideoModel.findOne({ "courses.courseId": courseId });
+                if (course) {
+
+                    const courseInfo = course.courses.find(c => c.courseId === courseId);
+                    const courseName = courseInfo?.courseName || '';
+                    const courseThumbUrl = courseInfo?.courseThumbUrl || '';
+                    const courseDescription = courseInfo?.courseDescription || '';
+    
+
+                    const videos = courseInfo?.videos || [];
+                    const videoDetails = videos.map(video => ({
+                        videoUrl: video.videoUrl,
+                        videoThumbnail: video.videoThumbnail,
+                        videoId: video.videoID,
+                        videoTitle: video.videoTitle,
+                        videoViews: video.videoViews.length,
+                        videoPublishedAt: video.videoPublishedAt
+                    }));
+    
+
+                    const totalNoOfVideos = videos.length;
+                    console.log(totalNoOfVideos)
+            
+                    courseDetails.push({
+                        courseId: courseId,
+                        courseName: courseName,
+                        courseThumbUrl: courseThumbUrl,
+                        courseDescription: courseDescription,
+                        videos: videoDetails,
+                        totalNoOfVideos: totalNoOfVideos
+                    });
+                }
+            }
+    
+            return courseDetails;
+        } catch (error) {
+            console.error('Error fetching user courses:', error);
+            throw new Error('An error occurred while fetching user courses');
         }
     }
 }

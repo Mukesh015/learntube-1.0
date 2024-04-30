@@ -161,8 +161,10 @@ const Navbar: React.FC = () => {
         }
     }, []);
 
-    const handleSearch = useCallback(async () => {
+    const handleSearch = useCallback(async (recommendedSearchString: string | null) => {
         try {
+            const searchstring = recommendedSearchString || searchString;
+    
             const response = await fetch(`${process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN}/features/addtosearchhistory`, {
                 method: "POST",
                 headers: {
@@ -170,20 +172,24 @@ const Navbar: React.FC = () => {
                 },
                 body: JSON.stringify({
                     email: email,
-                    searchString: searchString
+                    searchString: searchstring
                 })
             });
+    
             const data = await response.json();
-            const url = `${process.env.NEXT_PUBLIC_CLIENT_DOMAIN}/search/${searchString}`;
-            window.location.href = url;
-            console.log(data);
+    
             if (response.ok) {
-                console.log("search String saved successfully")
+                console.log("Search string saved successfully");
             }
+    
+            const url = `${process.env.NEXT_PUBLIC_CLIENT_DOMAIN}/search/${searchstring}`;
+            window.location.href = url;
+    
+            console.log(data);
         } catch (error) {
             console.error("Failed to fetch", error);
         }
-    }, [email, searchString]);
+    }, [email,searchString]);
 
     const deleteSearchString = useCallback(async (history: any) => {
         try {
@@ -320,7 +326,7 @@ const Navbar: React.FC = () => {
                         </Tooltip>
 
                         <Tooltip color="warning" delay={700} showArrow={true} content="Click to search">
-                            <Button className="font-semibold text-white ml-4" color="success" onClick={handleSearch}>
+                            <Button className="font-semibold text-white ml-4" color="success" onClick={() => handleSearch(searchString)}>
                                 Search
                             </Button>
                         </Tooltip>
@@ -425,14 +431,11 @@ const Navbar: React.FC = () => {
                     <div className="flex cursor-pointer">
                         <div className="flex flex-col">
                             {searchString === '' ? (
-
                                 Array.from(new Set(searchbarDetails.flatMap(item => item.searchHistory))).map((history, idx) => (
-                                    <div className="flex">
-                                        <p key={idx} className="p-2 hover:bg-gray-600 rounded-xl">{history}
-                                        </p>
-                                        <svg onClick={() => { deleteSearchString(history) }} className="  ml-20 mt-1 hover:bg-gray-600 rounded-full p-1" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" /></svg>
+                                    <div className="flex" key={idx}>
+                                        <p className="p-2 hover:bg-gray-600 rounded-xl" onClick={() => handleSearch(history)}>{history}</p>
+                                        <svg onClick={() => deleteSearchString(history)} className="ml-20 mt-1 hover:bg-gray-600 rounded-full p-1" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" /></svg>
                                     </div>
-
                                 ))
                             ) : (
                                 searchbarDetails
@@ -444,7 +447,7 @@ const Navbar: React.FC = () => {
                                     .map((item, idx) => (
                                         <div key={idx}>
                                             <div className="flex">
-                                                <p className="p-2 hover:bg-gray-600 rounded-xl">{item.videoTitle}</p>
+                                                <p className="p-2 hover:bg-gray-600 rounded-xl" onClick={() => handleSearch(item.videoTitle)}>{item.videoTitle}</p>
                                             </div>
                                             <hr className="border-gray-600" />
                                         </div>

@@ -186,6 +186,9 @@ const History: React.FC = () => {
                                 width={200}
                                 src={item.videoThumbnail}
                                 alt=""
+                                onClick={() => {
+                                    handleRedirect(item.videoId, item.courseFees, item.courseID)
+                                }}
                             />
                             <div className="flex mt-10 ml-5 justify-center mr-10">
                                 <div>
