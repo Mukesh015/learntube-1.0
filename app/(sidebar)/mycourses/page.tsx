@@ -28,7 +28,6 @@ const yourCourses = gql`
         }
       }
     }
-  }
 `;
 
 const MyCourses: React.FC = () => {
@@ -145,7 +144,7 @@ const MyCourses: React.FC = () => {
                                                 height={30}
                                                 width={30}
                                                 className="rounded-full m-1"
-                                                src="https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png"
+                                                src={course.channelLogo}
                                                 alt=""
                                             />
                                         </div>
@@ -173,19 +172,10 @@ const MyCourses: React.FC = () => {
                                                     alt=""
                                                 />
                                                 <div className="flex mt-10 ml-5 justify-center mr-10">
-                                                    <div>
-                                                        {/* Profile picture */}
-                                                        <img
-                                                            height={30}
-                                                            width={30}
-                                                            className="rounded-full m-1"
-                                                            src="https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png"
-                                                            alt=""
-                                                        />
-                                                    </div>
                                                     <div className="ml-3">
                                                         {/* Video title */}
                                                         <h1 className="">{video.videoTitle}</h1>
+                                                        <p className="mb-5 mt-5 text-gray-400">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Maxime cupiditate laborum dolorem officiis dicta repudiandae hic voluptate praesentium eveniet commodi!</p>
                                                         <p className="text-gray-500">
                                                             {video.videoViews} views - {/* Video description */}
                                                             {formatTime(video.videoPublishedAt)}
