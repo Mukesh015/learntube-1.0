@@ -10,18 +10,22 @@ import { auth } from "@/configurations/firebase/config";
 const yourCourses = gql`
   query yourCourses($email: String) {
     getYourCourse(email: $email) {
-      courseDescription
-      courseId
-      courseName
-      courseThumbUrl
-      totalNoOfVideos
-      videos {
-        videoId
-        videoPublishedAt
-        videoThumbnail
-        videoTitle
-        videoUrl
-        videoViews
+
+        courseDescription
+        courseId
+        courseName
+        courseThumbUrl
+        totalNoOfVideos
+        channelName
+        channelLogo
+        videos {
+          videoId
+          videoPublishedAt
+          videoThumbnail
+          videoTitle
+          videoUrl
+          videoViews
+        }
       }
     }
   }

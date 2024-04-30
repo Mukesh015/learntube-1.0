@@ -104,7 +104,14 @@ type Video {
     courseName: String
     courseThumbUrl: String
     courseDescription: String
+    channelLogo: String
+    channelName : String
     videos: [Video]
     totalNoOfVideos: Int
+  }
+  type subscribedChannels{
+    channelId:String
+    channelName:String
+    channelLogo:String
   }
 `;

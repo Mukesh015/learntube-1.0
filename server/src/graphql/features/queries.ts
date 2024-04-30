@@ -9,4 +9,5 @@ getchannelDetails(email:String):[channelDetails]
 getYourVideo(email:String):[yourVideo]
 getCreatorCard(email:String):[creatorCard]
 getYourCourse(email:String):[yourCourse]
+getSubscribedChannels(email:String):[subscribedChannels]
 `

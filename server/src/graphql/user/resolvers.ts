@@ -5,7 +5,7 @@ dotenv.config({ path: "../.env" });
 import { VideoModel, VideoDocument } from "../../models/video";
 import { UserModel, UserDocument } from "../../models/user";
 interface VideoInfo {
-    courseId:any;
+    courseId: any;
     courseFees: any;
     email: string;
     videoUrl: string;
@@ -102,7 +102,7 @@ const queries = {
                             channelLogo: channelLogo,
                             channelName: channelName,
                             courseFees: courseFees,
-                            courseId:courseId
+                            courseId: courseId
                         });
                     }
                 }
@@ -117,8 +117,8 @@ const queries = {
                 views: videothumb.videoViews,
                 channelLogo: videothumb.channelLogo,
                 channelName: videothumb.channelName,
-                courseFees: videothumb.courseFees ,
-                courseId:videothumb.courseId
+                courseFees: videothumb.courseFees,
+                courseId: videothumb.courseId
             }));
         } catch (error) {
             console.error('Error fetching video URLs:', error);
@@ -219,8 +219,8 @@ const queries = {
             const searchResults = videos.flatMap(Video =>
                 Video.courses.flatMap(course =>
                     course.videos.map(video => ({
-                        courseID:course.courseId,
-                        courseFees:course.courseFees.price,
+                        courseID: course.courseId,
+                        courseFees: course.courseFees.price,
                         videoUrl: video.videoUrl,
                         videoID: video.videoID,
                         videoDescription: video.videoDescription,
@@ -250,6 +250,7 @@ const queries = {
             throw new Error('Error fetching search query details');
         }
     }
+    
 
 };
 

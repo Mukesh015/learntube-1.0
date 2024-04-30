@@ -142,8 +142,10 @@ const queries = {
 
             const watchLater = user.features?.watchLater || [];
 
-            const watchLaterDetails: { videoId: any; videoTitle: any; videoViews: any; channelLogo: any; videoPublishedAt: any; 
-                videoThumbnail: any;courseId:any,courseFees:any }[] = [];
+            const watchLaterDetails: {
+                videoId: any; videoTitle: any; videoViews: any; channelLogo: any; videoPublishedAt: any;
+                videoThumbnail: any; courseId: any, courseFees: any
+            }[] = [];
 
             videos.forEach(video => {
                 video.courses.forEach(course => {
@@ -155,8 +157,8 @@ const queries = {
                                 videoViews: vid.videoViews.length,
                                 videoPublishedAt: vid.videoPublishedAt,
                                 videoThumbnail: vid.videoThumbnail,
-                                courseId:course.courseId,
-                                courseFees:course.courseFees.price,
+                                courseId: course.courseId,
+                                courseFees: course.courseFees.price,
                                 channelLogo: channelLogoResponse.find((logo: { email: string; }) => logo.email === video.email)?.channelLogo,
 
                             });
@@ -233,8 +235,10 @@ const queries = {
 
             const likedVideos = user.features?.likedVideos || [];
 
-            const likedVideosDetails: { videoId: any; videoTitle: any; videoViews: any; channelLogo: any; videoPublishedAt: any; 
-                videoThumbnail: any; courseId:any;courseFees:any}[] = [];
+            const likedVideosDetails: {
+                videoId: any; videoTitle: any; videoViews: any; channelLogo: any; videoPublishedAt: any;
+                videoThumbnail: any; courseId: any; courseFees: any
+            }[] = [];
 
             videos.forEach(video => {
                 video.courses.forEach(course => {
@@ -247,7 +251,7 @@ const queries = {
                                 videoPublishedAt: vid.videoPublishedAt,
                                 videoThumbnail: vid.videoThumbnail,
                                 courseId: course.courseId,
-                                courseFees:course.courseFees.price,
+                                courseFees: course.courseFees.price,
                                 channelLogo: channelLogoResponse.find((logo: { email: string; }) => logo.email === video.email)?.channelLogo,
                             });
                         }
@@ -399,19 +403,19 @@ const queries = {
             throw error;
         }
     },
-    getYourCourse:async(_:any,{email}:{email:string}) =>{
+    getYourCourse: async (_: any, { email }: { email: string }) => {
         try {
             const user = await UserModel.findOne({ email });
             if (!user) {
                 return "User not found";
             }
-    
+
             const enrolledCourses = user.EnrolledCourses || [];
             const courseDetails = [];
-    
+
 
             for (const courseId of enrolledCourses) {
- 
+
                 const course = await VideoModel.findOne({ "courses.courseId": courseId });
                 if (course) {
 
@@ -419,7 +423,13 @@ const queries = {
                     const courseName = courseInfo?.courseName || '';
                     const courseThumbUrl = courseInfo?.courseThumbUrl || '';
                     const courseDescription = courseInfo?.courseDescription || '';
-    
+
+                    const courseCreatorEmail = course.email;
+
+                    // Fetch channelLogo and channelName based on the course creator's email
+                    const channelInfo = await queries.getChannelLogo(undefined, { email: courseCreatorEmail });
+                    const channelLogo = channelInfo.find((info: { email: string }) => info.email === courseCreatorEmail)?.channelLogo || '';
+                    const channelName = channelInfo.find((info: { email: string }) => info.email === courseCreatorEmail)?.channelName || '';
 
                     const videos = courseInfo?.videos || [];
                     const videoDetails = videos.map(video => ({
@@ -430,26 +440,55 @@ const queries = {
                         videoViews: video.videoViews.length,
                         videoPublishedAt: video.videoPublishedAt
                     }));
-    
+
 
                     const totalNoOfVideos = videos.length;
-                    console.log(totalNoOfVideos)
-            
+
                     courseDetails.push({
                         courseId: courseId,
                         courseName: courseName,
                         courseThumbUrl: courseThumbUrl,
                         courseDescription: courseDescription,
+                        channelLogo: channelLogo,
+                        channelName: channelName,
                         videos: videoDetails,
                         totalNoOfVideos: totalNoOfVideos
                     });
                 }
             }
-    
+
             return courseDetails;
         } catch (error) {
             console.error('Error fetching user courses:', error);
             throw new Error('An error occurred while fetching user courses');
+        }
+    },
+    getSubscribedChannels: async(_: any, { email }: { email: string }) => {
+        try {
+            const user: UserDocument | null = await UserModel.findOne({ email });
+            if (!user) {
+                return "User not found";
+            }
+    
+            const subscribedChannels = user.subscribedChnannels?.channelId || [];
+            const channelDetails = [];
+            for (const channelId of subscribedChannels) {
+                const channel = await UserModel.findOne({ "channelId": channelId });
+                if (channel) {
+                    const channelName = channel.channelName || '';
+                    const channelLogo = channel.channelLogo || '';
+    
+                    channelDetails.push({
+                        channelId: channelId,
+                        channelName: channelName,
+                        channelLogo: channelLogo
+                    });
+                }
+            }
+            return channelDetails;
+        } catch (error) {
+            console.error('Error fetching subscribed channels:', error);
+            throw new Error('An error occurred while fetching subscribed channels');
         }
     }
 }

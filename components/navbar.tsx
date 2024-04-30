@@ -1,5 +1,5 @@
 "use client"
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
     useAuthState,
     useSignOut,
@@ -32,7 +32,7 @@ query Exam($email:String){
   }
 `
 
-const Navbar: React.FC = () => {
+const Navbar: React.FC= () => {
 
     const [userName, setuserName] = useState<string>("");
     const [email, setEmail] = useState<string>("");
@@ -53,6 +53,7 @@ const Navbar: React.FC = () => {
     const [updateProfile] = useUpdateProfile(auth);
     const [updatePassword] = useUpdatePassword(auth);
 
+    
     const { isOpen, onOpen, onClose } = useDisclosure();
 
 
@@ -164,7 +165,7 @@ const Navbar: React.FC = () => {
     const handleSearch = useCallback(async (recommendedSearchString: string | null) => {
         try {
             const searchstring = recommendedSearchString || searchString;
-    
+
             const response = await fetch(`${process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN}/features/addtosearchhistory`, {
                 method: "POST",
                 headers: {
@@ -175,21 +176,21 @@ const Navbar: React.FC = () => {
                     searchString: searchstring
                 })
             });
-    
+
             const data = await response.json();
-    
+
             if (response.ok) {
                 console.log("Search string saved successfully");
             }
-    
+
             const url = `${process.env.NEXT_PUBLIC_CLIENT_DOMAIN}/search/${searchstring}`;
             window.location.href = url;
-    
+
             console.log(data);
         } catch (error) {
             console.error("Failed to fetch", error);
         }
-    }, [email,searchString]);
+    }, [email, searchString]);
 
     const deleteSearchString = useCallback(async (history: any) => {
         try {
@@ -213,6 +214,7 @@ const Navbar: React.FC = () => {
             console.error("Failed to fetch", error);
         }
     }, [email]);
+    
 
     useEffect(() => {
         if (user) {
@@ -272,8 +274,9 @@ const Navbar: React.FC = () => {
                             width={50}
                             src="https://99designs-blog.imgix.net/blog/wp-content/uploads/2022/05/Mastercard_2019_logo.svg-e1659036851269.png?auto=format&q=60&fit=max&w=930"
                             alt=""
+                          
                         />
-                        <p className="font-semibold text-xl">LearnTube</p>
+                            <p className="font-semibold text-xl">LearnTube</p>
                     </li>
                     <li className="flex ml-32 mr-20">
                         <svg

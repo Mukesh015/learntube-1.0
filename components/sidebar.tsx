@@ -1,11 +1,44 @@
 "use client"
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { gql, useQuery } from "@apollo/client";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "@/configurations/firebase/config";
 
+
+const subscribedchannel = gql`
+
+query subscribedChannel($email: String) {
+    getSubscribedChannels(email: $email) {
+        channelLogo
+        channelId
+        channelName
+      }
+  }
+
+`
 const Sidebar: React.FC = () => {
 
-    const router = useRouter();
+    const [email, setEmail] = useState<string>("");
+    const [subscribedChannel, setSubscribedChannel] = useState<any[]>([]);
 
+    const [user] = useAuthState(auth);
+
+    const router = useRouter();
+    
+    const { loading, error, data } = useQuery(subscribedchannel, {
+        variables: { email: email },
+    });
+    
+    useEffect(() => {
+        if (user) {
+            setEmail(user.email || "");
+        }
+        if (data && email) {
+            setSubscribedChannel(data.getSubscribedChannels);
+            console.table(data.getSubscribedChannels)
+        }
+    }, [setEmail, data, user, setSubscribedChannel]);
     return (
         <div
             id="docs-sidebar"
