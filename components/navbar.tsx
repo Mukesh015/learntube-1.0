@@ -290,7 +290,9 @@ const Navbar: React.FC=() => {
             recognition.stop();
         }
     };
-
+    const synth = window.speechSynthesis;
+    const voices = [];
+    
     return (
         <>
             <nav

@@ -2,7 +2,7 @@ import { VideoModel, VideoDocument } from "../../models/video";
 import { UserModel, UserDocument } from "../../models/user";
 import axios from "axios";
 import dotenv from "dotenv";
-import { timeStamp } from "console";
+
 
 dotenv.config({ path: "../.env" });
 
@@ -40,7 +40,7 @@ const queries = {
 
 
         const history = user.features?.history || [];
-        const hasValueHistory = history.includes(videoID);
+        const hasValueHistory = history.map(history=>history.videoId).includes(videoID);
 
         const myVideos = user.features?.myVideos || [];
         const hasValueMyVideos = myVideos.includes(videoID);
@@ -179,25 +179,27 @@ const queries = {
             if (!user) {
                 return "User not found";
             }
-
+    
             const videos: VideoDocument[] | null = await VideoModel.find();
-
+    
             if (!videos) {
                 throw new Error("Videos not found");
             }
+    
             const channelLogoResponse = await queries.getChannelLogo(undefined, { email: videos.map(email => email.email) });
-
+    
             const history = user.features?.history || [];
-
+    
             const historyDetails: {
                 videoId: any; videoTitle: any; videoViews: any; channelLogo: any; videoPublishedAt: any;
-                videoThumbnail: any; courseID: any, courseFees: any
+                videoThumbnail: any; courseID: any; courseFees: any; viewedAt: any;
             }[] = [];
-
+    
             videos.forEach(video => {
                 video.courses.forEach(course => {
                     course.videos.forEach((vid: any) => {
-                        if (history.includes(vid.videoID)) {
+                        const viewedHistory = history.find(entry => entry.videoId === vid.videoID);
+                        if (viewedHistory) {
                             historyDetails.push({
                                 courseID: course.courseId,
                                 courseFees: course.courseFees.price,
@@ -206,16 +208,17 @@ const queries = {
                                 videoViews: vid.videoViews.length,
                                 videoPublishedAt: vid.videoPublishedAt,
                                 videoThumbnail: vid.videoThumbnail,
+                                viewedAt:`${viewedHistory.timeStamp}`, // Convert timestamp to a readable format
                                 channelLogo: channelLogoResponse.find((logo: { email: string; }) => logo.email === video.email)?.channelLogo,
                             });
                         }
                     });
                 });
             });
-
+    
             return historyDetails;
         } catch (error) {
-            console.log(error);
+            console.error(error);
             throw new Error("An error occurred while fetching user playlist.");
         }
     },

@@ -27,6 +27,7 @@ type history{
     videoPublishedAt : String
     channelLogo : String
     videoThumbnail : String
+    viewedAt: String
 }
 type watchLater{
     videoId : String
