@@ -109,4 +109,9 @@ type Video {
     videos: [Video]
     totalNoOfVideos: Int
   }
+  type subscribedChannels{
+    channelId:String
+    channelName:String
+    channelLogo:String
+  }
 `;

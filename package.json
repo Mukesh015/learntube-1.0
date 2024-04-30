@@ -19,6 +19,7 @@
     "@nextui-org/react": "^2.2.10",
     "@reduxjs/toolkit": "^2.2.3",
     "@stripe/stripe-js": "^3.3.0",
+    "annyang": "^2.6.1",
     "autoprefixer": "^10.4.19",
     "firebase": "^10.11.0",
     "framer-motion": "^11.0.28",

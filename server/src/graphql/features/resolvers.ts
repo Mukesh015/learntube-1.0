@@ -462,6 +462,34 @@ const queries = {
             console.error('Error fetching user courses:', error);
             throw new Error('An error occurred while fetching user courses');
         }
+    },
+    getSubscribedChannels: async(_: any, { email }: { email: string }) => {
+        try {
+            const user: UserDocument | null = await UserModel.findOne({ email });
+            if (!user) {
+                return "User not found";
+            }
+    
+            const subscribedChannels = user.subscribedChnannels?.channelId || [];
+            const channelDetails = [];
+            for (const channelId of subscribedChannels) {
+                const channel = await UserModel.findOne({ "channelId": channelId });
+                if (channel) {
+                    const channelName = channel.channelName || '';
+                    const channelLogo = channel.channelLogo || '';
+    
+                    channelDetails.push({
+                        channelId: channelId,
+                        channelName: channelName,
+                        channelLogo: channelLogo
+                    });
+                }
+            }
+            return channelDetails;
+        } catch (error) {
+            console.error('Error fetching subscribed channels:', error);
+            throw new Error('An error occurred while fetching subscribed channels');
+        }
     }
 }
 export const resolvers = { queries };
