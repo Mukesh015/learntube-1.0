@@ -435,6 +435,7 @@ const queries = {
                     const videoDetails = videos.map(video => ({
                         videoUrl: video.videoUrl,
                         videoThumbnail: video.videoThumbnail,
+                        videoDescription: video.videoDescription,
                         videoId: video.videoID,
                         videoTitle: video.videoTitle,
                         videoViews: video.videoViews.length,

@@ -97,6 +97,7 @@ type Video {
     videoTitle: String
     videoViews: Int
     videoPublishedAt: String
+    videoDescription :String
   }
   
   type yourCourse {

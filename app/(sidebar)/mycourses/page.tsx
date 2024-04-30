@@ -25,6 +25,7 @@ const yourCourses = gql`
           videoTitle
           videoUrl
           videoViews
+          videoDescription
         }
       }
     }

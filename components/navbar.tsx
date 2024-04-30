@@ -32,7 +32,9 @@ query Exam($email:String){
   }
 `
 
-const Navbar: React.FC= () => {
+
+
+const Navbar: React.FC=() => {
 
     const [userName, setuserName] = useState<string>("");
     const [email, setEmail] = useState<string>("");
@@ -47,13 +49,17 @@ const Navbar: React.FC= () => {
     const [searchString, setsearchString] = useState<string>("");
     const [searchbarDetails, setSearchBarDetails] = useState<any[]>([]);
 
+    const [text, setText] = useState("");
+    const [isListening, setIsListening] = useState(false);
+    const [recognition, setRecognition] = useState<any>(null);
+
     const router = useRouter();
     const [user] = useAuthState(auth);
     const [signOut] = useSignOut(auth);
     const [updateProfile] = useUpdateProfile(auth);
     const [updatePassword] = useUpdatePassword(auth);
 
-    
+
     const { isOpen, onOpen, onClose } = useDisclosure();
 
 
@@ -214,7 +220,7 @@ const Navbar: React.FC= () => {
             console.error("Failed to fetch", error);
         }
     }, [email]);
-    
+
 
     useEffect(() => {
         if (user) {
@@ -246,6 +252,44 @@ const Navbar: React.FC= () => {
         }
     }, [setsearchString]);
 
+    useEffect(() => {
+        if (!recognition) {
+            if ("webkitSpeechRecognition" in window) {
+                const recognitionInstance = new window.webkitSpeechRecognition();
+                recognitionInstance.continuous = true;
+                recognitionInstance.lang = "en-US";
+                setRecognition(recognitionInstance);
+            } else {
+                console.error("Speech recognition is not supported in this browser.");
+            }
+        }
+
+        if (recognition) {
+            recognition.onresult = (event: SpeechRecognitionEvent) => {
+                console.log("onresult:", event);
+                recognition.stop();
+                setText(event.results[0][0].transcript);
+                handleSearch(event.results[0][0].transcript);
+                setIsListening(false);
+            };
+        }
+    }, [recognition, setText, setIsListening]);
+
+    const startListening = () => {
+        setText("");
+        setIsListening(true);
+        if (recognition) {
+            recognition.start();
+        }
+    };
+
+    const stopListening = () => {
+        setIsListening(false);
+        handleSearch(text)
+        if (recognition) {
+            recognition.stop();
+        }
+    };
 
     return (
         <>
@@ -274,10 +318,28 @@ const Navbar: React.FC= () => {
                             width={50}
                             src="https://99designs-blog.imgix.net/blog/wp-content/uploads/2022/05/Mastercard_2019_logo.svg-e1659036851269.png?auto=format&q=60&fit=max&w=930"
                             alt=""
-                          
+
                         />
-                            <p className="font-semibold text-xl">LearnTube</p>
+                        <p className="font-semibold text-xl">LearnTube</p>
                     </li>
+                    <div>
+                        {
+                            recognition?(
+                                <>
+                                <div>
+                                <button onClick={startListening}>Start Listening</button>
+                                </div>
+                                <div>
+                                <button onClick={stopListening}>Stop Listening</button>
+                                </div>
+                                {
+                                    isListening? <div>Your browser currently Listening</div>:null
+                                }{text}
+                                </>
+                            ):(
+                                <h1>your browser does not support speechrecognition</h1>
+                            ) }
+                    </div>
                     <li className="flex ml-32 mr-20">
                         <svg
                             className="absolute mt-2.5 ml-2"
@@ -291,7 +353,7 @@ const Navbar: React.FC= () => {
                             <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
                         </svg>
                         <Tooltip color="warning" delay={700} showArrow={true} content="Search with voice">
-                            <svg
+                            <svg 
                                 className="absolute mt-2.5 hover:bg-gray-500 rounded-full hover:p-1"
                                 style={{ marginLeft: "560px" }}
                                 xmlns="http://www.w3.org/2000/svg"
@@ -300,7 +362,9 @@ const Navbar: React.FC= () => {
                                 viewBox="0 0 24 24"
                                 width="24px"
                                 fill="#FFFFFF"
+                               
                             >
+                 
                                 <g>
                                     <rect fill="none" height="24" width="24" />
                                     <rect fill="none" height="24" width="24" />
