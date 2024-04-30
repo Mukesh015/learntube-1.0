@@ -25,6 +25,7 @@ query yourCourses( $email: String){
           videoTitle
           videoUrl
           videoViews
+          videoDescription
         }
       }
 }`;
