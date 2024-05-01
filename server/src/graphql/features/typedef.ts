@@ -116,4 +116,11 @@ type Video {
     channelName:String
     channelLogo:String
   }
+  type creatorCourses{
+    courseId: String
+    courseName: String
+    courseThumb: String
+    courseDescription: String
+    videos: [Video]
+  }
 `;

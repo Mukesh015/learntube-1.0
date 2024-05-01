@@ -494,6 +494,48 @@ const queries = {
             console.error('Error fetching subscribed channels:', error);
             throw new Error('An error occurred while fetching subscribed channels');
         }
+    },
+    getCreatorCourses:async(_:any,{email}:{email:string})=>{
+        try {
+            const videos: VideoDocument[] = await VideoModel.find({ email });
+    
+            const result: any[] = [];
+    
+            videos.forEach((video: VideoDocument) => {
+                video.courses.forEach((course) => {
+                    const { courseId, courseName, courseThumbUrl, courseDescription } = course;
+                    const courseVideos: any[] = []; // Array to store video details
+    
+                    course.videos.forEach((video) => {
+                        const { videoID, videoTitle, videoViews, videoThumbnail, videoDescription, videoPublishedAt } = video;
+                        // Push video details into courseVideos array
+                        courseVideos.push({
+                            videoUrl: video.videoUrl,
+                            videoId: videoID,
+                            videoTitle:videoTitle,
+                            videoViews: videoViews.length,
+                            videoThumbnail: videoThumbnail,
+                            videoDescription:videoDescription,
+                            videoPublishedAt:videoPublishedAt
+                        });
+                    });
+    
+                    
+                    result.push({
+                        courseId,
+                        courseName,
+                        courseThumb: courseThumbUrl,
+                        courseDescription,
+                        videos: courseVideos 
+                    });
+                });
+            });
+    
+            return result;
+        } catch (error) {
+            console.error('Error fetching course details:', error);
+            throw new Error('An error occurred while fetching course details');
+        }
     }
 }
 export const resolvers = { queries };

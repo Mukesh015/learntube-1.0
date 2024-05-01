@@ -21,15 +21,22 @@ const Sidebar: React.FC = () => {
 
     const [email, setEmail] = useState<string>("");
     const [subscribedChannel, setSubscribedChannel] = useState<any[]>([]);
+    const [showSubscriptions, setShowSubscriptions] = useState<boolean>(false)
+    const [toggleSVG, setToggleSVG] = useState<boolean>(false)
 
     const [user] = useAuthState(auth);
 
     const router = useRouter();
-    
+
     const { loading, error, data } = useQuery(subscribedchannel, {
         variables: { email: email },
     });
-    
+
+    const handleShowSubscriptions = () => {
+        setShowSubscriptions(!showSubscriptions);
+        setToggleSVG(!toggleSVG);
+    }
+
     useEffect(() => {
         if (user) {
             setEmail(user.email || "");
@@ -289,20 +296,37 @@ const Sidebar: React.FC = () => {
                     <li className="border border-slate-700 m-3"></li>
                 </ul>
                 <ul id="Subscriptions" className="mt-4 space-y-1.5">
-                    <li className="py-2 px-2.5 hover:scale-110 rounded-lg flex ml-3 font-semibold pb-2 transition ease-in-out delay-150 hover:-translate-y-1 duration-150 hs-accordion hover:bg-gray-700">
+                    <li onClick={handleShowSubscriptions} className="py-2 px-2.5 rounded-lg flex ml-3 font-semibold pb-2 hover:bg-gray-700">
                         My Subscriptions
-                        <svg
-                            className="ml-2 rounded-full"
-                            xmlns="http://www.w3.org/2000/svg"
-                            height="24px"
-                            viewBox="0 0 24 24"
-                            width="24px"
-                            fill="#FFFFFF"
-                        >
-                            <path d="M0 0h24v24H0V0z" fill="none" />
-                            <path d="M7 10l5 5 5-5H7z" />
-                        </svg>
+                        {toggleSVG ? (
+
+                            <svg
+                                className="ml-2 rounded-full"
+                                xmlns="http://www.w3.org/2000/svg"
+                                height="24px"
+                                viewBox="0 0 24 24"
+                                width="24px"
+                                fill="#FFFFFF"
+                            >
+                                <path d="M0 0h24v24H0V0z" fill="none" />
+                                <path d="M7 10l5 5 5-5H7z" />
+                            </svg>
+
+                        ) : (
+                            <svg className="ml-2 rounded-full" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M24 0v24H0V0h24z" fill="none" opacity=".87" /><path d="M14 7l-5 5 5 5V7z" /></svg>
+                        )}
+
                     </li>
+                    {showSubscriptions &&
+                        <div>
+                            {subscribedChannel.map((item, index) => (
+                                <li key={index} className="py-2 px-2.5 hover:scale-110 rounded-lg flex ml-3 font-semibold pb-2 transition ease-in-out delay-150 hover:-translate-y-1 duration-150 hs-accordion hover:bg-gray-700">
+                                    <img className="h-8 rounded-full mr-2" src={item.channelLogo} alt="" />
+                                    <p className="text-sm text-blue-500">{item.channelId}</p>
+                                </li>
+                            ))}
+                        </div>
+                    }
                     <li className="border border-slate-700 m-3"></li>
                 </ul>
                 <ul className="mt-4 space-y-1.5">
@@ -410,7 +434,7 @@ const Sidebar: React.FC = () => {
                     </li>
                 </ul>
             </nav>
-        </div>
+        </div >
     )
 }
 

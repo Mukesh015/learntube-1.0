@@ -131,7 +131,7 @@ const Home: React.FC = () => {
                 <div className="relative">
                   <img
                     className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-150 rounded-md"
-                    style={{ height: '250px', width: '350px', filter: video.courseFees !== null ? 'blur(2px)' : 'none' }}
+                    style={{ height: '250px', width: '350px' }}
                     src={video.allThumbnailUrls}
                     onClick={() => {
                       handleRedirect(video.videoId, video.courseFees, video.courseId)
@@ -139,8 +139,8 @@ const Home: React.FC = () => {
                     alt=""
                   />
                   {video.courseFees !== null && (
-                    <div className="absolute top-0 left-0 m-2 bg-white bg-opacity-75 rounded-md p-1">
-                      <p className="text-black font-semibold">Price: ${video.courseFees}</p>
+                    <div className="absolute top-0 left-0 m-1 bg-opacity-100 rounded-md p-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="#fcba03" height="20" viewBox="0 -960 960 960" width="20"><path d="m185-65 80-331L3-620l343-29 134-313 134 314 343 28-262 224 80 331-295-176L185-65Z" /></svg>
                     </div>
                   )}
                 </div>

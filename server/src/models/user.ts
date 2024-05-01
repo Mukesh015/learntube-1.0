@@ -29,7 +29,6 @@ interface UserDocument extends Document {
     WatchTime?: number;
     history: any[];
     analytics: { date: Date; watchTime: number }[];
-
 }
 
 const userSchema = new mongoose.Schema<UserDocument>(

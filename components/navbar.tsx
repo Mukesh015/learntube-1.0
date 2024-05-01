@@ -17,7 +17,6 @@ import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-o
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Input } from "@nextui-org/react";
 import { gql, useQuery } from "@apollo/client";
 
-
 const VERIFY_CREATOR = gql`
 query Exam($email:String){
     getIsCreator(email: $email) {
@@ -32,9 +31,7 @@ query Exam($email:String){
   }
 `
 
-
-
-const Navbar: React.FC=() => {
+const Navbar: React.FC = () => {
 
     const [userName, setuserName] = useState<string>("");
     const [email, setEmail] = useState<string>("");
@@ -44,6 +41,7 @@ const Navbar: React.FC=() => {
     const [toUpdate, settoUpdate] = useState<string>("");
     const [isCreator, setIsCreator] = useState<string>("");
     const [searchItem, setSearchItem] = useState<boolean>(false);
+    const [toggleVoiceSearches, settoggleVoiceSearches] = useState<boolean>(false);
 
     const [spinnerButton, setspinnerButton] = useState<boolean>(false);
     const [searchString, setsearchString] = useState<string>("");
@@ -60,7 +58,7 @@ const Navbar: React.FC=() => {
     const [updatePassword] = useUpdatePassword(auth);
 
 
-    const { isOpen, onOpen, onClose } = useDisclosure();
+    const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
 
 
     const { loading, error, data } = useQuery(VERIFY_CREATOR, {
@@ -252,6 +250,31 @@ const Navbar: React.FC=() => {
         }
     }, [setsearchString]);
 
+    const startListening = async () => {
+        setText("");
+        setIsListening(true);
+        if (recognition) {
+            await recognition.start();
+        }
+    };
+
+    const stopListening = async () => {
+        setIsListening(false);
+        handleSearch(text)
+        if (recognition) {
+            await recognition.stop();
+        }
+        settoggleVoiceSearches(false);
+    };
+
+    const handleOpenVoiceSearchModel = useCallback(async () => {
+        settoggleVoiceSearches(!toggleVoiceSearches);
+        if (isListening) {
+            stopListening();
+        }
+        startListening();
+    }, [isListening, startListening, stopListening]);
+
     useEffect(() => {
         if (!recognition) {
             if ("webkitSpeechRecognition" in window) {
@@ -270,29 +293,16 @@ const Navbar: React.FC=() => {
                 recognition.stop();
                 setText(event.results[0][0].transcript);
                 handleSearch(event.results[0][0].transcript);
+                setTimeout(() => {
+                    handleSearch(event.results[0][0].transcript);
+                }, 1500);
                 setIsListening(false);
             };
         }
     }, [recognition, setText, setIsListening]);
 
-    const startListening = () => {
-        setText("");
-        setIsListening(true);
-        if (recognition) {
-            recognition.start();
-        }
-    };
 
-    const stopListening = () => {
-        setIsListening(false);
-        handleSearch(text)
-        if (recognition) {
-            recognition.stop();
-        }
-    };
-    const synth = window.speechSynthesis;
-    const voices = [];
-    
+
     return (
         <>
             <nav
@@ -324,24 +334,6 @@ const Navbar: React.FC=() => {
                         />
                         <p className="font-semibold text-xl">LearnTube</p>
                     </li>
-                    <div>
-                        {
-                            recognition?(
-                                <>
-                                <div>
-                                <button onClick={startListening}>Start Listening</button>
-                                </div>
-                                <div>
-                                <button onClick={stopListening}>Stop Listening</button>
-                                </div>
-                                {
-                                    isListening? <div>Your browser currently Listening</div>:null
-                                }{text}
-                                </>
-                            ):(
-                                <h1>your browser does not support speechrecognition</h1>
-                            ) }
-                    </div>
                     <li className="flex ml-32 mr-20">
                         <svg
                             className="absolute mt-2.5 ml-2"
@@ -355,7 +347,8 @@ const Navbar: React.FC=() => {
                             <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
                         </svg>
                         <Tooltip color="warning" delay={700} showArrow={true} content="Search with voice">
-                            <svg 
+                            <svg
+                                onClick={() => handleOpenVoiceSearchModel()}
                                 className="absolute mt-2.5 hover:bg-gray-500 rounded-full hover:p-1"
                                 style={{ marginLeft: "560px" }}
                                 xmlns="http://www.w3.org/2000/svg"
@@ -364,9 +357,8 @@ const Navbar: React.FC=() => {
                                 viewBox="0 0 24 24"
                                 width="24px"
                                 fill="#FFFFFF"
-                               
                             >
-                 
+
                                 <g>
                                     <rect fill="none" height="24" width="24" />
                                     <rect fill="none" height="24" width="24" />
@@ -380,11 +372,11 @@ const Navbar: React.FC=() => {
                                     </g>
                                 </g>
                             </svg>
+
                         </Tooltip>
                         <Tooltip color="warning" delay={700} showArrow={true} content="Search a content">
                             <input
                                 style={{ width: "600px" }}
-
                                 type="search"
                                 id="search-content"
                                 placeholder="Search here... or [ctrl+k]"
@@ -495,37 +487,6 @@ const Navbar: React.FC=() => {
                     </li>
                 </ul>
             </nav >
-            {searchItem && searchbarDetails && (
-                <div className="mt-20 bg-gray-800 rounded-md" style={{ marginLeft: "440px", marginRight: "480px" }}>
-                    <div className="flex cursor-pointer">
-                        <div className="flex flex-col">
-                            {searchString === '' ? (
-                                Array.from(new Set(searchbarDetails.flatMap(item => item.searchHistory))).map((history, idx) => (
-                                    <div className="flex" key={idx}>
-                                        <p className="p-2 hover:bg-gray-600 rounded-xl" onClick={() => handleSearch(history)}>{history}</p>
-                                        <svg onClick={() => deleteSearchString(history)} className="ml-20 mt-1 hover:bg-gray-600 rounded-full p-1" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" /></svg>
-                                    </div>
-                                ))
-                            ) : (
-                                searchbarDetails
-                                    .filter(item =>
-                                        item.videoTitle.toLowerCase().includes(searchString.toLowerCase()) ||
-                                        item.videoDescription.toLowerCase().includes(searchString.toLowerCase()) ||
-                                        item.videoTags.some((tag: string) => tag.toLowerCase().includes(searchString.toLowerCase()))
-                                    )
-                                    .map((item, idx) => (
-                                        <div key={idx}>
-                                            <div className="flex">
-                                                <p className="p-2 hover:bg-gray-600 rounded-xl" onClick={() => handleSearch(item.videoTitle)}>{item.videoTitle}</p>
-                                            </div>
-                                            <hr className="border-gray-600" />
-                                        </div>
-                                    ))
-                            )}
-                        </div>
-                    </div>
-                </div>
-            )}
             <Modal
                 backdrop="opaque"
                 size="3xl"
@@ -586,12 +547,108 @@ const Navbar: React.FC=() => {
                                         Changing...
                                     </Button>
                                 )}
-
                             </ModalFooter>
                         </>
                     )}
                 </ModalContent>
             </Modal>
+
+            {searchItem && searchbarDetails && (
+                <div className="z-50 top-20 fixed bg-gray-800 rounded-md" style={{ marginLeft: "440px", marginRight: "480px", width: "700px" }}>
+                    <div className="flex cursor-pointer">
+                        <div className="flex flex-col">
+                            {searchString === '' ? (
+                                Array.from(new Set(searchbarDetails.flatMap(item => item.searchHistory))).map((history, idx) => (
+                                    <div className="flex " key={idx}>
+                                        <div className="flex hover:bg-gray-600">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="mt-2 ml-2" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.25 2.52.77-1.28-3.52-2.09V8z" /></svg>
+                                            <p className="p-2 " style={{ width: "630px" }} onClick={() => handleSearch(history)}>{history}</p>
+                                        </div>
+                                        <svg onClick={() => deleteSearchString(history)} className="ml-20 mt-1 hover:bg-red-500  p-1 rounded-full absolute right-2" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" /></svg>
+                                    </div>
+                                ))
+                            ) : (
+                                searchbarDetails
+                                    .filter(item =>
+                                        item.videoTitle.toLowerCase().includes(searchString.toLowerCase()) ||
+                                        item.videoDescription.toLowerCase().includes(searchString.toLowerCase()) ||
+                                        item.videoTags.some((tag: string) => tag.toLowerCase().includes(searchString.toLowerCase()))
+                                    )
+                                    .map((item, idx) => (
+                                        <div key={idx}>
+                                            <div className="flex hover:bg-gray-600">
+                                                <svg className="mt-2 ml-2" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" /></svg>
+                                                <p className="p-2" onClick={() => handleSearch(item.videoTitle)}>{item.videoTitle}</p>
+                                            </div>
+                                        </div>
+                                    ))
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )
+            }
+
+            {toggleVoiceSearches && recognition && (
+                <div>
+                    {/* Backdrop */}
+                    <div
+                        style={{
+                            width: "100vw",
+                            height: "100vh",
+                            position: "fixed",
+                            top: 0,
+                            left: 0,
+                            backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent black
+                            backdropFilter: "blur(5px)", // Add blur effect
+                            zIndex: 9998, // Ensure it's behind the modal (9999)
+                        }}
+                    ></div>
+
+                    {/* Modal */}
+                    <div
+                        id="hs-custom-backdrop-modal"
+                        style={{
+                            width: "900px",
+                            height: "500px",
+                            marginLeft: "400px",
+                            zIndex: 9999, // Ensure it's on top
+                        }}
+                        className="hs-overlay z-50 fixed top-32 overflow-x-hidden overflow-y-auto pointer-events-auto rounded-xl bg-gray-800"
+                    >
+                        {/* Close button */}
+                        <svg
+                            onClick={stopListening}
+                            className="right-2 top-2 absolute p-2 cursor-pointer hover:bg-gray-500 rounded-full"
+                            xmlns="http://www.w3.org/2000/svg"
+                            height="48px"
+                            viewBox="0 0 24 24"
+                            width="48px"
+                            fill="#FFFFFF"
+                        >
+                            <path d="M0 0h24v24H0V0z" fill="none" />
+                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" />
+                        </svg>
+
+                        {/* Content */}
+                        <div className="flex mr-10 mt-28 ml-10">
+                            {isListening ? (
+                                <svg xmlns="http://www.w3.org/2000/svg" height="240" fill="#eb4034" viewBox="0 -960 960 960" width="240"><path d="M480.12-400q-51.04 0-86.58-35.46Q358-470.91 358-522v-242q0-51.09 35.42-86.54Q428.84-886 479.88-886q51.04 0 86.58 35.46Q602-815.09 602-764v242q0 51.09-35.42 86.54Q531.16-400 480.12-400ZM436-96v-128.85q-113-13.31-185.5-98.42Q178-408.39 178-522h86q0 90 63.18 152T480-308q89.64 0 152.82-62Q696-432 696-522h86q0 114.39-73.5 199.12Q635-238.16 522-224.85V-96h-86Z" /></svg>
+                            ) : (
+                                <svg xmlns="http://www.w3.org/2000/svg" height="240" fill="#FFFFFF" viewBox="0 -960 960 960" width="240"><path d="M480.12-400q-51.04 0-86.58-35.46Q358-470.91 358-522v-242q0-51.09 35.42-86.54Q428.84-886 479.88-886q51.04 0 86.58 35.46Q602-815.09 602-764v242q0 51.09-35.42 86.54Q531.16-400 480.12-400ZM436-96v-128.85q-113-13.31-185.5-98.42Q178-408.39 178-522h86q0 90 63.18 152T480-308q89.64 0 152.82-62Q696-432 696-522h86q0 114.39-73.5 199.12Q635-238.16 522-224.85V-96h-86Z" /></svg>
+                            )}
+                            {recognition ? (
+                                <p className="text-4xl mt-20 ml-20">{text ? text : "Listening ..."}</p>
+                            ) : (
+                                <p className="text-4xl mt-20 ml-20">
+                                    Your browser does not support speech recognition or allow recognition
+                                </p>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </>
     )
 }
