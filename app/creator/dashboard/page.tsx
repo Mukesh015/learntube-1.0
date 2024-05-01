@@ -49,7 +49,6 @@ query GetAllVideoUrl ($email: String){
         courseId
         courseName
         courseThumb
-       
         videos {
           videoPublishedAt
           videoDescription
@@ -69,12 +68,17 @@ const CardGrid: React.FC = () => {
     const [home, setHome] = useState<any[]>([]);
     const [creatorCard, setCreatorCard] = useState<any[]>([]);
     const [channelDeatails, setChannelDetails] = useState<any[]>([]);
+    const [allCourses, setAllCourses] = useState<any[]>([]);
+    const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
+
 
     const [homeTab, setHomeTab] = useState<boolean>(true);
     const [shortTab, setShortTab] = useState<boolean>(false);
     const [courseTab, setCourseTab] = useState<boolean>(false);
+    const [courseStates, setCourseStates] = useState<{ [key: string]: boolean }>({});
     const [communityTab, setCommunityTab] = useState<boolean>(false);
     const [searchTab, setSearchTab] = useState<boolean>(false);
+    const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
 
     const [user] = useAuthState(auth);
 
@@ -113,6 +117,13 @@ const CardGrid: React.FC = () => {
         }
     };
 
+    const handleShowDropdown = (courseId: string) => {
+        setSelectedCourseId(courseId);
+        setCourseStates((prevState) => ({
+            ...prevState,
+            [courseId]: !prevState[courseId],
+        }));
+    };
     const handlechangeTab = useCallback(async (tab: string) => {
         if (tab === "home") {
             setHomeTab(true);
@@ -160,10 +171,11 @@ const CardGrid: React.FC = () => {
             setHome(data.getYourVideo)
             setCreatorCard(data.getCreatorCard)
             setChannelDetails(data.getchannelDetails)
-            console.log(home, creatorCard, channelDeatails)
+            setAllCourses(data.getCreatorCourses)
+            console.log(home, creatorCard, channelDeatails, allCourses)
         }
 
-    }, [setEmail, user, data, home, creatorCard, channelDeatails, setHome, setCreatorCard, setChannelDetails]);
+    }, [setEmail, allCourses, user, data, home, creatorCard, channelDeatails, setHome, setCreatorCard, setChannelDetails]);
 
     return (
         <>
@@ -562,28 +574,122 @@ const CardGrid: React.FC = () => {
                     </div>
                 }
             </div>
-            <div>
+            <div className="mb-60">
                 {courseTab &&
-                    <h1>This is course tab</h1>
+                    <div>
+                        <div>
+                            {allCourses.map((course) => (
+                                <div
+                                    key={course.courseId}
+                                    className="ml-20 pt-3 pl-3 pr-3 pb-1 bg-gray-800 mr-20 rounded-lg mt-10 cursor-pointer"
+                                >
+                                    <div className="">
+                                        <div
+                                            onClick={() => setSelectedCourseId(course.courseId)}
+                                            id="video-content"
+                                            className="flex mb-10"
+                                        >
+                                            {/* Video thumbnail */}
+                                            <img
+                                                className="rounded-md"
+                                                height={200}
+                                                width={200}
+                                                src={course.courseThumb}
+                                                alt=""
+                                            />
+                                            <div className="flex ml-5 justify-center mr-10">
+                                                <div className="ml-3">
+                                                    {/* Course title */}
+                                                    <h1 className="mb-3">{course.courseName}</h1>
+                                                    <p className="text-gray-500 text-sm">{course.courseDescription}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Course videos */}
+                                        {courseStates[course.courseId] && selectedCourseId === course.courseId && (
+                                            <div className="ml-20 mb-10">
+                                                {course.videos.map((video: any) => (
+                                                    <div className="flex mb-10" key={video.videoId}>
+                                                        {/* Video thumbnail */}
+                                                        <img
+                                                            className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-150 rounded-md"
+                                                            height={100}
+                                                            width={300}
+                                                            src={video.videoThumbnail}
+                                                            alt=""
+                                                        />
+                                                        <div className="flex mt-10 ml-5 justify-center mr-10">
+                                                            <div className="ml-3">
+                                                                {/* Video title */}
+                                                                <h1 className="">{video.videoTitle}</h1>
+                                                                <p className="mb-5 mt-5 text-sm text-gray-400">{video.videoDescription}</p>
+                                                                <p className="text-sm text-gray-500">
+                                                                    {video.videoViews} views - {formatTime(video.videoPublishedAt)}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+
+                                        {/* Toggle dropdown icon */}
+                                        {courseStates[course.courseId] ? (
+                                            <svg
+                                                onClick={() => handleShowDropdown(course.courseId)}
+                                                style={{ marginLeft: "600px" }}
+                                                className="animate-bounce rotate-90 w-10  h-10 p-2 bg-slate-500 rounded-full"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                height="24px"
+                                                viewBox="0 0 24 24"
+                                                width="24px"
+                                                fill="#09e3d1"
+                                            >
+                                                <path d="M0 0h24v24H0V0z" fill="none" />
+                                                <path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z" />
+                                            </svg>
+                                        ) : (
+                                            <svg
+                                                onClick={() => handleShowDropdown(course.courseId)}
+                                                style={{ marginLeft: "600px" }}
+                                                className="animate-bounce w-10  h-10 p-2 bg-slate-500 rounded-full"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                height="24px"
+                                                viewBox="0 0 24 24"
+                                                width="24px"
+                                                fill="#09e3d1"
+                                            >
+                                                <path d="M0 0h24v24H0V0z" fill="none" />
+                                                <path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z" />
+                                            </svg>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 }
+                <div>
+                    {communityTab &&
+                        <h1>This tab is not implemented.</h1>
+                    }
+                </div>
+                <div>
+                    {searchTab &&
+                        <h1>Search bar is currently disabled.</h1>
+                    }
+                </div>
+                <div>
+                    {shortTab &&
+                        <h1>This tab is not implemented.</h1>
+                    }
+                </div>
             </div>
-            <div>
-                {communityTab &&
-                    <h1>This tab is not implemented.</h1>
-                }
-            </div>
-            <div>
-                {searchTab &&
-                    <h1>Search bar is currently disabled.</h1>
-                }
-            </div>
-            <div>
-                {shortTab &&
-                    <h1>This tab is not implemented.</h1>
-                }
-            </div>
+
         </>
     );
 }
+
 
 export default CardGrid;
