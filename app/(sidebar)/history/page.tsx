@@ -22,6 +22,7 @@ query history($email: String) {
         videoPublishedAt
         videoViews
         videoThumbnail
+        viewedAt
     }
   }
 

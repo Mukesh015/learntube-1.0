@@ -300,7 +300,6 @@ export async function courseEnrollment(req: Request, res: Response) {
 export async function isEnrolled(req: Request, res: Response) {
   try {
     const { email, courseId } = req.body;
-    console.log(email);
     const user = await UserModel.findOne({ email: email });
 
     if (!user) {

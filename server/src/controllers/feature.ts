@@ -54,8 +54,11 @@ export async function addToHistory(req: Request, res: Response) {
             if (user.features?.history.includes(videoId)) {
                 return res.status(200).json({ message: 'Video already exists in history' });
             }
-            // Push the videoUrl to the history array
-            user.features?.history.push(videoId);
+            const entry = {
+                videoId,
+                timeStamp: Date.now() 
+            };
+            user.features?.history.push(entry);
             await user.save();
             return res.status(200).json({ message: 'Video added to history' });
         }
@@ -333,7 +336,6 @@ export async function addToDislikedVideo(req: Request, res: Response) {
 
 export async function calculateWatchTime(req: Request, res: Response) {
     const { email, watchTime } = req.body;
-    console.log(email);
     try {
 
         const parsedWatchTime = parseFloat(watchTime);

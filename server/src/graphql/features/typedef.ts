@@ -27,6 +27,7 @@ type history{
     videoPublishedAt : String
     channelLogo : String
     videoThumbnail : String
+    viewedAt: String
 }
 type watchLater{
     videoId : String
@@ -114,5 +115,12 @@ type Video {
     channelId:String
     channelName:String
     channelLogo:String
+  }
+  type creatorCourses{
+    courseId: String
+    courseName: String
+    courseThumb: String
+    courseDescription: String
+    videos: [Video]
   }
 `;

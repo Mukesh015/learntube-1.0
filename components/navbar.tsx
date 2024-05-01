@@ -289,6 +289,7 @@ const Navbar: React.FC = () => {
 
     const stopListening = async () => {
         setIsListening(false);
+        handleSearch(text)
         if (recognition) {
             await recognition.stop();
         }
@@ -320,6 +321,7 @@ const Navbar: React.FC = () => {
                 console.log("onresult:", event);
                 recognition.stop();
                 setText(event.results[0][0].transcript);
+                handleSearch(event.results[0][0].transcript);
                 setTimeout(() => {
                     handleSearch(event.results[0][0].transcript);
                 }, 1500);

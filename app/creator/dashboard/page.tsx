@@ -44,6 +44,22 @@ query GetAllVideoUrl ($email: String){
         totalComments
         watchTime
       }
+      getCreatorCourses (email: $email){
+        courseDescription
+        courseId
+        courseName
+        courseThumb
+       
+        videos {
+          videoPublishedAt
+          videoDescription
+          videoId
+          videoThumbnail
+          videoTitle
+          videoUrl
+          videoViews
+        }
+      }
 }
 `
 
