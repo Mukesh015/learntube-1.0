@@ -538,7 +538,7 @@ const CardGrid: React.FC = () => {
                                 <div className="mt-3 justify-center">
                                     <h1 className=''>{video.videoTitle}</h1> {/* video title here*/}
                                     <p className="text-gray-500">
-                                        20k views - {formatTime(video.videoPublishedAt)} {/*Content details/analitics*/}
+                                        {video.viewsCount} views - {formatTime(video.videoPublishedAt)} {/*Content details/analitics*/}
                                     </p>
                                 </div>
                             </div>
