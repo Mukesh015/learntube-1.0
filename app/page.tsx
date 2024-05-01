@@ -130,7 +130,7 @@ const Home: React.FC = () => {
               <div key={index} id={`video-${index}`} className="video-card">
                 <div className="relative">
                   <img
-                    className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-150 rounded-md"
+                    className="transition ease-in-out delay-150 cursor-pointer hover:-translate-y-1 hover:scale-110 duration-150 rounded-md"
                     style={{ height: '250px', width: '350px' }}
                     src={video.allThumbnailUrls}
                     onClick={() => {
@@ -154,7 +154,7 @@ const Home: React.FC = () => {
                       alt=""
                     />
                   </div>
-                  <div className="ml-3">
+                  <div className="ml-3 cursor-default">
                     <h1>{video.allVideoTitles}</h1>
                     <p className="text-gray-500 text-sm">
                       {timeSinceUpload(video.uploadAt)} - {video.views} views

@@ -166,7 +166,16 @@ const Navbar: React.FC = () => {
         }
     }, []);
 
+    const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === "Enter") {
+            handleSearch(searchString);
+        }
+    };
+
     const handleSearch = useCallback(async (recommendedSearchString: string | null) => {
+        if (!searchString) {
+            return "Blank input";
+        }
         try {
             const searchstring = recommendedSearchString || searchString;
 
@@ -218,6 +227,26 @@ const Navbar: React.FC = () => {
             console.error("Failed to fetch", error);
         }
     }, [email]);
+
+    useEffect(() => {
+        if (searchItem) {
+            document.addEventListener("click", () => {
+                setSearchItem(false);
+            });
+        } else {
+            // Remove click event listener when the search bar is closed
+            document.removeEventListener("click", () => {
+                setSearchItem(false);
+            });
+        }
+
+        // Cleanup function to remove event listener when component unmounts
+        return () => {
+            document.removeEventListener("click", () => {
+                setSearchItem(false);
+            });
+        };
+    }, [searchItem, setSearchItem]);
 
 
     useEffect(() => {
@@ -300,7 +329,6 @@ const Navbar: React.FC = () => {
     }, [recognition, setText, setIsListening]);
 
 
-
     return (
         <>
             <nav
@@ -381,6 +409,7 @@ const Navbar: React.FC = () => {
                                 className="bg-inherit border border-gray-700 rounded-medium p-2 px-10 w-96"
                                 onClick={handleInputClick}
                                 data-search-content
+                                onKeyPress={handleKeyPress}
                             />
                         </Tooltip>
 
@@ -402,7 +431,6 @@ const Navbar: React.FC = () => {
                                 ></Switch>
                             </button>
                         </Tooltip>
-
                     </li>
                     <li onClick={() => handleCreateVideo()} className="hover:bg-gray-700 rounded-full p-1 cursor-pointer">
                         <Tooltip color="warning" delay={700} showArrow={true} content="Create video">
