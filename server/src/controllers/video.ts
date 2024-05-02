@@ -202,7 +202,7 @@ export async function addComment(req: Request, res: Response) {
   const { user, logo, comment, videoId, email,creatorEmail } = req.body;
   try {
 
-    const video = await VideoModel.findOne({ email: email, "courses.videos.videoID": videoId });
+    const video = await VideoModel.findOne({ email: creatorEmail, "courses.videos.videoID": videoId });
     const user = await UserModel.findOne({ email:creatorEmail});
     if (!video) {
       return res.status(404).json({ error: 'Video not found' });

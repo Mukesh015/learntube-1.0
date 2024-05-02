@@ -54,7 +54,7 @@ type comments{
     comment: String
     logo: String
     timestamp: String
-    users:String
+    users: [String]
 }
 type channelDetails{
     Name: String
