@@ -14,7 +14,7 @@ export async function uploadVideo(req: Request, res: Response) {
   try {
     const { email, courseName, courseDescription, price, videoTitle, videoDescription, videoTags, videoUrl, videoThumbnail, courseThumbUrl } = req.body;
     console.log(email, courseName, courseDescription, price, videoTitle, videoDescription, videoTags, videoUrl, videoThumbnail, courseThumbUrl)
-
+    const videoid= `@${Date.now()}${videoTitle.slice(0, 4)}`.replace(/\s/g, '')
     let video: VideoDocument | null = await VideoModel.findOne({ email });
     let user:UserDocument| null = await UserModel.findOne({ email });
 
@@ -30,7 +30,7 @@ export async function uploadVideo(req: Request, res: Response) {
       course.videos.push({
         videoUrl: videoUrl,
         videoTitle,
-        videoID: `@${Date.now()}${videoTitle.slice(0, 4)}`.replace(/\s/g, ''),
+        videoID:videoid,
         videoDescription,
         videoThumbnail: videoThumbnail,
         videoPublishedAt: new Date(),
@@ -60,7 +60,7 @@ export async function uploadVideo(req: Request, res: Response) {
         videos: [{
           videoUrl: videoUrl,
           videoTitle,
-          videoID: `@${Date.now()}${videoTitle.slice(0, 4)}`.replace(/\s/g, ''),
+          videoID: videoid,
           videoDescription,
           videoThumbnail: videoThumbnail,
           videoPublishedAt: new Date(),
@@ -89,6 +89,7 @@ export async function uploadVideo(req: Request, res: Response) {
     }
 
     const notificationId = `@${Date.now()}${email.slice(0, 4)}`.replace(/\s/g, '');
+    
     const subscribers = user?.subscribers?.users || [];
    
         const notification = {
@@ -97,6 +98,7 @@ export async function uploadVideo(req: Request, res: Response) {
             user: email,
             timeStamp: Date.now(),
             notificationId: notificationId,
+            videoId: videoid
         };
 
     
@@ -244,6 +246,7 @@ export async function addComment(req: Request, res: Response) {
       user:email,
       timeStamp:Date.now(),
       notificationId: `@${Date.now()}${email.slice(0, 4)}`.replace(/\s/g, ''),
+      videoId:videoId
     })
 
     await user?.save();

@@ -6,10 +6,11 @@ import {
     useUpdateProfile,
     useUpdatePassword,
 } from "react-firebase-hooks/auth";
+import { useDarkMode } from "@/components/hooks/theme"
 import { useRouter } from "next/navigation";
 import { Tooltip } from "@nextui-org/tooltip";
 import { Button } from "@nextui-org/button";
-import { Switch } from "@nextui-org/react";
+import { Switch, Badge } from "@nextui-org/react";
 import { MoonIcon } from "@/components/MoonIcon";
 import { SunIcon } from "@/components/SunIcon";
 import { auth } from "@/configurations/firebase/config";
@@ -28,10 +29,23 @@ query Exam($email:String){
         videoTags
         videoTitle
       }
+      getNotifications(email: $email) {
+        email
+        isRead
+        message
+        notificationId
+        timeStamp
+        videoId
+        videoThumbnail
+        avatar
+        channelLogo
+      }
   }
 `
 
 const Navbar: React.FC = () => {
+
+    const { isDarkMode, toggleDarkMode } = useDarkMode();
 
     const [userName, setuserName] = useState<string>("");
     const [email, setEmail] = useState<string>("");
@@ -42,10 +56,13 @@ const Navbar: React.FC = () => {
     const [isCreator, setIsCreator] = useState<string>("");
     const [searchItem, setSearchItem] = useState<boolean>(false);
     const [toggleVoiceSearches, settoggleVoiceSearches] = useState<boolean>(false);
+    const [showNotifications, setShowNotifications] = useState<boolean>(false);
+    const [showAllClear, setShowAllClear] = useState<boolean>(false);
 
     const [spinnerButton, setspinnerButton] = useState<boolean>(false);
     const [searchString, setsearchString] = useState<string>("");
     const [searchbarDetails, setSearchBarDetails] = useState<any[]>([]);
+    const [notification, setNotification] = useState<any[]>([]);
 
     const [text, setText] = useState("");
     const [isListening, setIsListening] = useState(false);
@@ -60,6 +77,9 @@ const Navbar: React.FC = () => {
 
     const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
 
+    const toggleTheme = useCallback(() => {
+        toggleDarkMode();
+    }, [toggleDarkMode])
 
     const { loading, error, data } = useQuery(VERIFY_CREATOR, {
         variables: { email: email },
@@ -134,6 +154,13 @@ const Navbar: React.FC = () => {
 
     }, [newInfo, toUpdate])
 
+    const handleClearNotifications = useCallback(async () => {
+        setShowAllClear(true);
+        setTimeout(() => {
+            setShowAllClear(false);
+        }, 3000);
+    }, [setShowAllClear])
+
     const handleModelOpen = useCallback(async (modelName: string) => {
         if (modelName === "nameChange") {
             settoUpdate("name");
@@ -166,7 +193,16 @@ const Navbar: React.FC = () => {
         }
     }, []);
 
+    const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === "Enter") {
+            handleSearch(searchString);
+        }
+    };
+
     const handleSearch = useCallback(async (recommendedSearchString: string | null) => {
+        if (!searchString) {
+            return "Blank input";
+        }
         try {
             const searchstring = recommendedSearchString || searchString;
 
@@ -219,6 +255,29 @@ const Navbar: React.FC = () => {
         }
     }, [email]);
 
+    const handleShowNotifications = async () => {
+        setShowNotifications(!showNotifications);
+    }
+
+    useEffect(() => {
+        if (searchItem) {
+            document.addEventListener("click", () => {
+                setSearchItem(false);
+            });
+        } else {
+            // Remove click event listener when the search bar is closed
+            document.removeEventListener("click", () => {
+                setSearchItem(false);
+            });
+        }
+
+        return () => {
+            document.removeEventListener("click", () => {
+                setSearchItem(false);
+            });
+        };
+    }, [searchItem, setSearchItem]);
+
 
     useEffect(() => {
         if (user) {
@@ -230,8 +289,9 @@ const Navbar: React.FC = () => {
             const verifyIsCreator = data.getIsCreator[0].isCreator
             setIsCreator(verifyIsCreator);
             setSearchBarDetails(data.getSearchBarDetails)
+            setNotification(data.getNotification)
         }
-    }, [user, setIsCreator, data, setSearchBarDetails]);
+    }, [user, setIsCreator, data, setSearchBarDetails,setNotification]);
 
     useEffect(() => {
         const handleSearchChange = (e: Event) => {
@@ -300,7 +360,6 @@ const Navbar: React.FC = () => {
             };
         }
     }, [recognition, setText, setIsListening]);
-
 
 
     return (
@@ -383,6 +442,7 @@ const Navbar: React.FC = () => {
                                 className="bg-inherit border border-gray-700 rounded-medium p-2 px-10 w-96"
                                 onClick={handleInputClick}
                                 data-search-content
+                                onKeyPress={handleKeyPress}
                             />
                         </Tooltip>
 
@@ -396,15 +456,15 @@ const Navbar: React.FC = () => {
                         <Tooltip color="warning" delay={700} showArrow={true} content="Toggle theme">
                             <button>
                                 <Switch
+                                    onClick={toggleTheme}
                                     defaultSelected
                                     size="lg"
                                     color="success"
-                                    startContent={<SunIcon />}
-                                    endContent={<MoonIcon />}
+                                    startContent={<MoonIcon />}
+                                    endContent={<SunIcon />}
                                 ></Switch>
                             </button>
                         </Tooltip>
-
                     </li>
                     <li onClick={() => handleCreateVideo()} className="hover:bg-gray-700 rounded-full p-1 cursor-pointer">
                         <Tooltip color="warning" delay={700} showArrow={true} content="Create video">
@@ -420,18 +480,20 @@ const Navbar: React.FC = () => {
                             </svg>
                         </Tooltip>
                     </li>
-                    <li className="hover:bg-gray-700 rounded-full p-1 cursor-pointer">
+                    <li onClick={handleShowNotifications} className="hover:bg-gray-700 rounded-full p-1 cursor-pointer">
                         <Tooltip color="warning" delay={700} showArrow={true} content="Notifications">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                height="36px"
-                                viewBox="0 0 24 24"
-                                width="36px"
-                                fill="#FFFFFF"
-                            >
-                                <path d="M0 0h24v24H0V0z" fill="none" />
-                                <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z" />
-                            </svg>
+                            <Badge content="2" shape="circle" color="danger">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    height="28px"
+                                    viewBox="0 0 24 24"
+                                    width="28px"
+                                    fill="#FFFFFF"
+                                >
+                                    <path d="M0 0h24v24H0V0z" fill="none" />
+                                    <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z" />
+                                </svg>
+                            </Badge>
                         </Tooltip>
                     </li>
                     <li className="cursor-pointer">
@@ -648,6 +710,29 @@ const Navbar: React.FC = () => {
                     </div>
                 </div>
             )}
+            <div id="notification-container">
+                {showNotifications &&
+                    <div className="z-50 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-300 [&::-webkit-scrollbar-thumb]:bg-gray-500 [&::-webkit-scrollbar-track]:rounded-full overflow-y-auto top-20 fixed bg-gray-800 rounded-md right-10" style={{ width: "30rem", height: "40rem" }}>
+                        <div id="notification" className="hover:bg-gray-700 cursor-pointer mb-3 p-1">
+                            <div className="flex ml-3 mr-3 mt-3">
+                                <img className="h-10 rounded-full mt-5" src="https://static.rfstat.com/renderforest/images/v2/landing-pics/youtube-logo/1124.jpg" alt="" />
+                                <h1 className="text-sm ml-3">Lorem ipsum dolor sit amet consectetur adipisicing elit. Optio saepe sunt commodi nesciunt molestiae.</h1>
+                                <img className="h-20 rounded-lg" src="https://marketplace.canva.com/EAFAMirCsX4/2/0/1600w/canva-purple-creative-livestream-youtube-thumbnail-X2eVuOzURSM.jpg" alt="" />
+                            </div>
+                            <span className="ml-20 text-sm text-gray-500">3 weeks ago</span>
+                        </div>
+                        <Tooltip color="warning" delay={700} showArrow={true} content="clear all">
+                            {showAllClear ? (
+                                <svg className="p-2 rounded-full bg-gray-700 fixed bottom-20 ml-52" xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 0 24 24" width="48px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" /></svg>
+
+                            ) : (
+
+                                <svg onClick={handleClearNotifications} className="p-2 rounded-full bg-gray-700 fixed bottom-20 ml-52" xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 0 24 24" width="48px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" /></svg>
+                            )}
+                        </Tooltip>
+                    </div>
+                }
+            </div>
 
         </>
     )

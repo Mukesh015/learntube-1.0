@@ -40,7 +40,7 @@ const queries = {
 
 
         const history = user.features?.history || [];
-        const hasValueHistory = history.map(history=>history.videoId).includes(videoID);
+        const hasValueHistory = history.map(history => history.videoId).includes(videoID);
 
         const myVideos = user.features?.myVideos || [];
         const hasValueMyVideos = myVideos.includes(videoID);
@@ -58,12 +58,12 @@ const queries = {
         const subsCribed = user.subscribedChnannels?.channelId || [];
         const hasValueSubscribed = subsCribed.includes(channelId);
 
-        const totalSubscriber=user.subscribers?.count;
+        const totalSubscriber = user.subscribers?.count;
 
         return [{
             haveInPlaylist: hasValuePlayList, hasInHistory: hasValueHistory, haveInMyVideos: hasValueMyVideos,
             haveInWatchLater: hasValueWatchLater, isLiked: hasValueLikedVideos, dislikedVideos: hasValueDislikedVideos,
-            subscribedchannel: hasValueSubscribed,totalSubscriber:totalSubscriber
+            subscribedchannel: hasValueSubscribed, totalSubscriber: totalSubscriber
         }];
     },
     getChannelLogo: async (undefined: undefined, p0: { email: any; }) => {
@@ -180,22 +180,22 @@ const queries = {
             if (!user) {
                 return "User not found";
             }
-    
+
             const videos: VideoDocument[] | null = await VideoModel.find();
-    
+
             if (!videos) {
                 throw new Error("Videos not found");
             }
-    
+
             const channelLogoResponse = await queries.getChannelLogo(undefined, { email: videos.map(email => email.email) });
-    
+
             const history = user.features?.history || [];
-    
+
             const historyDetails: {
                 videoId: any; videoTitle: any; videoViews: any; channelLogo: any; videoPublishedAt: any;
                 videoThumbnail: any; courseID: any; courseFees: any; viewedAt: any;
             }[] = [];
-    
+
             videos.forEach(video => {
                 video.courses.forEach(course => {
                     course.videos.forEach((vid: any) => {
@@ -209,14 +209,14 @@ const queries = {
                                 videoViews: vid.videoViews.length,
                                 videoPublishedAt: vid.videoPublishedAt,
                                 videoThumbnail: vid.videoThumbnail,
-                                viewedAt:`${viewedHistory.timeStamp}`, // Convert timestamp to a readable format
+                                viewedAt: `${viewedHistory.timeStamp}`, // Convert timestamp to a readable format
                                 channelLogo: channelLogoResponse.find((logo: { email: string; }) => logo.email === video.email)?.channelLogo,
                             });
                         }
                     });
                 });
             });
-    
+
             return historyDetails;
         } catch (error) {
             console.error(error);
@@ -303,7 +303,7 @@ const queries = {
                     channelLogo: user.channelLogo,
                     channelId: user.channelId,
                     channelCreatedDate: user.channelCreatedAt,
-          
+
                 }
             ];
         } catch (error) {
@@ -354,7 +354,7 @@ const queries = {
             }
 
             let totalComments = 0;
-            let totalLike=0
+            let totalLike = 0
             videos.forEach(video => {
                 video.courses.forEach(course => {
                     if (course.videos) {
@@ -362,7 +362,7 @@ const queries = {
                             if (video.videoComments) {
                                 totalComments += video.videoComments.count;
                             }
-                            totalLike+=video.videoLikeCount
+                            totalLike += video.videoLikeCount
                         });
                     }
                 });
@@ -372,7 +372,7 @@ const queries = {
                 subscriber: user.subscribers?.count,
                 watchTime: user.WatchTime,
                 totalComments: totalComments,
-                totalLike:totalLike
+                totalLike: totalLike
             }];
         } catch (error) {
             console.log(error);
@@ -473,13 +473,13 @@ const queries = {
             throw new Error('An error occurred while fetching user courses');
         }
     },
-    getSubscribedChannels: async(_: any, { email }: { email: string }) => {
+    getSubscribedChannels: async (_: any, { email }: { email: string }) => {
         try {
             const user: UserDocument | null = await UserModel.findOne({ email });
             if (!user) {
                 return "User not found";
             }
-    
+
             const subscribedChannels = user.subscribedChnannels?.channelId || [];
             const channelDetails = [];
             for (const channelId of subscribedChannels) {
@@ -487,7 +487,7 @@ const queries = {
                 if (channel) {
                     const channelName = channel.channelName || '';
                     const channelLogo = channel.channelLogo || '';
-    
+
                     channelDetails.push({
                         channelId: channelId,
                         channelName: channelName,
@@ -501,47 +501,145 @@ const queries = {
             throw new Error('An error occurred while fetching subscribed channels');
         }
     },
-    getCreatorCourses:async(_:any,{email}:{email:string})=>{
+    getCreatorCourses: async (_: any, { email }: { email: string }) => {
         try {
             const videos: VideoDocument[] = await VideoModel.find({ email });
-    
+
             const result: any[] = [];
-    
+
             videos.forEach((video: VideoDocument) => {
                 video.courses.forEach((course) => {
                     const { courseId, courseName, courseThumbUrl, courseDescription } = course;
                     const courseVideos: any[] = []; // Array to store video details
-    
+
                     course.videos.forEach((video) => {
                         const { videoID, videoTitle, videoViews, videoThumbnail, videoDescription, videoPublishedAt } = video;
                         // Push video details into courseVideos array
                         courseVideos.push({
                             videoUrl: video.videoUrl,
                             videoId: videoID,
-                            videoTitle:videoTitle,
+                            videoTitle: videoTitle,
                             videoViews: videoViews.length,
                             videoThumbnail: videoThumbnail,
-                            videoDescription:videoDescription,
-                            videoPublishedAt:videoPublishedAt
+                            videoDescription: videoDescription,
+                            videoPublishedAt: videoPublishedAt
                         });
                     });
-    
-                    
+
+
                     result.push({
                         courseId,
                         courseName,
                         courseThumb: courseThumbUrl,
                         courseDescription,
-                        videos: courseVideos 
+                        videos: courseVideos
                     });
                 });
             });
-    
+
             return result;
         } catch (error) {
             console.error('Error fetching course details:', error);
             throw new Error('An error occurred while fetching course details');
         }
+    },
+    getvideoThumbnail: async (_: any, { videoId }: { videoId: string }) => {
+
+        try {
+            const video = await VideoModel.findOne({ "courses.videos.videoID": videoId });
+            if (!video) {
+                throw new Error('Video not found');
+            }
+
+            const course = video.courses.find(course => course.videos.some(video => video.videoID === videoId));
+
+            if (!course) {
+                throw new Error('Course containing the video not found');
+            }
+
+
+            const videoItem = course.videos.find(video => video.videoID === videoId);
+
+            if (!videoItem) {
+                throw new Error('Video item not found');
+            }
+
+            return [{ videoThumnail: videoItem.videoThumbnail }];
+        } catch (error) {
+            console.error('Error fetching video thumbnail:', error);
+            throw new Error('An error occurred while fetching video thumbnail');
+        }
+    },
+    getNotifications: async (_: any, { email }: { email: string }) => {
+
+        try {
+            const user: UserDocument | null = await UserModel.findOne({ email });
+            if (!user) {
+                return "User not found";
+            }
+
+            const getMessageDetails = async (message: string,email:string) => {
+                if (message.includes(" commented on your video")) {
+
+                    const commenter = await UserModel.findOne({ email });
+                    if (!commenter) {
+                        throw new Error('Commenter not found');
+                    }
+                    return { displayMessage: `${commenter.username} commented on your video`, avatar: commenter.avatar };
+                } else if (message === "uploaded a new video. Check it out now") {
+                    const channel = await UserModel.findOne({ email });
+                    if (!channel) {
+                        throw new Error('Channel not found');
+                    }
+                    return { displayMessage: `${channel.channelName} uploaded a new video. Check it out now`, channelLogo: channel.channelLogo };
+                } else {
+                    return { displayMessage: message };
+                }
+            };
+
+            const getVideoThumbnail = async (videoId: string) => {
+                try {
+                    const video = await VideoModel.findOne({ "courses.videos.videoID": videoId });
+                    if (!video) {
+                        throw new Error('Video not found');
+                    }
+                    const course = video.courses.find(course => course.videos.some(video => video.videoID === videoId));
+                    if (!course) {
+                        throw new Error('Course containing the video not found');
+                    }
+                    const videoItem = course.videos.find(video => video.videoID === videoId);
+                    if (!videoItem) {
+                        throw new Error('Video item not found');
+                    }
+                    return videoItem.videoThumbnail;
+                } catch (error) {
+                    console.error('Error fetching video thumbnail:', error);
+                    throw new Error('An error occurred while fetching video thumbnail');
+                }
+            };
+
+            const notifications = await Promise.all(user.notification.map(async notification => {
+                const { displayMessage, avatar, channelLogo } = await getMessageDetails(notification.message,notification.user);
+                return {
+                    isRead: notification.isRead,
+                    notificationId: notification.notificationId,
+                    timeStamp: notification.timeStamp,
+                    videoId: notification.videoId,
+                    email: notification.user,
+                    message: displayMessage,
+                    videoThumbnail: await getVideoThumbnail(notification.videoId),
+                    avatar,
+                    channelLogo
+                };
+            }));
+
+            return notifications;
+        } catch (error) {
+            console.error('Error fetching notifications:', error);
+            throw new Error('An error occurred while fetching notifications');
+        }
     }
 }
 export const resolvers = { queries };
+
+

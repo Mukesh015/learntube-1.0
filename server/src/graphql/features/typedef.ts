@@ -126,4 +126,19 @@ type Video {
     courseDescription: String
     videos: [Video]
   }
+
+  type videoThumbnail{
+    videoThumnail: String
+  }
+ type notifications{
+    isRead: Boolean
+    notificationId: String
+    timeStamp: String
+    videoId: String
+    email: String
+    message: String
+    videoThumbnail: String
+    avatar: String
+    channelLogo: String
+ }
 `;

@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { UiProviders } from "@/components/providers";
+import { DarkModeProvider } from "@/components/hooks/theme";
 import "react-toastify/dist/ReactToastify.css";
 import NextTopLoader from "nextjs-toploader";
 import { ApolloWrapper } from "@/configurations/apollo/client"
-import {StoreProvider} from "@/configurations/redux/storeProvider"
+import { StoreProvider } from "@/configurations/redux/storeProvider"
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -22,14 +23,16 @@ export default function RootLayout({
   return (
     <html lang="en" className='dark'>
       <body className={inter.className}>
-        <NextTopLoader />
-        <StoreProvider>
-        <ApolloWrapper>
-          <UiProviders>
-            {children}
-          </UiProviders>
-        </ApolloWrapper>
-        </StoreProvider>
+        <DarkModeProvider>
+          <NextTopLoader />
+          <StoreProvider>
+            <ApolloWrapper>
+              <UiProviders>
+                {children}
+              </UiProviders>
+            </ApolloWrapper>
+          </StoreProvider>
+        </DarkModeProvider>
       </body>
     </html>
   );
