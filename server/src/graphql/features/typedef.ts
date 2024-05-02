@@ -79,6 +79,7 @@ type channelDetails{
     coverPhotoURL:String
     channelLogo:String
     channelId:String
+    channelCreatedDate:String
 }
 type yourVideo{
     videoId: String

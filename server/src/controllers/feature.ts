@@ -359,6 +359,68 @@ export async function calculateWatchTime(req: Request, res: Response) {
 }
 
 
+export async function markAsRead(req: Request, res: Response) {
+
+    const {email,notificationId}=req.body;
+    try {
+        const user = await UserModel.findOne({ email: email });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        const notificationIndex = user.notification.findIndex(
+            (notification) => notification.notificationId === notificationId
+        );
+        if (notificationIndex === -1) {
+            return res.status(404).json({ message: 'Notification not found' });
+        }
+        user.notification[notificationIndex].isRead = true;
+        await user.save();
+        return res.status(200).json({ message: 'Notification marked as read' });
+    } catch (error) {
+        console.error("Error marking notification as read:", error);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+}
+
+
+export async function clearNotification(req: Request, res: Response) {
+
+    const {email,notificationId}=req.body;
+    try {
+        const user = await UserModel.findOne({ email: email });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        
+        user.notification = user.notification.filter(notification => notification.notificationId !== notificationId);
+        
+ 
+        await user.save();
+        
+        return res.status(200).json({ message: 'Notification cleared successfully' });
+    } catch (error) {
+        console.error("Error clearing notification:", error);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+}
+
+
+export async function clearAllNotifiacation(req: Request, res: Response) {
+    const {email}=req.body;
+    try {
+        const user = await UserModel.findOne({ email: email });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        user.notification = [];
+        await user.save();
+        return res.status(200).json({ message: 'Notification cleared successfully' });
+    } catch (error) {
+        console.error("Error clearing notification:", error);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+
+}
 
 
 
@@ -401,3 +463,5 @@ export async function makepayment(req: Request, res: Response) {
     }
 
 }
+
+

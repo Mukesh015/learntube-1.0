@@ -38,6 +38,7 @@ query GetAllVideoUrl ($email: String){
         phoneNumber
         state
         websiteURL
+        channelCreatedDate
       }
       getCreatorCard(email: $email) {
         subscriber

@@ -27,8 +27,8 @@ interface UserDocument extends Document {
     };
     EnrolledCourses?:string[];
     WatchTime?: number;
-    history: any[];
-    analytics: { date: Date; watchTime: number }[];
+
+    notification: { isRead: boolean; message: string,user: string ,timeStamp:number,notificationId:string}[];
 }
 
 const userSchema = new mongoose.Schema<UserDocument>(
@@ -133,14 +133,16 @@ const userSchema = new mongoose.Schema<UserDocument>(
             count: { type: Number, default: 0 },
             channelId: [{ type: mongoose.Schema.Types.Mixed, required: false }]
         },
-        history: [mongoose.Schema.Types.Mixed],
-        analytics: [
+        notification: [
             {
-                date: { type: Date, },
-                watchTime: { type: Number, }
+                isRead: { type: Boolean,default: false },
+                message: { type: String,  required: false},
+                user: { type: String, required: false },
+                timeStamp: { type: Date,},
+                notificationId: { type: String, required: false },
             }
         ],
-        EnrolledCourses:[{type:String}],
+        EnrolledCourses:[{type:String,}],
         WatchTime: { 
             type: Number,
             required: false

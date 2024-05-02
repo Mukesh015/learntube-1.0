@@ -302,6 +302,8 @@ const queries = {
                     coverPhotoURL: user.coverPhoto,
                     channelLogo: user.channelLogo,
                     channelId: user.channelId,
+                    channelCreatedDate: user.channelCreatedAt,
+          
                 }
             ];
         } catch (error) {

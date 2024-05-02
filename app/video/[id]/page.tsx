@@ -250,7 +250,8 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                     videoId: videoId,
                     comment: comment,
                     logo: logo,
-                    user: email
+                    user: email,
+                    creatorEmail: creatorEmail
                 })
             });
             const data = await response.json();
