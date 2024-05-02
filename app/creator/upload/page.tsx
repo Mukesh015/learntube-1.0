@@ -11,7 +11,7 @@ import { useQuery, gql } from '@apollo/client';
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/configurations/firebase/config";
 import { toast, ToastContainer } from "react-toastify";
-
+import { useRouter } from "next/navigation";
 
 const GET_COURSENAME = gql`
 query Exam($email:String){
@@ -23,6 +23,8 @@ query Exam($email:String){
 
 
 const VideoUploadForm: React.FC = () => {
+
+    const router = useRouter();
 
     const [isExistingCourse, setIsExistingCourse] = useState<boolean>(false);
     const [isPaidCourse, setIsPaidCourse] = useState<boolean>(false);
@@ -86,7 +88,9 @@ const VideoUploadForm: React.FC = () => {
                     theme: "light",
                 });
                 setShowLoading(false);
-
+                setTimeout(() => {
+                    router.push("/");
+                }, 1000);
 
             } else {
                 toast.error("Video upload failed", {

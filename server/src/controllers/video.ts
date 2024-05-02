@@ -16,7 +16,7 @@ export async function uploadVideo(req: Request, res: Response) {
     console.log(email, courseName, courseDescription, price, videoTitle, videoDescription, videoTags, videoUrl, videoThumbnail, courseThumbUrl)
 
     let video: VideoDocument | null = await VideoModel.findOne({ email });
-    let user:UserDocument| null = await UserModel.findOne({ email });
+    let user: UserDocument | null = await UserModel.findOne({ email });
 
     if (!video) {
       video = await VideoModel.create({
@@ -81,27 +81,27 @@ export async function uploadVideo(req: Request, res: Response) {
       };
       video.courses.push(course);
     }
-  
+
     await video.save();
 
-    if(!user){
-      res.status(404).send({ message:"user not found"})
+    if (!user) {
+      res.status(404).send({ message: "user not found" })
     }
 
     const subscriber = user?.subscribers?.users || [];
     user?.notification.push(
       {
-        isRead:false,
-        message:'uploaded a new video. Check it out now',
-        user:email,
-        timeStamp:Date.now(),
+        isRead: false,
+        message: 'uploaded a new video. Check it out now',
+        user: email,
+        timeStamp: Date.now(),
         notificationId: `@${Date.now()}${email.slice(0, 4)}`.replace(/\s/g, ''),
       }
     )
     res.status(200).json({ message: 'Video uploaded successfully' });
 
     await user?.save();
-    
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -199,11 +199,10 @@ export async function redirect(req: Request, res: Response) {
 }
 
 export async function addComment(req: Request, res: Response) {
-  const { user, logo, comment, videoId, email,creatorEmail } = req.body;
+  const { logo, comment, videoId, email, creatorEmail } = req.body;
   try {
-
     const video = await VideoModel.findOne({ email: creatorEmail, "courses.videos.videoID": videoId });
-    const user = await UserModel.findOne({ email:creatorEmail});
+    const user = await UserModel.findOne({ email: creatorEmail });
     if (!video) {
       return res.status(404).json({ error: 'Video not found' });
     }
@@ -223,17 +222,17 @@ export async function addComment(req: Request, res: Response) {
       });
     });
 
-  
+
     await video.save();
 
-    if(!user){
-      res.status(404).send({ message:"user not found"})
+    if (!user) {
+      res.status(404).send({ message: "user not found" })
     }
     user?.notification.push({
-      isRead:false,
-      message:'A new comment added in our Video. Check it out now',
-      user:email,
-      timeStamp:Date.now(),
+      isRead: false,
+      message: 'A new comment added in our Video. Check it out now',
+      user: email,
+      timeStamp: Date.now(),
       notificationId: `@${Date.now()}${email.slice(0, 4)}`.replace(/\s/g, ''),
     })
 
