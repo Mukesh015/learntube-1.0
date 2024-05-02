@@ -245,7 +245,7 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    email: creatorEmail,
+                    email: email,
                     videoId: videoId,
                     comment: comment,
                     logo: logo,

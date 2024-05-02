@@ -88,16 +88,25 @@ export async function uploadVideo(req: Request, res: Response) {
       res.status(404).send({ message:"user not found"})
     }
 
-    const subscriber = user?.subscribers?.users || [];
-    user?.notification.push(
-      {
-        isRead:false,
-        message:'uploaded a new video. Check it out now',
-        user:email,
-        timeStamp:Date.now(),
-        notificationId: `@${Date.now()}${email.slice(0, 4)}`.replace(/\s/g, ''),
-      }
-    )
+    const notificationId = `@${Date.now()}${email.slice(0, 4)}`.replace(/\s/g, '');
+    const subscribers = user?.subscribers?.users || [];
+   
+        const notification = {
+            isRead: false,
+            message: 'uploaded a new video. Check it out now',
+            user: email,
+            timeStamp: Date.now(),
+            notificationId: notificationId,
+        };
+
+    
+        for (const subscriberEmail of subscribers) {
+            const subscriber = await UserModel.findOne({ email: subscriberEmail });
+            if (subscriber) {
+                subscriber.notification.push(notification);
+                await subscriber.save();
+            }
+        }
     res.status(200).json({ message: 'Video uploaded successfully' });
 
     await user?.save();
@@ -231,7 +240,7 @@ export async function addComment(req: Request, res: Response) {
     }
     user?.notification.push({
       isRead:false,
-      message:'A new comment added in our Video. Check it out now',
+      message:' commented on your video',
       user:email,
       timeStamp:Date.now(),
       notificationId: `@${Date.now()}${email.slice(0, 4)}`.replace(/\s/g, ''),
