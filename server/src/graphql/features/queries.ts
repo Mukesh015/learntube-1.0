@@ -11,4 +11,6 @@ getCreatorCard(email:String):[creatorCard]
 getYourCourse(email:String):[yourCourse]
 getSubscribedChannels(email:String):[subscribedChannels]
 getCreatorCourses(email:String):[creatorCourses]
+getvideoThumbnail(videoId:String):[videoThumbnail]
+getNotifications(email:String):[notifications]
 `

@@ -29,6 +29,17 @@ query Exam($email:String){
         videoTags
         videoTitle
       }
+      getNotifications(email: $email) {
+        email
+        isRead
+        message
+        notificationId
+        timeStamp
+        videoId
+        videoThumbnail
+        avatar
+        channelLogo
+      }
   }
 `
 
@@ -51,6 +62,7 @@ const Navbar: React.FC = () => {
     const [spinnerButton, setspinnerButton] = useState<boolean>(false);
     const [searchString, setsearchString] = useState<string>("");
     const [searchbarDetails, setSearchBarDetails] = useState<any[]>([]);
+    const [notification, setNotification] = useState<any[]>([]);
 
     const [text, setText] = useState("");
     const [isListening, setIsListening] = useState(false);
@@ -259,7 +271,6 @@ const Navbar: React.FC = () => {
             });
         }
 
-        // Cleanup function to remove event listener when component unmounts
         return () => {
             document.removeEventListener("click", () => {
                 setSearchItem(false);
@@ -278,8 +289,9 @@ const Navbar: React.FC = () => {
             const verifyIsCreator = data.getIsCreator[0].isCreator
             setIsCreator(verifyIsCreator);
             setSearchBarDetails(data.getSearchBarDetails)
+            setNotification(data.getNotification)
         }
-    }, [user, setIsCreator, data, setSearchBarDetails]);
+    }, [user, setIsCreator, data, setSearchBarDetails,setNotification]);
 
     useEffect(() => {
         const handleSearchChange = (e: Event) => {
