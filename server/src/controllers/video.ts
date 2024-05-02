@@ -241,7 +241,7 @@ export async function addComment(req: Request, res: Response) {
     }
     user?.notification.push({
       isRead:false,
-      message:' commented on your video',
+      message:'A new comment added in our Video. Check it out now',
       user:email,
       timeStamp:Date.now(),
       notificationId: `@${Date.now()}${email.slice(0, 4)}`.replace(/\s/g, ''),

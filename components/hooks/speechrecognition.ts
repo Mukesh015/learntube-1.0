@@ -24,6 +24,7 @@ const useSpeechRecognition = () => {
                 recognition.stop();
                 setText(event.results[0][0].transcript);
                 setIsListening(false);
+        
             };
         }
     }, [recognition, setText, setIsListening]);

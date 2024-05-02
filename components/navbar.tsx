@@ -87,6 +87,7 @@ const Navbar: React.FC = () => {
 
     const handleInputClick = () => {
         toggleSearchDiv();
+        console.log(searchItem)
     };
 
     const toggleSearchDiv = () => {
@@ -200,7 +201,8 @@ const Navbar: React.FC = () => {
     };
 
     const handleSearch = useCallback(async (recommendedSearchString: string | null) => {
-        if (!searchString) {
+
+        if (!recommendedSearchString) {
             return "Blank input";
         }
         try {
@@ -260,23 +262,20 @@ const Navbar: React.FC = () => {
     }
 
     useEffect(() => {
-        if (searchItem) {
-            document.addEventListener("click", () => {
-                setSearchItem(false);
-            });
-        } else {
-            // Remove click event listener when the search bar is closed
-            document.removeEventListener("click", () => {
-                setSearchItem(false);
-            });
-        }
-
-        return () => {
-            document.removeEventListener("click", () => {
-                setSearchItem(false);
-            });
+        const handleClickOutside = () => {
+            setSearchItem(false);
         };
-    }, [searchItem, setSearchItem]);
+    
+        if (searchItem) {
+            document.addEventListener("click", handleClickOutside);
+        } else {
+            document.removeEventListener("click", handleClickOutside);
+        }
+    
+        return () => {
+            document.removeEventListener("click", handleClickOutside);
+        };
+    }, [searchItem, setSearchItem])
 
 
     useEffect(() => {
@@ -291,7 +290,7 @@ const Navbar: React.FC = () => {
             setSearchBarDetails(data.getSearchBarDetails)
             setNotification(data.getNotification)
         }
-    }, [user, setIsCreator, data, setSearchBarDetails,setNotification]);
+    }, [user, setIsCreator, data, setSearchBarDetails, setNotification]);
 
     useEffect(() => {
         const handleSearchChange = (e: Event) => {
@@ -328,12 +327,13 @@ const Navbar: React.FC = () => {
     };
 
     const handleOpenVoiceSearchModel = useCallback(async () => {
+        handleSearch(text)
         settoggleVoiceSearches(!toggleVoiceSearches);
         if (isListening) {
             stopListening();
         }
         startListening();
-    }, [isListening, startListening, stopListening]);
+    }, [isListening, text, handleSearch, startListening, settoggleVoiceSearches, stopListening]);
 
     useEffect(() => {
         if (!recognition) {
@@ -350,16 +350,17 @@ const Navbar: React.FC = () => {
         if (recognition) {
             recognition.onresult = (event: SpeechRecognitionEvent) => {
                 console.log("onresult:", event);
+                
                 recognition.stop();
-                setText(event.results[0][0].transcript);
-                handleSearch(event.results[0][0].transcript);
                 setTimeout(() => {
                     handleSearch(event.results[0][0].transcript);
-                }, 1500);
+                    },1000)
+                setText(event.results[0][0].transcript);
                 setIsListening(false);
+
             };
         }
-    }, [recognition, setText, setIsListening]);
+    }, [recognition, setText, setIsListening, handleSearch]);
 
 
     return (
@@ -616,7 +617,7 @@ const Navbar: React.FC = () => {
                 </ModalContent>
             </Modal>
 
-            {searchItem && searchbarDetails && (
+            {searchItem && searchbarDetails &&(
                 <div className={`z-50 top-20 rounded-md fixed shadow-lg shadow-gray-500 ${isDarkMode ? "bg-white" : "bg-gray-700"}`} style={{ marginLeft: "440px", marginRight: "480px", width: "700px" }}>
                     <div className="flex cursor-pointer">
                         <div className="flex flex-col">
@@ -628,7 +629,7 @@ const Navbar: React.FC = () => {
                                             ><path d="M0 0h24v24H0V0z" fill="none" /><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.25 2.52.77-1.28-3.52-2.09V8z" /></svg>
                                             <p className={`p-2 ${isDarkMode ? "text-black" : "text-white"}`} style={{ width: "630px" }} onClick={() => handleSearch(history)}>{history}</p>
                                         </div>
-                                        <svg onClick={() => deleteSearchString(history)} className="ml-20 mt-1 hover:bg-red-500  p-1 rounded-full absolute right-2" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" f fill={isDarkMode ? '#000000' : '#FFFFFF'}
+                                        <svg onClick={() => deleteSearchString(history)} className="ml-20 mt-1 hover:bg-red-500  p-1 rounded-full absolute right-2" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill={isDarkMode ? '#000000' : '#FFFFFF'}
                                         ><path d="M0 0h24v24H0V0z" fill="none" /><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" /></svg>
                                     </div>
                                 ))
@@ -700,7 +701,8 @@ const Navbar: React.FC = () => {
                             {isListening ? (
                                 <svg xmlns="http://www.w3.org/2000/svg" height="240" fill="#eb4034" viewBox="0 -960 960 960" width="240"><path d="M480.12-400q-51.04 0-86.58-35.46Q358-470.91 358-522v-242q0-51.09 35.42-86.54Q428.84-886 479.88-886q51.04 0 86.58 35.46Q602-815.09 602-764v242q0 51.09-35.42 86.54Q531.16-400 480.12-400ZM436-96v-128.85q-113-13.31-185.5-98.42Q178-408.39 178-522h86q0 90 63.18 152T480-308q89.64 0 152.82-62Q696-432 696-522h86q0 114.39-73.5 199.12Q635-238.16 522-224.85V-96h-86Z" /></svg>
                             ) : (
-                                <svg xmlns="http://www.w3.org/2000/svg" height="240" fill="#FFFFFF" viewBox="0 -960 960 960" width="240"><path d="M480.12-400q-51.04 0-86.58-35.46Q358-470.91 358-522v-242q0-51.09 35.42-86.54Q428.84-886 479.88-886q51.04 0 86.58 35.46Q602-815.09 602-764v242q0 51.09-35.42 86.54Q531.16-400 480.12-400ZM436-96v-128.85q-113-13.31-185.5-98.42Q178-408.39 178-522h86q0 90 63.18 152T480-308q89.64 0 152.82-62Q696-432 696-522h86q0 114.39-73.5 199.12Q635-238.16 522-224.85V-96h-86Z" /></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" height="240" fill={isDarkMode ? '#000000' : '#FFFFFF'}
+                                    viewBox="0 -960 960 960" width="240"><path d="M480.12-400q-51.04 0-86.58-35.46Q358-470.91 358-522v-242q0-51.09 35.42-86.54Q428.84-886 479.88-886q51.04 0 86.58 35.46Q602-815.09 602-764v242q0 51.09-35.42 86.54Q531.16-400 480.12-400ZM436-96v-128.85q-113-13.31-185.5-98.42Q178-408.39 178-522h86q0 90 63.18 152T480-308q89.64 0 152.82-62Q696-432 696-522h86q0 114.39-73.5 199.12Q635-238.16 522-224.85V-96h-86Z" /></svg>
                             )}
                             {recognition ? (
                                 <p className="text-4xl mt-20 ml-20">{text ? text : "Listening ..."}</p>

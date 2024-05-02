@@ -250,11 +250,12 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    creatorEmail: creatorEmail,
+                    email: email,
                     videoId: videoId,
                     comment: comment,
                     logo: logo,
-                    email: email,
+                    user: email,
+                    creatorEmail: creatorEmail
                 })
             });
             const data = await response.json();

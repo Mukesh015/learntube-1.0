@@ -581,10 +581,13 @@ const queries = {
             const getMessageDetails = async (message: string,email:string) => {
                 if (message.includes(" commented on your video")) {
 
-                    const commenter = await UserModel.findOne({ email });
+                    const commenter = await UserModel.findOne({ email:email });
                     if (!commenter) {
+                        console.error("email not found")
                         throw new Error('Commenter not found');
+                        
                     }
+                    console.log(commenter)
                     return { displayMessage: `${commenter.username} commented on your video`, avatar: commenter.avatar };
                 } else if (message === "uploaded a new video. Check it out now") {
                     const channel = await UserModel.findOne({ email });
@@ -620,6 +623,7 @@ const queries = {
 
             const notifications = await Promise.all(user.notification.map(async notification => {
                 const { displayMessage, avatar, channelLogo } = await getMessageDetails(notification.message,notification.user);
+            
                 return {
                     isRead: notification.isRead,
                     notificationId: notification.notificationId,

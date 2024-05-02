@@ -56,7 +56,7 @@ export async function addToHistory(req: Request, res: Response) {
             }
             const entry = {
                 videoId,
-                timeStamp: Date.now() 
+                timeStamp: Date.now()
             };
             user.features?.history.push(entry);
             await user.save();
@@ -361,7 +361,7 @@ export async function calculateWatchTime(req: Request, res: Response) {
 
 export async function markAsRead(req: Request, res: Response) {
 
-    const {email,notificationId}=req.body;
+    const { email, notificationId } = req.body;
     try {
         const user = await UserModel.findOne({ email: email });
         if (!user) {
@@ -385,18 +385,18 @@ export async function markAsRead(req: Request, res: Response) {
 
 export async function clearNotification(req: Request, res: Response) {
 
-    const {email,notificationId}=req.body;
+    const { email, notificationId } = req.body;
     try {
         const user = await UserModel.findOne({ email: email });
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-        
+
         user.notification = user.notification.filter(notification => notification.notificationId !== notificationId);
-        
- 
+
+
         await user.save();
-        
+
         return res.status(200).json({ message: 'Notification cleared successfully' });
     } catch (error) {
         console.error("Error clearing notification:", error);
@@ -406,7 +406,7 @@ export async function clearNotification(req: Request, res: Response) {
 
 
 export async function clearAllNotifiacation(req: Request, res: Response) {
-    const {email}=req.body;
+    const { email } = req.body;
     try {
         const user = await UserModel.findOne({ email: email });
         if (!user) {
@@ -424,7 +424,40 @@ export async function clearAllNotifiacation(req: Request, res: Response) {
 
 
 
+export async function dynamicChanges(req: Request, res: Response) {
+    const { email,channelName,RecoveryEmail,channelDescription,any,Facebook,Instagram,Twitter,Github,LinkedIn,Discord } = req.body;
+    const modify: string = req.params.modify as string;
 
+    try {
+        const user = await UserModel.findOne({ email: email });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        if (modify === 'channelName') {
+            user.channelName = channelName;
+        }
+        else if (modify === 'RecoveryEmail') {
+            user.recoveryEmail = RecoveryEmail;
+        }
+        else if (modify === 'channelDescription') {
+            user.channelDescription = channelDescription;
+        }
+        else if (modify === 'ProvidedLinks') {
+            user.website.any=any
+            user.website.Instagram=Instagram
+            user.website.Twitter=Twitter
+            user.website.Github=Github
+            user.website.LinkedIn=LinkedIn
+            user.website.Facebook=Facebook
+            user.website.Discord=Discord
+        }
+        await user.save();
+        return res.status(200).json({ message: 'Changed sucessfully' });
+    } catch (error) {
+        console.error("Error modify :", error);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+}
 
 
 
