@@ -42,6 +42,7 @@ const Navbar: React.FC = () => {
     const [isCreator, setIsCreator] = useState<string>("");
     const [searchItem, setSearchItem] = useState<boolean>(false);
     const [toggleVoiceSearches, settoggleVoiceSearches] = useState<boolean>(false);
+    const [showNotifications, setShowNotifications] = useState<boolean>(false);
 
     const [spinnerButton, setspinnerButton] = useState<boolean>(false);
     const [searchString, setsearchString] = useState<string>("");
@@ -227,6 +228,10 @@ const Navbar: React.FC = () => {
             console.error("Failed to fetch", error);
         }
     }, [email]);
+
+    const handleShowNotifications = async () => {
+        setShowNotifications(!showNotifications);
+    }
 
     useEffect(() => {
         if (searchItem) {
@@ -448,7 +453,7 @@ const Navbar: React.FC = () => {
                             </svg>
                         </Tooltip>
                     </li>
-                    <li className="hover:bg-gray-700 rounded-full p-1 cursor-pointer">
+                    <li onClick={handleShowNotifications} className="hover:bg-gray-700 rounded-full p-1 cursor-pointer">
                         <Tooltip color="warning" delay={700} showArrow={true} content="Notifications">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -676,6 +681,20 @@ const Navbar: React.FC = () => {
                     </div>
                 </div>
             )}
+            <div id="notification-container">
+                {showNotifications &&
+                    <div className="z-50 top-20 fixed bg-gray-800 rounded-md right-10" style={{ width: "30rem", height: "40rem" }}>
+                        <div className="hover:bg-gray-700 cursor-pointer mb-3 p-1">
+                            <div className="flex ml-3 mr-3 mt-3">
+                                <img className="h-10 rounded-full mt-5" src="https://static.rfstat.com/renderforest/images/v2/landing-pics/youtube-logo/1124.jpg" alt="" />
+                                <h1 className="text-sm ml-3">Lorem ipsum dolor sit amet consectetur adipisicing elit. Optio saepe sunt commodi nesciunt molestiae.</h1>
+                                <img className="h-20 rounded-lg" src="https://marketplace.canva.com/EAFAMirCsX4/2/0/1600w/canva-purple-creative-livestream-youtube-thumbnail-X2eVuOzURSM.jpg" alt="" />
+                            </div>
+                            <span className="ml-20 text-sm text-gray-500">3 weeks ago</span>
+                        </div>
+                    </div>
+                }
+            </div>
 
         </>
     )
