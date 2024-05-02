@@ -6,6 +6,8 @@ import Sidebar from "@/components/sidebar";
 import { gql, useQuery } from "@apollo/client";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/configurations/firebase/config";
+import { useDarkMode } from "@/components/hooks/theme"
+
 
 const HOMEPAGE_DETAILS = gql`
   query GetAllVideoUrl {
@@ -25,6 +27,9 @@ const HOMEPAGE_DETAILS = gql`
 `;
 
 const Home: React.FC = () => {
+
+  const { isDarkMode } = useDarkMode();
+
   const [homePageDetails, setHomePageDetails] = useState<any[]>([]);
   const [email, setEmail] = useState<string>("");
   const [notificationToken, setNotificationToken] = useState<string>("");
@@ -111,10 +116,10 @@ const Home: React.FC = () => {
 
   return (
     <>
-      <div>
+      <div className={`${isDarkMode ? "bg-white" : "bg-black"}`}>
         <Navbar />
         <Sidebar />
-        <div className=" mt-28 ml-80 ">
+        <div className="py-14 ml-80 ">
           <div
             id="description-container"
             className="gap-12 grid grid-cols-3 hover"
@@ -122,7 +127,7 @@ const Home: React.FC = () => {
           >
             {homePageDetails.map((video: any, index: number) => (
               <div key={index} id={`video-${index}`} className="video-card">
-                <div className="relative">
+                <div className=""> {/*relative*/}
                   <img
                     className="transition ease-in-out delay-150 cursor-pointer hover:-translate-y-1 hover:scale-110 duration-150 rounded-md"
                     style={{ height: '250px', width: '350px' }}
@@ -148,7 +153,7 @@ const Home: React.FC = () => {
                       alt=""
                     />
                   </div>
-                  <div className="ml-3 cursor-default">
+                  <div className={`ml-3 text-sm font-semibold ${isDarkMode ? "text-black" : ""} cursor-default`}>
                     <h1>{video.allVideoTitles}</h1>
                     <p className="text-gray-500 text-sm">
                       {timeSinceUpload(video.uploadAt)} - {video.views} views

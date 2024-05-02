@@ -366,17 +366,18 @@ const Navbar: React.FC = () => {
         <>
             <nav
                 id="navbar"
-                className="p-3 shadow-md shadow-gray-700 fixed top-0 backdrop-blur-md backdrop-brightness-0 w-full"
+                className={`p-3 ${isDarkMode ? 'bg-white' : ''} shadow-md shadow-gray-700 fixed top-0 backdrop-blur-md backdrop-brightness-0 w-full`}
             >
                 <ul className="flex gap-6 items-center">
-                    <li className="ml-5 hover:bg-gray-500 rounded-full p-1 cursor-pointer">
+                    <li className={`ml-5 ${isDarkMode ? "hover:bg-gray-300" : "hover:bg-gray-700"} hover:bg-gray-500 rounded-full p-1 cursor-pointer`}>
                         <Tooltip color="warning" delay={700} showArrow={true} content="Menu">
+
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 height="24px"
                                 viewBox="0 0 24 24"
                                 width="24px"
-                                fill="#FFFFFF"
+                                fill={isDarkMode ? '#000000' : '#FFFFFF'}
                             >
                                 <path d="M0 0h24v24H0V0z" fill="none" />
                                 <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" />
@@ -391,7 +392,7 @@ const Navbar: React.FC = () => {
                             alt=""
 
                         />
-                        <p className="font-semibold text-xl">LearnTube</p>
+                        <p className={`font-bold ${isDarkMode ? "text-black" : ""} text-xl`}>LearnTube</p>
                     </li>
                     <li className="flex ml-32 mr-20">
                         <svg
@@ -400,7 +401,7 @@ const Navbar: React.FC = () => {
                             height="24px"
                             viewBox="0 0 24 24"
                             width="24px"
-                            fill="#FFFFFF"
+                            fill={isDarkMode ? '#000000' : '#FFFFFF'}
                         >
                             <path d="M0 0h24v24H0V0z" fill="none" />
                             <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
@@ -408,14 +409,14 @@ const Navbar: React.FC = () => {
                         <Tooltip color="warning" delay={700} showArrow={true} content="Search with voice">
                             <svg
                                 onClick={() => handleOpenVoiceSearchModel()}
-                                className="absolute mt-2.5 hover:bg-gray-500 rounded-full hover:p-1"
+                                className={`absolute mt-2.5 ${isDarkMode ? "hover:bg-gray-300" : "hover:bg-gray-700"} rounded-full hover:p-1`}
                                 style={{ marginLeft: "560px" }}
                                 xmlns="http://www.w3.org/2000/svg"
                                 enableBackground="new 0 0 24 24"
                                 height="24px"
                                 viewBox="0 0 24 24"
                                 width="24px"
-                                fill="#FFFFFF"
+                                fill={isDarkMode ? '#000000' : '#FFFFFF'}
                             >
 
                                 <g>
@@ -439,7 +440,7 @@ const Navbar: React.FC = () => {
                                 type="search"
                                 id="search-content"
                                 placeholder="Search here... or [ctrl+k]"
-                                className="bg-inherit border border-gray-700 rounded-medium p-2 px-10 w-96"
+                                className={`bg-inherit border ${isDarkMode ? "text-black" : "text-white"} border-gray-700 rounded-medium p-2 px-10 w-96`}
                                 onClick={handleInputClick}
                                 data-search-content
                                 onKeyPress={handleKeyPress}
@@ -460,27 +461,27 @@ const Navbar: React.FC = () => {
                                     defaultSelected
                                     size="lg"
                                     color="success"
-                                    startContent={<MoonIcon />}
-                                    endContent={<SunIcon />}
+                                    startContent={<SunIcon />}
+                                    endContent={<MoonIcon />}
                                 ></Switch>
                             </button>
                         </Tooltip>
                     </li>
-                    <li onClick={() => handleCreateVideo()} className="hover:bg-gray-700 rounded-full p-1 cursor-pointer">
+                    <li onClick={() => handleCreateVideo()} className={`rounded-full ${isDarkMode ? "hover:bg-gray-300" : "hover:bg-gray-700"} p-1 cursor-pointer`}>
                         <Tooltip color="warning" delay={700} showArrow={true} content="Create video">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 height="36px"
                                 viewBox="0 0 24 24"
                                 width="36px"
-                                fill="#FFFFFF"
+                                fill={isDarkMode ? '#000000' : '#FFFFFF'}
                             >
                                 <path d="M0 0h24v24H0V0z" fill="none" />
                                 <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4zM15 16H5V8h10v8zm-6-1h2v-2h2v-2h-2V9H9v2H7v2h2z" />
                             </svg>
                         </Tooltip>
                     </li>
-                    <li onClick={handleShowNotifications} className="hover:bg-gray-700 rounded-full p-1 cursor-pointer">
+                    <li onClick={handleShowNotifications} className={`rounded-full px-1 ${isDarkMode ? "hover:bg-gray-300" : "hover:bg-gray-700"}  p-0.5 cursor-pointer`}>
                         <Tooltip color="warning" delay={700} showArrow={true} content="Notifications">
                             <Badge content="2" shape="circle" color="danger">
                                 <svg
@@ -488,7 +489,7 @@ const Navbar: React.FC = () => {
                                     height="28px"
                                     viewBox="0 0 24 24"
                                     width="28px"
-                                    fill="#FFFFFF"
+                                    fill={isDarkMode ? '#000000' : '#FFFFFF'}
                                 >
                                     <path d="M0 0h24v24H0V0z" fill="none" />
                                     <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z" />
@@ -616,17 +617,19 @@ const Navbar: React.FC = () => {
             </Modal>
 
             {searchItem && searchbarDetails && (
-                <div className="z-50 top-20 fixed bg-gray-800 rounded-md" style={{ marginLeft: "440px", marginRight: "480px", width: "700px" }}>
+                <div className={`z-50 top-20 rounded-md fixed shadow-lg shadow-gray-500 ${isDarkMode ? "bg-white" : "bg-gray-700"}`} style={{ marginLeft: "440px", marginRight: "480px", width: "700px" }}>
                     <div className="flex cursor-pointer">
                         <div className="flex flex-col">
                             {searchString === '' ? (
                                 Array.from(new Set(searchbarDetails.flatMap(item => item.searchHistory))).map((history, idx) => (
                                     <div className="flex " key={idx}>
-                                        <div className="flex hover:bg-gray-600">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="mt-2 ml-2" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.25 2.52.77-1.28-3.52-2.09V8z" /></svg>
-                                            <p className="p-2 " style={{ width: "630px" }} onClick={() => handleSearch(history)}>{history}</p>
+                                        <div className={`flex ${isDarkMode ? "hover:bg-gray-300" : "hover:bg-gray-700"}`}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="mt-2 ml-2" height="24px" viewBox="0 0 24 24" width="24px" fill={isDarkMode ? '#000000' : '#FFFFFF'}
+                                            ><path d="M0 0h24v24H0V0z" fill="none" /><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.25 2.52.77-1.28-3.52-2.09V8z" /></svg>
+                                            <p className={`p-2 ${isDarkMode ? "text-black" : "text-white"}`} style={{ width: "630px" }} onClick={() => handleSearch(history)}>{history}</p>
                                         </div>
-                                        <svg onClick={() => deleteSearchString(history)} className="ml-20 mt-1 hover:bg-red-500  p-1 rounded-full absolute right-2" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" /></svg>
+                                        <svg onClick={() => deleteSearchString(history)} className="ml-20 mt-1 hover:bg-red-500  p-1 rounded-full absolute right-2" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" f fill={isDarkMode ? '#000000' : '#FFFFFF'}
+                                        ><path d="M0 0h24v24H0V0z" fill="none" /><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" /></svg>
                                     </div>
                                 ))
                             ) : (
@@ -652,7 +655,7 @@ const Navbar: React.FC = () => {
             }
 
             {toggleVoiceSearches && recognition && (
-                <div>
+                <div id="voicesearch-container">
                     {/* Backdrop */}
                     <div
                         style={{
@@ -676,17 +679,17 @@ const Navbar: React.FC = () => {
                             marginLeft: "400px",
                             zIndex: 9999, // Ensure it's on top
                         }}
-                        className="hs-overlay z-50 fixed top-32 overflow-x-hidden overflow-y-auto pointer-events-auto rounded-xl bg-gray-800"
+                        className={`hs-overlay z-50 ${isDarkMode ? "text-black bg-white" : "text-white bg-gray-700"} fixed top-32 overflow-x-hidden overflow-y-auto pointer-events-auto rounded-xl`}
                     >
                         {/* Close button */}
                         <svg
                             onClick={stopListening}
-                            className="right-2 top-2 absolute p-2 cursor-pointer hover:bg-gray-500 rounded-full"
+                            className={`right-2 top-2 absolute p-2 ${isDarkMode ? "hover:bg-gray-300" : "hover:bg-gray-800"} cursor-pointer rounded-full`}
                             xmlns="http://www.w3.org/2000/svg"
                             height="48px"
                             viewBox="0 0 24 24"
                             width="48px"
-                            fill="#FFFFFF"
+                            fill={isDarkMode ? '#000000' : '#FFFFFF'}
                         >
                             <path d="M0 0h24v24H0V0z" fill="none" />
                             <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" />
@@ -712,8 +715,8 @@ const Navbar: React.FC = () => {
             )}
             <div id="notification-container">
                 {showNotifications &&
-                    <div className="z-50 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-300 [&::-webkit-scrollbar-thumb]:bg-gray-500 [&::-webkit-scrollbar-track]:rounded-full overflow-y-auto top-20 fixed bg-gray-800 rounded-md right-10" style={{ width: "30rem", height: "40rem" }}>
-                        <div id="notification" className="hover:bg-gray-700 cursor-pointer mb-3 p-1">
+                    <div className={`z-50 ${isDarkMode ? "text-black bg-white shadow-gray-500 shadow-md" : "text-white bg-gray-800"} [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-300 [&::-webkit-scrollbar-thumb]:bg-gray-500 [&::-webkit-scrollbar-track]:rounded-full overflow-y-auto top-20 fixed  rounded-md right-10 `} style={{ width: "30rem", height: "40rem" }}>
+                        <div id="notification" className={` cursor-pointer ${isDarkMode ? "hover:bg-gray-300" : "hover:bg-gray-700"} mb-3 p-1`}>
                             <div className="flex ml-3 mr-3 mt-3">
                                 <img className="h-10 rounded-full mt-5" src="https://static.rfstat.com/renderforest/images/v2/landing-pics/youtube-logo/1124.jpg" alt="" />
                                 <h1 className="text-sm ml-3">Lorem ipsum dolor sit amet consectetur adipisicing elit. Optio saepe sunt commodi nesciunt molestiae.</h1>
@@ -723,11 +726,13 @@ const Navbar: React.FC = () => {
                         </div>
                         <Tooltip color="warning" delay={700} showArrow={true} content="clear all">
                             {showAllClear ? (
-                                <svg className="p-2 rounded-full bg-gray-700 fixed bottom-20 ml-52" xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 0 24 24" width="48px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" /></svg>
+                                <svg className={`p-2 rounded-full ${isDarkMode ? "bg-gray-300" : "bg-gray-700"}  fixed bottom-20 ml-52`} xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 0 24 24" width="48px" fill={isDarkMode ? '#000000' : '#FFFFFF'}
+                                ><path d="M0 0h24v24H0V0z" fill="none" /><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" /></svg>
 
                             ) : (
 
-                                <svg onClick={handleClearNotifications} className="p-2 rounded-full bg-gray-700 fixed bottom-20 ml-52" xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 0 24 24" width="48px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" /></svg>
+                                <svg onClick={handleClearNotifications} className={`p-2 rounded-full ${isDarkMode ? "bg-gray-300" : "bg-gray-700"}  fixed bottom-20 ml-52`} xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 0 24 24" width="48px" fill={isDarkMode ? '#000000' : '#FFFFFF'}
+                                ><path d="M0 0h24v24H0V0z" fill="none" /><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" /></svg>
                             )}
                         </Tooltip>
                     </div>
