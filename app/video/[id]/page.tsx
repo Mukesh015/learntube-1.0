@@ -14,48 +14,47 @@ const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 
 const VideoUrl = gql`
 query GetVideoUrl( $email: String, $videoId: String,$channelId: String) {
-    getVideoUrl(email: $email, videoID: $videoId) {
-        videoURl
-        videoDescription
-        channelLogo 
-        channelName
-        creatorEmail
-        videoTitle
-        videoViews
-        videoPublishedAt
-        videoTags
-        channelId
-    }
-    getFeatures(email: $email, videoID: $videoId,channelId: $channelId) {
+    getFeatures(email: $email, videoID: $videoId, channelId: $channelId) {
+        dislikedVideos
+        hasInHistory
         haveInMyVideos
         haveInPlaylist
-        haveInWatchLater    
+        haveInWatchLater
         isLiked
         subscribedchannel
-        hasInHistory
-        dislikedVideos
         totalSubscriber
-
-    }
-    getComments(videoID: $videoId) {
-        logo
-        comment
-        users
-        timestamp
-    }
-    getAllVideoUrl {
-        channelLogo
-        channelName
+      }
+      getAllVideoUrl {
         allEmail
         allThumbnailUrls
         allVideoTitles
         allVideoUrls
+        channelLogo
+        channelName
+        courseFees
+        courseId
         uploadAt
         videoId
         views
-        courseFees
-        courseId
-        }
+      }
+      getVideoUrl (email: $email, videoID: $videoId) {
+        channelId
+        channelName
+        channelLogo
+        creatorEmail
+        videoDescription
+        videoPublishedAt
+        videoTags
+        videoTitle
+        videoURl
+        videoViews
+      }
+      getComments (videoID: $videoId) {
+        comment
+        logo
+        timestamp
+    
+      }
     }
 `;
 
