@@ -22,10 +22,10 @@ interface UserDocument extends Document {
     website: { any: string, Facebook: string, Instagram: string, Twitter: string, Github: string, LinkedIn: string, Discord: string }
     address: { country: string; state: string; city: string; pincode: number; addressLine: string; phone: number };
     features?: {
-        subscriptions: any[], playlists: any[], history: {videoId:string,timeStamp:number}[], myVideos: any[], watchLater: any[], likedVideos: any[],
+        subscriptions: any[], playlists: any[], history: { videoId: string, timeStamp: number }[], myVideos: any[], watchLater: any[], likedVideos: any[],
         disLikedVideo: any[], comments: any[], searchHistory: any[],
     };
-    EnrolledCourses?:string[];
+    EnrolledCourses?: string[];
     WatchTime?: number;
     history: any[];
     analytics: { date: Date; watchTime: number }[];
@@ -123,7 +123,7 @@ const userSchema = new mongoose.Schema<UserDocument>(
             likedVideos: [{ type: mongoose.Schema.Types.Mixed, required: false }],
             disLikedVideo: [{ type: mongoose.Schema.Types.Mixed, required: false }],
             comments: [{ type: mongoose.Schema.Types.Mixed, required: false }],
-            searchHistory: [{ type: mongoose.Schema.Types.Mixed,timeStamp: mongoose.Schema.Types.Mixed, required: false }, ]
+            searchHistory: [{ type: mongoose.Schema.Types.Mixed, timeStamp: mongoose.Schema.Types.Mixed, required: false },]
         },
         subscribers: {
             count: { type: Number, default: 0 },
@@ -140,11 +140,11 @@ const userSchema = new mongoose.Schema<UserDocument>(
                 watchTime: { type: Number, }
             }
         ],
-        EnrolledCourses:[{type:String}],
-        WatchTime: { 
+        EnrolledCourses: [{ type: String }],
+        WatchTime: {
             type: Number,
             required: false
-         },
+        },
     }
 );
 

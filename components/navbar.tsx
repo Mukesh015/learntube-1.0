@@ -452,9 +452,9 @@ const Navbar: React.FC = () => {
                         <Tooltip color="warning" delay={700} showArrow={true} content="Notifications">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                height="36px"
+                                height="28px"
                                 viewBox="0 0 24 24"
-                                width="36px"
+                                width="28px"
                                 fill="#FFFFFF"
                             >
                                 <path d="M0 0h24v24H0V0z" fill="none" />

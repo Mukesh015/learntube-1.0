@@ -7,7 +7,6 @@ import { gql, useQuery } from "@apollo/client";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/configurations/firebase/config";
 
-
 const HOMEPAGE_DETAILS = gql`
   query GetAllVideoUrl {
     getAllVideoUrl {
@@ -28,6 +27,7 @@ const HOMEPAGE_DETAILS = gql`
 const Home: React.FC = () => {
   const [homePageDetails, setHomePageDetails] = useState<any[]>([]);
   const [email, setEmail] = useState<string>("");
+  const [notificationToken, setNotificationToken] = useState<string>("");
 
   const { loading, error, data } = useQuery(HOMEPAGE_DETAILS);
   const [user] = useAuthState(auth);
@@ -86,16 +86,10 @@ const Home: React.FC = () => {
     }
   }, [email]);
 
-
   useEffect(() => {
-
-
     if (user) {
-
       setEmail(user.email || "");
     }
-
-
     if (data) {
       setHomePageDetails(data.getAllVideoUrl);
     }
