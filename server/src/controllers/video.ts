@@ -91,11 +91,12 @@ export async function uploadVideo(req: Request, res: Response) {
     const subscriber = user?.subscribers?.users || [];
     user?.notification.push(
       {
-        isRead:false,
-        message:'uploaded a new video. Check it out now',
-        user:email,
-        timeStamp:Date.now(),
+        isRead: false,
+        message: 'uploaded a new video. Check it out now',
+        user: email,
+        timeStamp: Date.now(),
         notificationId: `@${Date.now()}${email.slice(0, 4)}`.replace(/\s/g, ''),
+        videoId: ''
       }
     )
     res.status(200).json({ message: 'Video uploaded successfully' });
