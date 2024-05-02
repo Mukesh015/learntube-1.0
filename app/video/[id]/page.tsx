@@ -34,7 +34,6 @@ query GetVideoUrl( $email: String, $videoId: String,$channelId: String) {
         subscribedchannel
         hasInHistory
         dislikedVideos
-
     }
     getComments(videoID: $videoId) {
         logo
@@ -249,7 +248,7 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                     videoId: videoId,
                     comment: comment,
                     logo: logo,
-                    user: email
+                    user: email,
                 })
             });
             const data = await response.json();

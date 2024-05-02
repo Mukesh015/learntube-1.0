@@ -21,6 +21,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/page.tsx", "app/provider.jsx", "configurations/apollo/client.tsx", "app/error/502"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/page.tsx", "app/provider.jsx", "configurations/apollo/client.tsx", "app/error/502", "components/hooks/theme.tsx"],
   "exclude": ["node_modules"]
 }

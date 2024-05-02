@@ -38,11 +38,13 @@ query GetAllVideoUrl ($email: String){
         phoneNumber
         state
         websiteURL
+        channelCreatedDate
       }
       getCreatorCard(email: $email) {
         subscriber
         totalComments
         watchTime
+        totalLike
       }
       getCreatorCourses (email: $email){
         courseDescription
@@ -273,7 +275,7 @@ const CardGrid: React.FC = () => {
                                         <div className="flex-none w-2/3 max-w-full px-3">
                                             <div>
                                                 <p className="mb-0 font-sans text-sm font-semibold leading-normal uppercase dark:text-white dark:opacity-60">total likes</p>
-                                                <h5 className="mb-2 font-bold dark:text-white">$103,430</h5>
+                                                <h5 className="mb-2 font-bold dark:text-white">{item.totalLike}</h5>
                                                 <p className="mb-0 dark:text-white dark:opacity-60">
                                                     <span className="text-sm font-bold leading-normal text-emerald-500">+5%</span>
                                                     than last month

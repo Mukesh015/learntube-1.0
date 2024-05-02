@@ -6,6 +6,7 @@ import {
     useUpdateProfile,
     useUpdatePassword,
 } from "react-firebase-hooks/auth";
+import { useDarkMode } from "@/components/hooks/theme"
 import { useRouter } from "next/navigation";
 import { Tooltip } from "@nextui-org/tooltip";
 import { Button } from "@nextui-org/button";
@@ -32,6 +33,8 @@ query Exam($email:String){
 `
 
 const Navbar: React.FC = () => {
+
+    const { isDarkMode, toggleDarkMode } = useDarkMode();
 
     const [userName, setuserName] = useState<string>("");
     const [email, setEmail] = useState<string>("");
@@ -62,6 +65,9 @@ const Navbar: React.FC = () => {
 
     const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
 
+    const toggleTheme = useCallback(() => {
+        toggleDarkMode();
+    }, [toggleDarkMode])
 
     const { loading, error, data } = useQuery(VERIFY_CREATOR, {
         variables: { email: email },
@@ -438,11 +444,12 @@ const Navbar: React.FC = () => {
                         <Tooltip color="warning" delay={700} showArrow={true} content="Toggle theme">
                             <button>
                                 <Switch
+                                    onClick={toggleTheme}
                                     defaultSelected
                                     size="lg"
                                     color="success"
-                                    startContent={<SunIcon />}
-                                    endContent={<MoonIcon />}
+                                    startContent={<MoonIcon />}
+                                    endContent={<SunIcon />}
                                 ></Switch>
                             </button>
                         </Tooltip>

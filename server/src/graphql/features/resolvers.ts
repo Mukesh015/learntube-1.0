@@ -58,11 +58,12 @@ const queries = {
         const subsCribed = user.subscribedChnannels?.channelId || [];
         const hasValueSubscribed = subsCribed.includes(channelId);
 
+        const totalSubscriber=user.subscribers?.count;
 
         return [{
             haveInPlaylist: hasValuePlayList, hasInHistory: hasValueHistory, haveInMyVideos: hasValueMyVideos,
             haveInWatchLater: hasValueWatchLater, isLiked: hasValueLikedVideos, dislikedVideos: hasValueDislikedVideos,
-            subscribedchannel: hasValueSubscribed
+            subscribedchannel: hasValueSubscribed,totalSubscriber:totalSubscriber
         }];
     },
     getChannelLogo: async (undefined: undefined, p0: { email: any; }) => {
@@ -301,6 +302,8 @@ const queries = {
                     coverPhotoURL: user.coverPhoto,
                     channelLogo: user.channelLogo,
                     channelId: user.channelId,
+                    channelCreatedDate: user.channelCreatedAt,
+          
                 }
             ];
         } catch (error) {
@@ -351,6 +354,7 @@ const queries = {
             }
 
             let totalComments = 0;
+            let totalLike=0
             videos.forEach(video => {
                 video.courses.forEach(course => {
                     if (course.videos) {
@@ -358,6 +362,7 @@ const queries = {
                             if (video.videoComments) {
                                 totalComments += video.videoComments.count;
                             }
+                            totalLike+=video.videoLikeCount
                         });
                     }
                 });
@@ -366,7 +371,8 @@ const queries = {
             return [{
                 subscriber: user.subscribers?.count,
                 watchTime: user.WatchTime,
-                totalComments: totalComments
+                totalComments: totalComments,
+                totalLike:totalLike
             }];
         } catch (error) {
             console.log(error);

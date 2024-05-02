@@ -136,9 +136,7 @@ export async function getUserDetails(req: Request, res: Response) {
         channelName: user.channelName,
         channelLogo: user.channelLogo,
         channelId: user.channelId,
-        history: user.history,
-        analytics: user.analytics,
-        watchTime: user.WatchTime
+        watchTime:user.WatchTime
       }));
       res.status(200).json(userDetailsArray);
     } else {

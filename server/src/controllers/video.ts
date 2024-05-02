@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import { VideoModel, VideoDocument } from "../models/video";
 import dotenv from "dotenv";
 import { log } from 'console';
+import { UserDocument, UserModel } from '../models/user';
 
 dotenv.config({ path: "./.env" });
 
@@ -14,16 +15,16 @@ export async function uploadVideo(req: Request, res: Response) {
     const { email, courseName, courseDescription, price, videoTitle, videoDescription, videoTags, videoUrl, videoThumbnail, courseThumbUrl } = req.body;
     console.log(email, courseName, courseDescription, price, videoTitle, videoDescription, videoTags, videoUrl, videoThumbnail, courseThumbUrl)
 
-    let user: VideoDocument | null = await VideoModel.findOne({ email });
+    let video: VideoDocument | null = await VideoModel.findOne({ email });
+    let user:UserDocument| null = await UserModel.findOne({ email });
 
-    if (!user) {
-      user = await VideoModel.create({
+    if (!video) {
+      video = await VideoModel.create({
         email,
         courses: []
       });
     }
-
-    let course = user.courses.find(course => course.courseName === courseName);
+    let course = video.courses.find(course => course.courseName === courseName);
 
     if (course) {
       course.videos.push({
@@ -78,14 +79,29 @@ export async function uploadVideo(req: Request, res: Response) {
           }
         }]
       };
-      user.courses.push(course);
+      video.courses.push(course);
+    }
+  
+    await video.save();
+
+    if(!user){
+      res.status(404).send({ message:"user not found"})
     }
 
-
-
-    await user.save();
-
+    const subscriber = user?.subscribers?.users || [];
+    user?.notification.push(
+      {
+        isRead:false,
+        message:'uploaded a new video. Check it out now',
+        user:email,
+        timeStamp:Date.now(),
+        notificationId: `@${Date.now()}${email.slice(0, 4)}`.replace(/\s/g, ''),
+      }
+    )
     res.status(200).json({ message: 'Video uploaded successfully' });
+
+    await user?.save();
+    
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -183,16 +199,16 @@ export async function redirect(req: Request, res: Response) {
 }
 
 export async function addComment(req: Request, res: Response) {
-  const { user, logo, comment, videoId, email } = req.body;
+  const { user, logo, comment, videoId, email,creatorEmail } = req.body;
   try {
-    // Find the video by email and videoId
-    const video = await VideoModel.findOne({ email: email, "courses.videos.videoID": videoId });
 
+    const video = await VideoModel.findOne({ email: email, "courses.videos.videoID": videoId });
+    const user = await UserModel.findOne({ email:creatorEmail});
     if (!video) {
       return res.status(404).json({ error: 'Video not found' });
     }
 
-    // Update the video with the new comment
+
     video.courses.forEach(course => {
       course.videos.forEach(video => {
         if (video.videoID === videoId) {
@@ -207,8 +223,21 @@ export async function addComment(req: Request, res: Response) {
       });
     });
 
-    // Save the updated video document
+  
     await video.save();
+
+    if(!user){
+      res.status(404).send({ message:"user not found"})
+    }
+    user?.notification.push({
+      isRead:false,
+      message:'A new comment added in our Video. Check it out now',
+      user:email,
+      timeStamp:Date.now(),
+      notificationId: `@${Date.now()}${email.slice(0, 4)}`.replace(/\s/g, ''),
+    })
+
+    await user?.save();
 
     return res.status(200).json({ message: 'Comment added successfully' });
   } catch (error) {

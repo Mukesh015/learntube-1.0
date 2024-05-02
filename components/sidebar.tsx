@@ -43,7 +43,6 @@ const Sidebar: React.FC = () => {
         }
         if (data && email) {
             setSubscribedChannel(data.getSubscribedChannels);
-            console.table(data.getSubscribedChannels)
         }
     }, [setEmail, data, user, setSubscribedChannel]);
     return (
