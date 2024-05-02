@@ -125,7 +125,7 @@ export async function addToLikedVideo(req: Request, res: Response) {
 
         const index1 = user.features?.disLikedVideo.indexOf(videoIdString);
         if (index1 !== -1 && user.features?.disLikedVideo) {
-            // If the videoId exists in disLikedVideo array, remove it
+
             await UserModel.updateOne(
                 { email },
                 { $pull: { 'features.disLikedVideo': videoIdString } }
@@ -145,7 +145,6 @@ export async function addToLikedVideo(req: Request, res: Response) {
                 { $push: { 'features.likedVideos': videoIdString } }
             );
 
-            // Increase the videoLikeCount by 1 in the video document
             await VideoModel.updateOne(
                 { "courses.videos.videoID": videoIdString },
                 { $inc: { "courses.$[].videos.$[video].videoLikeCount": 1 } },

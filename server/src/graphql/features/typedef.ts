@@ -7,6 +7,7 @@ type features{
     isLiked: Boolean
     dislikedVideos: Boolean
     subscribedchannel: Boolean
+    totalSubscriber: String
 }
 type playlist{
     courseID:String
@@ -90,6 +91,7 @@ type creatorCard{
     subscriber:String
     watchTime: String
     totalComments:String
+    totalLike:String
 }
 type Video {
     videoUrl: String

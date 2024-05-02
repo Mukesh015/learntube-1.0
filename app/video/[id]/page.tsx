@@ -34,6 +34,7 @@ query GetVideoUrl( $email: String, $videoId: String,$channelId: String) {
         subscribedchannel
         hasInHistory
         dislikedVideos
+        totalSubscriber
 
     }
     getComments(videoID: $videoId) {

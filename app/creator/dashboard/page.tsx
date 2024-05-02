@@ -43,6 +43,7 @@ query GetAllVideoUrl ($email: String){
         subscriber
         totalComments
         watchTime
+        totalLike
       }
       getCreatorCourses (email: $email){
         courseDescription

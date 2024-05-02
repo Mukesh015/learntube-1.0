@@ -10,16 +10,16 @@ import { gql, useQuery } from "@apollo/client";
 const watchLaterDetails = gql`
 
 query likedVideos($email: String) {
-    getLikedVideos(email: $email) {
+    getLikedVideos (email: $email){
+        channelLogo
         courseFees
         courseId
         videoId
-        videoTitle
-        channelLogo
         videoPublishedAt
-        videoViews
         videoThumbnail
-    }
+        videoTitle
+        videoViews
+      }
   }
 `
 const Likedvideo: React.FC = () => {
