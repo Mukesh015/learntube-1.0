@@ -50,11 +50,13 @@ query GetVideoUrl( $email: String, $videoId: String,$channelId: String) {
         videoURl
         videoViews
       }
-      getComments (videoID: $videoId) {
-        comment
-        logo
-        timestamp
-    
+      getComments(videoID: $videoId) {
+        count
+        comments
+        timeStamp
+        user
+        channelId
+        channelLogo
       }
     }
 `;

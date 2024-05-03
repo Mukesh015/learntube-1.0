@@ -29,6 +29,30 @@ interface User {
     history: any[];
     analytics: any[];
 }
+
+interface Video {
+    videoUrl: string;
+    videoTitle: string;
+    videoID: string;
+    videoDescription: string;
+    videoThumbnail: string;
+    videoPublishedAt: Date;
+    videoTags: [];
+    videoViews: [{ user: string, timestamp: number }];
+    videoLikeCount: number;
+    videoDislikeCount: number;
+    videoComments?: {
+        count: number;
+        comments: {
+            user: string;
+            logo: string;
+            comment: string;
+            timestamp: number;
+        }[];
+    };
+}
+
+
 const queries = {
     getFeatures: async (_: any, { email, videoID, channelId }: { email: string, videoID: string, channelId: string }) => {
         const user: UserDocument | null = await UserModel.findOne({ email });
@@ -73,7 +97,7 @@ const queries = {
             const creators = userDetails.filter(user => user.isCreator);
             return creators.map(creator => ({
                 channelLogo: creator.channelLogo, email: creator.email, channelName: creator.channelName,
-                channelId: creator.channelId
+                channelId: creator.channelId,avatar: creator.avatar,usernames: creator.username
             }));
         } catch (error) {
             console.error('Error fetching channellogo:', error);
@@ -381,35 +405,45 @@ const queries = {
     },
     getComments: async (_: any, { videoID }: { videoID: string }) => {
         try {
-            const video = await VideoModel.findOne({ "courses.videos.videoID": videoID });
+            const video: VideoDocument | null = await VideoModel.findOne({ "courses.videos.videoID": videoID });
             if (!video) {
                 throw new Error('Video not found');
             }
-
-            const courseWithVideo = video.courses.find(course =>
-                course.videos.some(video => video.videoID === videoID)
-            );
-
-            if (!courseWithVideo || !courseWithVideo.videos) {
-                return [];
+        
+            const course = video.courses.find(course => course.videos.some(video => video.videoID === videoID));
+            if (!course) {
+                throw new Error('Course containing the video not found');
             }
+        
+            const videoItem = course.videos.find(video => video.videoID === videoID);
+            if (!videoItem) {
+                throw new Error('Video item not found');
+            }
+    
+            const comments = videoItem.videoComments?.comments?.comment.map(comment => ({ comment: comment || "" })) || [];
+            const logos = videoItem.videoComments?.comments?.logo.map(logo => ({ logo: logo || "" })) || [];
+            const timestamps = videoItem.videoComments?.comments?.timestamp.map(ts => ({ timestamp: ts || "" })) || [];
+            const users = videoItem.videoComments?.comments?.user.map(user => ({ user: user || "" })) || [];
+            
+            const channelInfo = await queries.getChannelLogo(undefined, { email: users });
+            
 
-            const videoComments = courseWithVideo.videos.map(video => video.videoComments);
-
-            const comments = videoComments.flatMap(comment => comment?.comments.comment || []);
-            const logos = videoComments.flatMap(comment => comment?.comments.logo || []);
-            const timestamps = videoComments.flatMap(comment => comment?.comments.timestamp || []);
-            const users = videoComments.flatMap(comment => comment?.comments.user || []);
-            const result = comments.map((comment, index) => ({
-                comment: comment || "",
-                logo: logos[index] || "",
-                timestamp: timestamps[index] || "",
-                users: users[index] || ""
+            const result = comments.map((_, index) => ({
+                comments: comments[index]?.comment,
+                logo: logos[index]?.logo,
+                timeStamp: timestamps[index]?.timestamp,
+                user: users[index]?.user,
+                channelLogo:channelInfo.find((info: { email: string }) => info.email === users[index]?.user)?.channelLogo || 
+                channelInfo.find((info: { email: string }) => info.email === users[index]?.user)?.avatar,
+                channelId:channelInfo.find((info: { email: string }) => info.email === users[index]?.user)?.channelId || 
+                channelInfo.find((info: { email: string }) => info.email === users[index]?.user)?.usernames,
+                count: videoItem.videoComments?.count
             }));
+    
             return result;
         } catch (error) {
             console.error('Error fetching video comments:', error);
-            throw error;
+            throw new Error('Error fetching video comments');
         }
     },
     getYourCourse: async (_: any, { email }: { email: string }) => {
@@ -579,7 +613,7 @@ const queries = {
             }
 
             const getMessageDetails = async (message: string,email:string) => {
-                if (message.includes(" commented on your video")) {
+                if (message.includes("commented on your video")) {
 
                     const commenter = await UserModel.findOne({ email:email });
                     if (!commenter) {
@@ -587,7 +621,6 @@ const queries = {
                         throw new Error('Commenter not found');
                         
                     }
-                    console.log(commenter)
                     return { displayMessage: `${commenter.username} commented on your video`, avatar: commenter.avatar };
                 } else if (message === "uploaded a new video. Check it out now") {
                     const channel = await UserModel.findOne({ email });

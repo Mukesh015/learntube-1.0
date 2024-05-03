@@ -224,7 +224,7 @@ export async function addComment(req: Request, res: Response) {
         if (video.videoID === videoId) {
           if (video.videoComments) {
             video.videoComments.count += 1;
-            video.videoComments.comments.user.push(user);
+            video.videoComments.comments.user.push(email);
             video.videoComments.comments.logo.push(logo);
             video.videoComments.comments.comment.push(comment);
             video.videoComments.comments.timestamp.push(Date.now());
@@ -241,7 +241,7 @@ export async function addComment(req: Request, res: Response) {
     }
     user?.notification.push({
       isRead:false,
-      message:'A new comment added in our Video. Check it out now',
+      message:'commented on your video',
       user:email,
       timeStamp:Date.now(),
       notificationId: `@${Date.now()}${email.slice(0, 4)}`.replace(/\s/g, ''),
