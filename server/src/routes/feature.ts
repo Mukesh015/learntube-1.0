@@ -1,6 +1,6 @@
 import express from 'express';
 import { addToPlaylist, addSubscription, addToHistory, addToLikedVideo, addToMyVideos, addToWatchLater,addToDislikedVideo,addSearchHistory,
-    removeSearchHistory,calculateWatchTime,markAsRead,clearNotification,clearAllNotifiacation } from '../controllers/feature';
+    removeSearchHistory,calculateWatchTime,markAsRead,clearNotification,clearAllNotifiacation ,dynamicChanges} from '../controllers/feature';
 const FeatureRouter = express.Router();
 
 FeatureRouter.post("/addtoplaylist", addToPlaylist)
@@ -18,6 +18,9 @@ FeatureRouter.post("/calculatewatchtime",calculateWatchTime)
 FeatureRouter.post("/markasread",markAsRead)
 FeatureRouter.post("/clearnotification",clearNotification)
 FeatureRouter.post("/clearallnotification",clearAllNotifiacation)
+
+FeatureRouter.post("/:modify",dynamicChanges)
+
 
 
 export default FeatureRouter;

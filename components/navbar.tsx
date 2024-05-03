@@ -88,6 +88,7 @@ const Navbar: React.FC = () => {
 
     const handleInputClick = () => {
         toggleSearchDiv();
+        console.log(searchItem)
     };
 
     const toggleSearchDiv = () => {
@@ -201,7 +202,8 @@ const Navbar: React.FC = () => {
     };
 
     const handleSearch = useCallback(async (recommendedSearchString: string | null) => {
-        if (!searchString) {
+
+        if (!recommendedSearchString) {
             return "Blank input";
         }
         try {
@@ -261,23 +263,20 @@ const Navbar: React.FC = () => {
     }
 
     useEffect(() => {
-        if (searchItem) {
-            document.addEventListener("click", () => {
-                setSearchItem(false);
-            });
-        } else {
-            // Remove click event listener when the search bar is closed
-            document.removeEventListener("click", () => {
-                setSearchItem(false);
-            });
-        }
-
-        return () => {
-            document.removeEventListener("click", () => {
-                setSearchItem(false);
-            });
+        const handleClickOutside = () => {
+            setSearchItem(false);
         };
-    }, [searchItem, setSearchItem]);
+    
+        if (searchItem) {
+            document.addEventListener("click", handleClickOutside);
+        } else {
+            document.removeEventListener("click", handleClickOutside);
+        }
+    
+        return () => {
+            document.removeEventListener("click", handleClickOutside);
+        };
+    }, [searchItem, setSearchItem])
 
 
     useEffect(() => {
@@ -329,8 +328,8 @@ const Navbar: React.FC = () => {
     };
 
     const handleOpenVoiceSearchModel = useCallback(async () => {
-        settoggleVoiceSearches(!toggleVoiceSearches);
         handleSearch(text)
+        settoggleVoiceSearches(!toggleVoiceSearches);
         if (isListening) {
             stopListening();
         }
@@ -352,16 +351,17 @@ const Navbar: React.FC = () => {
         if (recognition) {
             recognition.onresult = (event: SpeechRecognitionEvent) => {
                 console.log("onresult:", event);
+                
                 recognition.stop();
-                setText(event.results[0][0].transcript);
-                handleSearch(event.results[0][0].transcript);
                 setTimeout(() => {
                     handleSearch(event.results[0][0].transcript);
-                }, 1500);
+                    },1000)
+                setText(event.results[0][0].transcript);
                 setIsListening(false);
+
             };
         }
-    }, [recognition, setText, setIsListening]);
+    }, [recognition, setText, setIsListening, handleSearch]);
 
 
     return (
@@ -618,7 +618,7 @@ const Navbar: React.FC = () => {
                 </ModalContent>
             </Modal>
 
-            {searchItem && searchbarDetails && (
+            {searchItem && searchbarDetails &&(
                 <div className={`z-50 top-20 rounded-md fixed shadow-lg shadow-gray-500 ${isDarkMode ? "bg-white" : "bg-gray-700"}`} style={{ marginLeft: "440px", marginRight: "480px", width: "700px" }}>
                     <div className="flex cursor-pointer">
                         <div className="flex flex-col">
