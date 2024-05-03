@@ -12,6 +12,8 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/configurations/firebase/config";
 import { toast, ToastContainer } from "react-toastify";
 import { useRouter } from "next/navigation";
+import NextTopLoader from "nextjs-toploader";
+import "react-toastify/dist/ReactToastify.css";
 
 const GET_COURSENAME = gql`
 query Exam($email:String){
@@ -166,6 +168,7 @@ const VideoUploadForm: React.FC = () => {
     }, [user, data, email, setCourseList]);
     return (
         <>
+            <NextTopLoader />
             <ToastContainer />
             <div className="flex">
                 <div className='ml-10' style={{ maxWidth: "600px" }}>

@@ -17,6 +17,7 @@ import { auth } from "@/configurations/firebase/config";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/react";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Input } from "@nextui-org/react";
 import { gql, useQuery } from "@apollo/client";
+import NextTopLoader from "nextjs-toploader";
 
 const VERIFY_CREATOR = gql`
 query Exam($email:String){
@@ -291,7 +292,7 @@ const Navbar: React.FC = () => {
             setSearchBarDetails(data.getSearchBarDetails)
             setNotification(data.getNotification)
         }
-    }, [user, setIsCreator, data, setSearchBarDetails,setNotification]);
+    }, [user, setIsCreator, data, setSearchBarDetails, setNotification]);
 
     useEffect(() => {
         const handleSearchChange = (e: Event) => {
@@ -365,14 +366,14 @@ const Navbar: React.FC = () => {
 
     return (
         <>
+            <NextTopLoader />
             <nav
                 id="navbar"
-                className={`p-3 ${isDarkMode ? 'bg-white' : ''} shadow-md shadow-gray-700 fixed top-0 backdrop-blur-md backdrop-brightness-0 w-full`}
+                className={`p-3 ${isDarkMode ? 'bg-white' : ''} z-50 shadow-md shadow-gray-700 fixed top-0 backdrop-blur-md backdrop-brightness-0 w-full`}
             >
                 <ul className="flex gap-6 items-center">
-                    <li className={`ml-5 ${isDarkMode ? "hover:bg-gray-300" : "hover:bg-gray-700"} hover:bg-gray-500 rounded-full p-1 cursor-pointer`}>
+                    <li className={`ml-5 ${isDarkMode ? "hover:bg-gray-300" : "hover:bg-gray-700"} rounded-full p-1 cursor-pointer`}>
                         <Tooltip color="warning" delay={700} showArrow={true} content="Menu">
-
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 height="24px"
@@ -715,9 +716,15 @@ const Navbar: React.FC = () => {
                     </div>
                 </div>
             )}
-            <div id="notification-container">
+            <div id="notification-container" className="">
                 {showNotifications &&
-                    <div className={`z-50 ${isDarkMode ? "text-black bg-white shadow-gray-500 shadow-md" : "text-white bg-gray-800"} [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-300 [&::-webkit-scrollbar-thumb]:bg-gray-500 [&::-webkit-scrollbar-track]:rounded-full overflow-y-auto top-20 fixed  rounded-md right-10 `} style={{ width: "30rem", height: "40rem" }}>
+                    <div
+                        className={`z-50 ${isDarkMode ? "text-black bg-white shadow-gray-500 shadow-md" : "text-white bg-gray-800"} scrollbar-w-2 scrollbar-thumb-rounded-full scrollbar-track-bg-gray-300 scrollbar-thumb-bg-gray-500 scrollbar-track-rounded-full overflow-y-auto top-20 fixed rounded-md right-10`}
+                        style={{
+                            width: "30rem",
+                            height: "40rem",
+                        }}
+                    >
                         <div id="notification" className={` cursor-pointer ${isDarkMode ? "hover:bg-gray-300" : "hover:bg-gray-700"} mb-3 p-1`}>
                             <div className="flex ml-3 mr-3 mt-3">
                                 <img className="h-10 rounded-full mt-5" src="https://static.rfstat.com/renderforest/images/v2/landing-pics/youtube-logo/1124.jpg" alt="" />

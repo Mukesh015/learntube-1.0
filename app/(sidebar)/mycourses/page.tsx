@@ -6,6 +6,8 @@ import { Tooltip } from "@nextui-org/react";
 import { gql, useQuery } from "@apollo/client";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/configurations/firebase/config";
+import NextTopLoader from "nextjs-toploader";
+import "react-toastify/dist/ReactToastify.css";
 
 const yourCourses = gql`
   query yourCourses($email: String) {
@@ -89,6 +91,7 @@ const MyCourses: React.FC = () => {
 
     return (
         <>
+            <NextTopLoader />
             <Navbar />
             <Sidebar />
             <nav className="mt-24 mr-20">

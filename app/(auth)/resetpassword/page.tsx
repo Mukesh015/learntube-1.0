@@ -4,7 +4,6 @@ import { useSendPasswordResetEmail } from "react-firebase-hooks/auth";
 import { auth } from "@/configurations/firebase/config";
 import NextTopLoader from "nextjs-toploader";
 import { Button } from "@nextui-org/button";
-import LoadingEffect from "@/components/loading";
 
 interface ActionCodeSettings {
     url: string;

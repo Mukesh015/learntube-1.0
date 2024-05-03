@@ -6,6 +6,9 @@ import { Input } from "@nextui-org/react";
 import { Button } from "@nextui-org/react";
 import { toast, ToastContainer } from "react-toastify";
 import { otpValidation } from '@/configurations/firebase/config';
+import NextTopLoader from 'nextjs-toploader';
+import "react-toastify/dist/ReactToastify.css";
+
 
 const CreatorRegisterForm: React.FC = () => {
     const [personalInfoNext, setPersonalInfoNext] = useState<boolean>(false);
@@ -143,7 +146,7 @@ const CreatorRegisterForm: React.FC = () => {
         catch (error: any) {
             console.log("Internal server error", error);
         }
-    }, [name, email, gender, contactNumber, addressLine, city, state, pinCode, country, channelName, channelAdminName, 
+    }, [name, email, gender, contactNumber, addressLine, city, state, pinCode, country, channelName, channelAdminName,
         channelDescription, recoveryEmail, mediaLinks, logo, cover]);
 
     const handleLogo = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -228,6 +231,7 @@ const CreatorRegisterForm: React.FC = () => {
 
     return (
         <>
+            <NextTopLoader />
             <ToastContainer />
             {otpForm ? (
                 <div className='flex'>

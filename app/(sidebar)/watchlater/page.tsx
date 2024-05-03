@@ -2,11 +2,16 @@
 import React, { useCallback, useEffect, useState } from "react";
 import Navbar from "@/components/navbar";
 import Sidebar from "@/components/sidebar";
-import { Switch, cn } from "@nextui-org/react";
+import { useRouter } from "next/navigation";
+
 import { Tooltip } from "@nextui-org/react";
 import { auth } from "@/configurations/firebase/config";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { gql, useQuery } from "@apollo/client";
+import { useDarkMode } from "@/components/hooks/theme"
+import NextTopLoader from "nextjs-toploader";
+import "react-toastify/dist/ReactToastify.css";
+
 
 const watchLaterDetails = gql`
 
@@ -26,6 +31,9 @@ query playlist($email: String) {
 `
 const WatchLater: React.FC = () => {
 
+    const { isDarkMode } = useDarkMode();
+
+    const router = useRouter();
     const [email, setEmail] = useState<string>("");
     const [watchLater, setWatchLater] = useState<any[]>([]);
 
@@ -88,9 +96,10 @@ const WatchLater: React.FC = () => {
 
         // Check if course is free
         if (courseFees === null) {
-            const videoUrl = `/video/${videoId}`;
-            window.location.href = videoUrl;
-            return;
+            // const videoUrl = `/video/${videoId}`;
+            // window.location.href = videoUrl;
+            // return;
+            router.push(`/video/${videoId}`);
         }
 
         try {
@@ -109,11 +118,13 @@ const WatchLater: React.FC = () => {
 
             // Redirect based on enrollment status
             if (enrollData.isEnrolled === true) {
-                const videoUrl = `/video/${videoId}`;
-                window.location.href = videoUrl;
+                // const videoUrl = `/video/${videoId}`;
+                // window.location.href = videoUrl;
+                router.push(`/video/${videoId}`);
             } else {
-                const paymentUrl = `/payment/${courseId}`;
-                window.location.href = paymentUrl;
+                // const paymentUrl = `/payment/${courseId}`;
+                // window.location.href = paymentUrl;
+                router.push(`/payment/${courseId}`);
             }
         } catch (enrollError) {
             console.error("Failed to fetch enrollment status:", enrollError);
@@ -132,53 +143,57 @@ const WatchLater: React.FC = () => {
 
     return (
         <>
+            <NextTopLoader />
             <Navbar />
             <Sidebar />
-            <nav className="mt-24 mr-20">
-                <ul className="flex flex-row-reverse gap-10">
-                    <Tooltip color="warning" delay={700} showArrow={true} content="clear all">
-                        <li className="flex ext-blue-500 font-semibold hover:bg-gray-700 rounded-full cursor-default">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="m-2" height="24px" viewBox="0 0 24 24" width="24px" fill="#e30b13"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M5 13h14v-2H5v2zm-2 4h14v-2H3v2zM7 7v2h14V7H7z" /></svg>
+            <div className={`${isDarkMode ? "bg-white text-black" : "bg-black text-white"} pb-10`}>
+
+                <nav className="pt-20 pr-20 ">
+                    <ul className="flex flex-row-reverse gap-10">
+                        <Tooltip color="warning" delay={700} showArrow={true} content="clear all">
+                            <li className={`flex ext-blue-500 ${isDarkMode ? "hover:bg-gray-300" : "hover:bg-gray-700"} font-semibold rounded-full cursor-default`}>
+                                <svg xmlns="http://www.w3.org/2000/svg" className="m-2" height="24px" viewBox="0 0 24 24" width="24px" fill="#e30b13"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M5 13h14v-2H5v2zm-2 4h14v-2H3v2zM7 7v2h14V7H7z" /></svg>
+                            </li>
+                        </Tooltip>
+                        <li className="text-3xl font-bold text-amber-600" style={{ marginRight: "820px" }} >
+                            Watch later list
                         </li>
-                    </Tooltip>
-                    <li className="text-3xl font-bold text-amber-600" style={{ marginRight: "820px" }} >
-                        Watch later list
-                    </li>
-                </ul>
-            </nav>
-            <div className="ml-80 ">
-                <div
-                    id="description-container"
-                    className=""
-                    style={{ marginTop: "40px" }}
-                >
-                    {watchLater.map((item, index) => (
-                        <div id="video-content" className="flex mb-10">
-                            {/* video content here*/}
-                            <img
-                                className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-150 rounded-md"
-                                height={200}
-                                width={200}
-                                src={item.videoThumbnail}
-                                onClick={() => {
-                                    handleRedirect(item.videoId, item.courseFees, item.courseID)
-                                }}
-                                alt=""
-                            />
-                            <div className="flex mt-10 ml-5 justify-center mr-10">
-                                <div>
-                                    {/* Profile picture here */}
-                                    <img height={30} width={30} className="rounded-full m-1" src={item.channelLogo} alt="" />
-                                </div>
-                                <div className="ml-3">
-                                    <h1 className="">{item.videoTitle}</h1> {/* video title here*/}
-                                    <p className="text-gray-500">
-                                        {item.videoViews} views - {formatTime(item.videoPublishedAt)} {/*Content details/analitics*/}
-                                    </p>
+                    </ul>
+                </nav>
+                <div className="ml-80 ">
+                    <div
+                        id="description-container"
+                        className=""
+                        style={{ marginTop: "40px" }}
+                    >
+                        {watchLater.map((item, index) => (
+                            <div id="video-content" className="flex mb-10">
+                                {/* video content here*/}
+                                <img
+                                    className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-150 rounded-md"
+                                    height={200}
+                                    width={200}
+                                    src={item.videoThumbnail}
+                                    onClick={() => {
+                                        handleRedirect(item.videoId, item.courseFees, item.courseID)
+                                    }}
+                                    alt=""
+                                />
+                                <div className="flex mt-10 ml-5 justify-center mr-10">
+                                    <div>
+                                        {/* Profile picture here */}
+                                        <img height={30} width={30} className="rounded-full m-1" src={item.channelLogo} alt="" />
+                                    </div>
+                                    <div className="ml-3">
+                                        <h1 className="font-bold">{item.videoTitle}</h1> {/* video title here*/}
+                                        <p className="text-gray-500 text-sm">
+                                            {item.videoViews} views - {formatTime(item.videoPublishedAt)} {/*Content details/analitics*/}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
             </div>
         </>

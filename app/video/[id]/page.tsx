@@ -1,6 +1,7 @@
 "use client"
 import dynamic from 'next/dynamic'
 import Navbar from "@/components/navbar";
+import { useRouter } from 'next/navigation';
 import { User } from "@nextui-org/react"
 import { Button, ButtonGroup } from "@nextui-org/button";
 import { Accordion, AccordionItem } from "@nextui-org/react";
@@ -11,6 +12,9 @@ import { gql, useQuery } from "@apollo/client";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/configurations/firebase/config";
 import { useDarkMode } from "@/components/hooks/theme"
+import NextTopLoader from 'nextjs-toploader';
+import "react-toastify/dist/ReactToastify.css";
+
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 
 const VideoUrl = gql`
@@ -70,7 +74,7 @@ const VideoPage: React.FC<Props> = ({ params }) => {
     const [user] = useAuthState(auth);
     const { isDarkMode } = useDarkMode();
 
-
+    const router = useRouter();
     const [isAddedToPlaylist, setIsAddedToPlaylist] = useState<boolean>(false);
     const [isAddedToWatchLater, setIsAddedToWatchLater] = useState<boolean>(false);
     const [isLikedVideo, setIsLikedVideo] = useState<boolean>(false);
@@ -286,8 +290,9 @@ const VideoPage: React.FC<Props> = ({ params }) => {
 
         // Check if course is free
         if (courseFees === null) {
-            const videoUrl = `/video/${videoId}`;
-            window.location.href = videoUrl;
+            // const videoUrl = `/video/${videoId}`;
+            // window.location.href = videoUrl;
+            router.push(`/video/${videoId}`);
             return;
         }
 
@@ -307,16 +312,18 @@ const VideoPage: React.FC<Props> = ({ params }) => {
 
             // Redirect based on enrollment status
             if (enrollData.isEnrolled === true) {
-                const videoUrl = `/video/${videoId}`;
-                window.location.href = videoUrl;
+                // const videoUrl = `/video/${videoId}`;
+                // window.location.href = videoUrl;
+                router.push(`/video/${videoId}`);
             } else {
-                const paymentUrl = `/payment/${courseId}`;
-                window.location.href = paymentUrl;
+                // const paymentUrl = `/payment/${courseId}`;
+                // window.location.href = paymentUrl;
+                router.push(`/payment/${courseId}`);
             }
         } catch (enrollError) {
             console.error("Failed to fetch enrollment status:", enrollError);
         }
-    }, [email]);
+    }, [email,router]);
 
     const startWatchTime = () => {
         const startTime = Date.now();
@@ -386,6 +393,7 @@ const VideoPage: React.FC<Props> = ({ params }) => {
 
     return (
         <>
+            <NextTopLoader />
             <Navbar />
             <div className={`py-20 ${isDarkMode ? "bg-white" : "bg-black"}  px-10 flex`}>
                 <div id="video-container" style={{ maxWidth: "950px" }}>

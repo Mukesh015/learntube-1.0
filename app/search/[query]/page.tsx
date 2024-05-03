@@ -3,8 +3,10 @@ import Navbar from "@/components/navbar";
 import Sidebar from "@/components/sidebar";
 import { auth } from "@/configurations/firebase/config";
 import { gql, useQuery } from "@apollo/client";
+import NextTopLoader from "nextjs-toploader";
 import { useCallback, useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
+import "react-toastify/dist/ReactToastify.css";
 
 
 
@@ -106,9 +108,10 @@ const SerachResult: React.FC<Props> = ({ params }) => {
             console.log(data.getSearchQueryDetails)
 
         }
-    }, [setSearchQuery, data,setEmail,user]);
+    }, [setSearchQuery, data, setEmail, user]);
     return (
         <>
+            <NextTopLoader />
             <Navbar />
             <Sidebar />
             <div className="mt-28 ml-72 ">
