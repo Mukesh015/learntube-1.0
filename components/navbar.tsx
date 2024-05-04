@@ -88,6 +88,7 @@ const Navbar: React.FC<{ query: string }> = ({ query }) => {
         variables: { email: email },
     });
 
+
     const handleInputClick = () => {
         toggleSearchDiv();
 

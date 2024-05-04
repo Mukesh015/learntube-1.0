@@ -144,4 +144,38 @@ type Video {
     avatar: String
     channelLogo: String
  }
+ type SocialMediaLinks {
+    any: String
+    Facebook: String
+    Instagram: String
+    Discord: String
+    Github: String
+    LinkedIn: String
+    Twitter: String
+  }
+ type detailsByChanneld{
+    channelId: String
+    channelName: String
+    channelDescription: String
+    channelLogo: String
+    coverPhoto: String
+    link: SocialMediaLinks
+    subscribers: String
+    noOfVideos: String
+  
+ }
+ type coursebyChannelId{
+    courseId: String
+    courseName: String
+    courseThumb: String
+    courseDescription: String
+    videos: [Video]
+ }
+ type videoByChannelId{
+    videoId: String
+    videoTitle: String
+    viewsCount: String
+    videoPublishedAt: String
+    videoThumbnail:  String
+ }
 `;
