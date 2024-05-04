@@ -41,6 +41,10 @@ const Home: React.FC = () => {
   const { loading, error, data, refetch } = useQuery(HOMEPAGE_DETAILS);
   const [user] = useAuthState(auth);
 
+  const handleRedirectToChannelPage = useCallback(async () => {
+    router.push("/channel/gaming")
+  }, [router])
+
 
   const handleRedirect = useCallback(async (videoId: string, courseFees: any, courseId: string) => {
     try {
@@ -101,7 +105,7 @@ const Home: React.FC = () => {
     if (user) {
       setEmail(user.email || "");
     }
-    if (!loading && !error) {
+    if (data) {
       setHomePageDetails(data.getAllVideoUrl);
     }
     if (error) {
@@ -177,7 +181,7 @@ const Home: React.FC = () => {
                     )}
                   </div>
                   <div className="flex mt-3 justify-center">
-                    <div>
+                    <div className="cursor-pointer" onClick={handleRedirectToChannelPage}>
                       <img
                         height={30}
                         width={30}

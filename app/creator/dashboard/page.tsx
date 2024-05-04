@@ -207,6 +207,24 @@ const CardGrid: React.FC = () => {
         }
     }, [setHomeTab, setShortTab, setCourseTab, setCommunityTab, setSearchTab])
 
+    function formatWatchTime(totalTimeInMillis: number) {
+        // Convert total time to seconds
+        const totalTimeInSeconds = Math.floor(totalTimeInMillis / 1000);
+
+        // Calculate hours, minutes, and seconds
+        const hours = Math.floor(totalTimeInSeconds / 3600);
+        const minutes = Math.floor((totalTimeInSeconds % 3600) / 60);
+        const seconds = totalTimeInSeconds % 60;
+
+        // Format hours, minutes, and seconds
+        const formattedHours = hours < 10 ? `0${hours}` : hours;
+        const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+        const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
+
+        // Return formatted watch time
+        return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+    }
+
     const handleInfoChange = useCallback(async () => {
         console.log("toUpdate: ", toUpdate)
         console.log("updatedData: ", updateddata)
@@ -232,7 +250,7 @@ const CardGrid: React.FC = () => {
         } catch (error) {
             console.log("Failed to change informations, server error", error);
         }
-    }, [toUpdate, updateddata,setspinnerButton, email])
+    }, [toUpdate, updateddata, setspinnerButton, email])
 
     useEffect(() => {
         if (user) {
@@ -266,7 +284,7 @@ const CardGrid: React.FC = () => {
                                                     <h5 className={`mb-2 ${isDarkMode ? "text-slate-700" : "text-white"} font-bold`}>{item.subscriber}</h5>
                                                     <p className="mb-0 dark:text-white dark:opacity-60">
                                                         <span className="text-sm font-bold leading-normal text-emerald-500">+55%</span>
-                                                        <span className={`${isDarkMode ? "text-blue-900" : ""}`}>since yesterday</span>
+                                                        <span className={`ml-2 ${isDarkMode ? "text-blue-900" : ""}`}>since yesterday</span>
 
                                                     </p>
                                                 </div>
@@ -291,10 +309,10 @@ const CardGrid: React.FC = () => {
                                             <div className="flex-none w-2/3 max-w-full px-3">
                                                 <div>
                                                     <p className="mb-0 font-sans text-sm font-semibold leading-normal uppercase text-yellow-600">Total watch time</p>
-                                                    <h5 className="mb-2 font-bold text-slate-600">{item.watchTime}</h5>
+                                                    <h5 className={`mb-2 ${isDarkMode ? "text-slate-700" : "text-white"} font-bold`}>{formatWatchTime(item.watchTime)}</h5>
                                                     <p className="mb-0 dark:text-white dark:opacity-60">
                                                         <span className="text-sm font-bold leading-normal text-emerald-500">+3%</span>
-                                                        <span className='text-blue-900'>
+                                                        <span className='text-sky-500 ml-2'>
                                                             since last week
                                                         </span>
                                                     </p>
@@ -321,10 +339,10 @@ const CardGrid: React.FC = () => {
                                             <div className="flex-none w-2/3 max-w-full px-3">
                                                 <div>
                                                     <p className="mb-0 font-sans text-sm font-semibold leading-normal uppercase text-yellow-600">total comments</p>
-                                                    <h5 className="mb-2 font-bold text-slate-700">{item.totalComments}</h5>
+                                                    <h5 className={`mb-2 ${isDarkMode ? "text-slate-700" : "text-white"} font-bold`}>{item.totalComments}</h5>
                                                     <p className="mb-0 dark:text-white dark:opacity-60">
                                                         <span className="text-sm font-bold leading-normal text-red-600">-2%</span>
-                                                        <span className='text-red-900'>since last quarter</span>
+                                                        <span className='text-rose-500 ml-2'>since last quarter</span>
                                                     </p>
                                                 </div>
                                             </div>
@@ -349,10 +367,10 @@ const CardGrid: React.FC = () => {
                                             <div className="flex-none w-2/3 max-w-full px-3">
                                                 <div>
                                                     <p className="mb-0 font-sans text-sm font-semibold leading-normal uppercase text-yellow-600 ">total likes</p>
-                                                    <h5 className="mb-2 font-bold text-slate-700">{item.totalLike}</h5>
+                                                    <h5 className={`mb-2 ${isDarkMode ? "text-slate-700" : "text-white"} font-bold`}>{item.totalLike}</h5>
                                                     <p className="mb-0 dark:text-white dark:opacity-60">
                                                         <span className="text-sm font-bold leading-normal text-emerald-500">+5%</span>
-                                                        <span className='text-blue-900'>than last month</span>
+                                                        <span className='text-cyan-500 ml-2'>than last month</span>
                                                     </p>
                                                 </div>
                                             </div>
