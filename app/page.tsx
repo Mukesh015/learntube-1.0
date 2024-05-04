@@ -39,7 +39,7 @@ const Home: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [isLoaded, setIsLoaded] = React.useState(false);
 
-  const { loading, error, data } = useQuery(HOMEPAGE_DETAILS);
+  const { loading, error, data, refetch } = useQuery(HOMEPAGE_DETAILS);
   const [user] = useAuthState(auth);
 
 
@@ -98,16 +98,17 @@ const Home: React.FC = () => {
   }, [email]);
 
   useEffect(() => {
+
     if (user) {
       setEmail(user.email || "");
     }
-    if (data) {
+    if (!loading && !error && email) {
       setHomePageDetails(data.getAllVideoUrl);
     }
     if (error) {
       router.push("/error/502")
-     }
-  }, [data, error, setHomePageDetails, user, setEmail]);
+    }
+  }, [data, setHomePageDetails, user, setEmail, loading, error]);
 
   const timeSinceUpload = (uploadAt: string) => {
     const uploadDate = new Date(uploadAt);
@@ -127,7 +128,7 @@ const Home: React.FC = () => {
     <>
       <NextTopLoader />
       <div className={`${isDarkMode ? "bg-white" : "bg-black"}`}>
-        <Navbar />
+        <Navbar query={""} />
         <Sidebar />
         {loading && homePageDetails ? (
           <div className="pt-28 pb-10 pl-72 gap-8 grid grid-cols-3">

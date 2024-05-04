@@ -42,13 +42,12 @@ const SerachResult: React.FC<Props> = ({ params }) => {
     const [user] = useAuthState(auth);
 
     const query: any = decodeURIComponent(params.query)
-
+    
     const { loading, error, data } = useQuery(searchQuery, {
         variables: { query: query },
     });
 
 
-    console.log(searQuery)
     const handleRedirect = useCallback(async (videoId: string, courseFees: any, courseId: string) => {
         try {
             // Add video to history
@@ -115,7 +114,7 @@ const SerachResult: React.FC<Props> = ({ params }) => {
     return (
         <>
             <NextTopLoader />
-            <Navbar />
+            <Navbar query={query} />
             <Sidebar />
             <div className={`pt-20 pl-72 pb-10 ${isDarkMode ? "bg-white" : "bg-black"}`}>
                 <h1 className={`mb-10 ${isDarkMode ? "text-black" : "text-white"} text-medium`}>Based on your search</h1>

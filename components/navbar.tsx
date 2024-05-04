@@ -44,7 +44,7 @@ query Exam($email:String){
   }
 `
 
-const Navbar: React.FC = () => {
+const Navbar: React.FC<{ query: string }> = ({ query }) => {
 
     const { isDarkMode, toggleDarkMode } = useDarkMode();
 
@@ -69,6 +69,7 @@ const Navbar: React.FC = () => {
     const [text, setText] = useState("");
     const [isListening, setIsListening] = useState(false);
     const [recognition, setRecognition] = useState<any>(null);
+    const [searchitem, setSearchitem] = useState<string>('');
 
     const router = useRouter();
     const [user] = useAuthState(auth);
@@ -83,14 +84,14 @@ const Navbar: React.FC = () => {
         toggleDarkMode();
     }, [toggleDarkMode])
 
-    const { loading, error, data } = useQuery(VERIFY_CREATOR, {
+    const { loading, error, data, refetch } = useQuery(VERIFY_CREATOR, {
         variables: { email: email },
     });
 
 
     const handleInputClick = () => {
         toggleSearchDiv();
-        console.log(searchItem)
+
     };
 
     const toggleSearchDiv = () => {
@@ -274,9 +275,11 @@ const Navbar: React.FC = () => {
             });
             const data = await response.json();
             console.log(data);
+            refetch()
 
             if (response.ok) {
                 console.log("search String deleted successfully")
+                refetch();
             }
         } catch (error) {
             console.error("Failed to fetch", error);
@@ -326,6 +329,7 @@ const Navbar: React.FC = () => {
             });
             const data = await response.json();
             console.log(data);
+            refetch()
             if (response.ok) {
                 setShowAllClear(true);
                 setTimeout(() => {
@@ -351,6 +355,8 @@ const Navbar: React.FC = () => {
             });
             const data = await response.json();
             console.log(data);
+            refetch()
+
         } catch (error) {
             console.error("Failed to clear all notifications", error);
         }
@@ -379,6 +385,7 @@ const Navbar: React.FC = () => {
             setuserName(user.displayName || "");
             setavatar(user.photoURL || "");
             setEmail(user.email || "");
+            refetch()
         }
         if (data && email !== "") {
             const verifyIsCreator = data.getIsCreator[0].isCreator
@@ -386,10 +393,14 @@ const Navbar: React.FC = () => {
             setSearchBarDetails(data.getSearchBarDetails)
             setNotifications(data.getNotifications)
             console.log(notifications)
+            refetch()
+
         }
         if (notifications) {
             const unreadCount = notifications.filter(notification => !notification.isRead).length;
             setUnreadMessages(unreadCount);
+            refetch()
+
         }
     }, [user, setIsCreator, setUnreadMessages, data, setSearchBarDetails, notifications, setNotifications]);
 
@@ -517,6 +528,9 @@ const Navbar: React.FC = () => {
                                 style={{ width: "600px" }}
                                 type="search"
                                 id="search-content"
+                                value={query}
+                                onChange={(e) => setSearchitem(e.target.value)}
+
                                 placeholder="Search here... or [ctrl+k]"
                                 className={`bg-inherit border ${isDarkMode ? "text-black" : "text-white"} border-gray-700 rounded-medium p-2 px-10 w-96`}
                                 onClick={handleInputClick}
