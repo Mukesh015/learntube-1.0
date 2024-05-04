@@ -1,8 +1,10 @@
+import NextTopLoader from "nextjs-toploader";
 import React from "react";
 
 const ServerError: React.FC = () => {
     return (
         <>
+            <NextTopLoader />
             <div className="flex h-[calc(100vh-80px)] items-center justify-center p-5 w-full bg-black">
                 <div className="text-center">
                     <div className="inline-flex rounded-full bg-red-100 p-4">

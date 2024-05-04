@@ -7,6 +7,9 @@ import { gql, useQuery } from "@apollo/client";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/configurations/firebase/config";
 import { useDarkMode } from "@/components/hooks/theme"
+import "react-toastify/dist/ReactToastify.css";
+import NextTopLoader from "nextjs-toploader";
+import { useRouter } from "next/navigation";
 
 
 const HOMEPAGE_DETAILS = gql`
@@ -29,6 +32,7 @@ const HOMEPAGE_DETAILS = gql`
 const Home: React.FC = () => {
 
   const { isDarkMode } = useDarkMode();
+  const router = useRouter();
 
   const [homePageDetails, setHomePageDetails] = useState<any[]>([]);
   const [email, setEmail] = useState<string>("");
@@ -59,8 +63,7 @@ const Home: React.FC = () => {
 
     // Check if course is free
     if (courseFees === null) {
-      const videoUrl = `/video/${videoId}`;
-      window.location.href = videoUrl;
+      router.push(`/video/${videoId}`);
       return;
     }
 
@@ -80,8 +83,10 @@ const Home: React.FC = () => {
 
       // Redirect based on enrollment status
       if (enrollData.isEnrolled === true) {
-        const videoUrl = `/video/${videoId}`;
-        window.location.href = videoUrl;
+        // const videoUrl = `/video/${videoId}`;
+        // window.location.href = videoUrl;
+        router.push(`/video/${videoId}`);
+
       } else {
         const paymentUrl = `/payment/${courseId}`;
         window.location.href = paymentUrl;
@@ -116,6 +121,7 @@ const Home: React.FC = () => {
 
   return (
     <>
+      <NextTopLoader />
       <div className={`${isDarkMode ? "bg-white" : "bg-black"}`}>
         <Navbar />
         <Sidebar />

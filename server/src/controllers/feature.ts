@@ -362,6 +362,7 @@ export async function calculateWatchTime(req: Request, res: Response) {
 export async function markAsRead(req: Request, res: Response) {
 
     const { email, notificationId } = req.body;
+    console.log(notificationId, email);
     try {
         const user = await UserModel.findOne({ email: email });
         if (!user) {
@@ -425,9 +426,8 @@ export async function clearAllNotifiacation(req: Request, res: Response) {
 
 
 export async function dynamicChanges(req: Request, res: Response) {
-    const { email,channelName,RecoveryEmail,channelDescription,any,Facebook,Instagram,Twitter,Github,LinkedIn,Discord } = req.body;
+    const { email, channelName, RecoveryEmail, channelDescription, any, Facebook, Instagram, Twitter, Github, LinkedIn, Discord } = req.body;
     const modify: string = req.params.modify as string;
-
     try {
         const user = await UserModel.findOne({ email: email });
         if (!user) {
@@ -442,14 +442,26 @@ export async function dynamicChanges(req: Request, res: Response) {
         else if (modify === 'channelDescription') {
             user.channelDescription = channelDescription;
         }
-        else if (modify === 'ProvidedLinks') {
-            user.website.any=any
-            user.website.Instagram=Instagram
-            user.website.Twitter=Twitter
-            user.website.Github=Github
-            user.website.LinkedIn=LinkedIn
-            user.website.Facebook=Facebook
-            user.website.Discord=Discord
+        else if (modify === "Facebook") {
+            user.website.Facebook = Facebook
+        }
+        else if (modify === "LinkedIn") {
+            user.website.LinkedIn = LinkedIn
+        }
+        else if (modify === "Github") {
+            user.website.Github = Github
+        }
+        else if (modify === "any") {
+            user.website.any = any
+        }
+        else if (modify === "Discord") {
+            user.website.Discord = Discord
+        }
+        else if (modify === "Instagram") {
+            user.website.Instagram = Instagram
+        }
+        else if (modify === "Twitter") {
+            user.website.Twitter = Twitter
         }
         await user.save();
         return res.status(200).json({ message: 'Changed sucessfully' });

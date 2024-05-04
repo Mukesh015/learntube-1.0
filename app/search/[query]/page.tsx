@@ -3,8 +3,12 @@ import Navbar from "@/components/navbar";
 import Sidebar from "@/components/sidebar";
 import { auth } from "@/configurations/firebase/config";
 import { gql, useQuery } from "@apollo/client";
+import NextTopLoader from "nextjs-toploader";
 import { useCallback, useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
+import "react-toastify/dist/ReactToastify.css";
+import { useDarkMode } from "@/components/hooks/theme"
+import { useRouter } from "next/navigation";
 
 
 
@@ -31,10 +35,9 @@ interface Props {
     };
 }
 const SerachResult: React.FC<Props> = ({ params }) => {
-
+    const router = useRouter();
     const [email, setEmail] = useState<string>("");
-    
-
+    const { isDarkMode } = useDarkMode();
     const [searQuery, setSearchQuery] = useState<any[]>([]);
     const [user] = useAuthState(auth);
 
@@ -45,7 +48,6 @@ const SerachResult: React.FC<Props> = ({ params }) => {
     });
 
 
-    console.log(searQuery)
     const handleRedirect = useCallback(async (videoId: string, courseFees: any, courseId: string) => {
         try {
             // Add video to history
@@ -68,8 +70,7 @@ const SerachResult: React.FC<Props> = ({ params }) => {
         // Check if course is free
         if (courseFees === null) {
             const videoUrl = `/video/${videoId}`;
-            window.location.href = videoUrl;
-            return;
+            router.push(videoUrl);
         }
 
         try {
@@ -89,10 +90,12 @@ const SerachResult: React.FC<Props> = ({ params }) => {
             // Redirect based on enrollment status
             if (enrollData.isEnrolled === true) {
                 const videoUrl = `/video/${videoId}`;
-                window.location.href = videoUrl;
+                router.push(videoUrl);
+
             } else {
                 const paymentUrl = `/payment/${courseId}`;
-                window.location.href = paymentUrl;
+                router.push(paymentUrl);
+
             }
         } catch (enrollError) {
             console.error("Failed to fetch enrollment status:", enrollError);
@@ -107,17 +110,16 @@ const SerachResult: React.FC<Props> = ({ params }) => {
             console.log(data.getSearchQueryDetails)
 
         }
-    }, [setSearchQuery, data,setEmail,user]);
+    }, [setSearchQuery, data, setEmail, user]);
     return (
         <>
-            <Navbar />
+            <NextTopLoader />
+            <Navbar query={query} />
             <Sidebar />
-            <div className="mt-28 ml-72 ">
-                <h1 className="mb-10 text-medium">Based on your search</h1>
-                {/* Map over searchResults instead of searchQuery */}
+            <div className={`pt-20 pl-72 pb-10 ${isDarkMode ? "bg-white" : "bg-black"}`}>
+                <h1 className={`mb-10 ${isDarkMode ? "text-black" : "text-white"} text-medium`}>Based on your search</h1>
                 {searQuery.map((video, index) => (
                     <div key={index} className="flex cursor-pointer mb-10">
-                        {/* Thumbnail */}
                         <img
                             height={250}
                             width={350}
@@ -129,22 +131,18 @@ const SerachResult: React.FC<Props> = ({ params }) => {
                             }}
                         />
                         <div className="ml-6">
-                            {/* Video title */}
-                            <p className="text-xl">{video.videoTitle}</p>
-                            {/* details */}
+                            <p className={`text-xl ${isDarkMode ? "text-black" : "text-white"}`}>{video.videoTitle}</p>
                             <p className="text-sm text-gray-600 mt-3">
                                 {video.videoViews} views - 9 months ago
                             </p>
-                            <div className="mt-5 flex">
-                                {/* channel info */}
+                            <div className="mt-5 mb-2 flex">
                                 <img
                                     className="h-8 rounded-full"
                                     src={video.channelLogo}
                                     alt=""
                                 />
-                                <p className="font-semibold ml-3">{video.channelName}</p>
+                                <p className={`font-semibold ${isDarkMode ? "text-black" : "text-white"} ml-3`}>{video.channelName}</p>
                             </div>
-                            {/* video description */}
                             <p className="text-sm text-gray-600">{video.videoDescription}</p>
                         </div>
                     </div>

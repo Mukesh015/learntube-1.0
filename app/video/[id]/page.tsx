@@ -1,6 +1,7 @@
 "use client"
 import dynamic from 'next/dynamic'
 import Navbar from "@/components/navbar";
+import { useRouter } from 'next/navigation';
 import { User } from "@nextui-org/react"
 import { Button, ButtonGroup } from "@nextui-org/button";
 import { Accordion, AccordionItem } from "@nextui-org/react";
@@ -11,6 +12,9 @@ import { gql, useQuery } from "@apollo/client";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/configurations/firebase/config";
 import { useDarkMode } from "@/components/hooks/theme"
+import NextTopLoader from 'nextjs-toploader';
+import "react-toastify/dist/ReactToastify.css";
+
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 
 const VideoUrl = gql`
@@ -72,7 +76,7 @@ const VideoPage: React.FC<Props> = ({ params }) => {
     const [user] = useAuthState(auth);
     const { isDarkMode } = useDarkMode();
 
-
+    const router = useRouter();
     const [isAddedToPlaylist, setIsAddedToPlaylist] = useState<boolean>(false);
     const [isAddedToWatchLater, setIsAddedToWatchLater] = useState<boolean>(false);
     const [isLikedVideo, setIsLikedVideo] = useState<boolean>(false);
@@ -114,6 +118,37 @@ const VideoPage: React.FC<Props> = ({ params }) => {
     const { loading, error, data,refetch } = useQuery(VideoUrl, {
         variables: { email: email, videoId: videoId, channelId: channelId },
     });
+
+    const formatTime = (timestampString: string) => {
+        // Convert the string timestamp to a number
+        const timestamp = parseInt(timestampString, 10);
+
+        // Check if the converted timestamp is a valid number
+        if (isNaN(timestamp)) {
+            return "Invalid timestamp";
+        }
+
+        const currentDate = new Date();
+        const publishedDate = new Date(timestamp);
+        const diffInMs = currentDate.getTime() - publishedDate.getTime();
+        const diffInSec = Math.floor(diffInMs / 1000);
+
+        // Handle case where timestamp is in the future
+        if (diffInSec < 0) {
+            return "Future timestamp";
+        }
+
+        // Convert timestamp to readable format
+        if (diffInSec < 60) {
+            return `${diffInSec} seconds ago`;
+        } else if (diffInSec < 3600) {
+            return `${Math.floor(diffInSec / 60)} minutes ago`;
+        } else if (diffInSec < 86400) {
+            return `${Math.floor(diffInSec / 3600)} hours ago`;
+        } else {
+            return `${Math.floor(diffInSec / 86400)} days ago`;
+        }
+    };
 
     const handleSubscribe = useCallback(async () => {
         try {
@@ -289,8 +324,9 @@ const VideoPage: React.FC<Props> = ({ params }) => {
 
         // Check if course is free
         if (courseFees === null) {
-            const videoUrl = `/video/${videoId}`;
-            window.location.href = videoUrl;
+            // const videoUrl = `/video/${videoId}`;
+            // window.location.href = videoUrl;
+            router.push(`/video/${videoId}`);
             return;
         }
 
@@ -310,16 +346,18 @@ const VideoPage: React.FC<Props> = ({ params }) => {
 
             // Redirect based on enrollment status
             if (enrollData.isEnrolled === true) {
-                const videoUrl = `/video/${videoId}`;
-                window.location.href = videoUrl;
+                // const videoUrl = `/video/${videoId}`;
+                // window.location.href = videoUrl;
+                router.push(`/video/${videoId}`);
             } else {
-                const paymentUrl = `/payment/${courseId}`;
-                window.location.href = paymentUrl;
+                // const paymentUrl = `/payment/${courseId}`;
+                // window.location.href = paymentUrl;
+                router.push(`/payment/${courseId}`);
             }
         } catch (enrollError) {
             console.error("Failed to fetch enrollment status:", enrollError);
         }
-    }, [email]);
+    }, [email, router]);
 
     const startWatchTime = () => {
         const startTime = Date.now();
@@ -350,6 +388,7 @@ const VideoPage: React.FC<Props> = ({ params }) => {
             }
         }
     };
+
 
     useEffect(() => {
         startWatchTime();
@@ -390,13 +429,14 @@ const VideoPage: React.FC<Props> = ({ params }) => {
 
     return (
         <>
+            <NextTopLoader />
             <Navbar />
             <div className={`py-20 ${isDarkMode ? "bg-white" : "bg-black"}  px-10 flex`}>
                 <div id="video-container" style={{ maxWidth: "950px" }}>
                     <ReactPlayer width={960} height={550} controls url={videoUrl} onPlay={startWatchTime}
                         onPause={stopWatchTime} />
                     <div>
-                        <h1 className={`text-xl font-bold ${isDarkMode ? "text-black" : "text-white"} mb-5`}>{videoTitle}</h1>
+                        <h1 className={`text-xl font-bold mt-3 ${isDarkMode ? "text-black" : "text-white"} mb-5`}>{videoTitle}</h1>
                         <nav className="mb-5">
                             <ul className="flex gap-4">
                                 <li>
@@ -524,7 +564,7 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                             </Tooltip>
                         </div>
                         <div className="flex gap-7 mb-10">
-                            <img className="h-10 mt-3 rounded-full" src="https://i.pravatar.cc/150?u=a04258114e29026702d" alt="" />
+                            <img className="h-10 mt-3 rounded-full" src={logo} alt="" />
                             <Input type="text" color='primary' className={`ml-0 ${isDarkMode ? "text-black" : "text-white"}`} onChange={(e) => setComment(e.target.value)} value={comment} variant="underlined" label="Add a comment" />
                             <Button onPress={() => handleAddComment()} className={`ml-10 ${isDarkMode ? "text-black" : "text-white"}`} variant="bordered">
                                 Add
@@ -532,13 +572,17 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                         </div>
                         {comments.map((comment, index) => (
                             <div key={index} className='mb-3'>
-                                <div className="flex">
-                                    <img className="h-10 mr-5 rounded-full" src={comment.logo} alt="" />
-                                    <p className={`text-sm ${isDarkMode ? "text-black" : "text-white"}`}>
-                                        @{comment.users}
+                                <div className='flex'>
+                                    <img className="h-8 mr-5 rounded-full" src={comment.channelLogo} alt="" />
+                                    <p className={`text-md text-blue-700 font-semibold`}>
+                                        {comment.channelId}
                                     </p>
                                 </div>
-                                <p className={`ml-16 ${isDarkMode ? "text-black" : "text-white"}`}>{comment.comment}</p>
+                                <p className={`ml-16 text-sm ${isDarkMode ? "text-black" : "tuserId}hite"}`}>{comment.comments}</p>
+                                <p className='text-blue-500 text-sm ml-14 mt-2'>
+                                    <span>{formatTime(comment.timeStamp)}</span>
+                                    <span className='hover:underline ml-5 hover:text-blue-950 cursor-pointer'>reply</span>
+                                </p>
                             </div>
                         ))}
                     </div>

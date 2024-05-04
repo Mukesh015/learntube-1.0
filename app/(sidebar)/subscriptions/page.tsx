@@ -2,10 +2,13 @@ import React from "react";
 import Navbar from "@/components/navbar";
 import Sidebar from "@/components/sidebar";
 import { Tooltip } from "@nextui-org/react";
+import NextTopLoader from "nextjs-toploader";
+import "react-toastify/dist/ReactToastify.css";
 
 const SubsCriptions: React.FC = () => {
     return (
         <>
+            <NextTopLoader />
             <Navbar />
             <Sidebar />
             <nav className="mt-24 mr-20">

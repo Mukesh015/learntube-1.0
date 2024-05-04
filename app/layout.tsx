@@ -7,6 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 import NextTopLoader from "nextjs-toploader";
 import { ApolloWrapper } from "@/configurations/apollo/client"
 import { StoreProvider } from "@/configurations/redux/storeProvider"
+import "react-toastify/dist/ReactToastify.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {

@@ -12,6 +12,9 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/configurations/firebase/config";
 import { toast, ToastContainer } from "react-toastify";
 import { useRouter } from "next/navigation";
+import NextTopLoader from "nextjs-toploader";
+import "react-toastify/dist/ReactToastify.css";
+import { useDarkMode } from "@/components/hooks/theme"
 
 const GET_COURSENAME = gql`
 query Exam($email:String){
@@ -25,7 +28,7 @@ query Exam($email:String){
 const VideoUploadForm: React.FC = () => {
 
     const router = useRouter();
-
+    const { isDarkMode } = useDarkMode();
     const [isExistingCourse, setIsExistingCourse] = useState<boolean>(false);
     const [isPaidCourse, setIsPaidCourse] = useState<boolean>(false);
     const [showUploadForm, setShowUploadForm] = useState<boolean>(false);
@@ -166,24 +169,25 @@ const VideoUploadForm: React.FC = () => {
     }, [user, data, email, setCourseList]);
     return (
         <>
+            <NextTopLoader />
             <ToastContainer />
-            <div className="flex">
-                <div className='ml-10' style={{ maxWidth: "600px" }}>
-                    <h1 className='text-3xl font-bold mt-20 text-orange-500'>Upload You video</h1>
-                    <p className='mt-10 text-lg text-orange-200'>You need to export the video content as a vertical over-under of equidistant projection before you upload it to YouTube. The aspect ratio should be at 1:1, and the resolution should be from 5120×5120 to 8192×8192. Use square pixels. The video should have a horizontal layout and fill out the whole player window.</p>
-                    <p className='mt-10 text-lg text-orange-200'>
+            <div style={{ height: "1000px" }} className={`flex ${isDarkMode ? "bg-white" : "bg-black"}`}>
+                <div className={`ml-10 `} style={{ maxWidth: "600px" }}>
+                    <h1 className={`text-3xl font-bold mt-20 ${isDarkMode ? "text-zinc-700" : "text-orange-500"} `}>Upload You video</h1>
+                    <p className={`mt-10 text-lg ${isDarkMode ? "text-zinc-500" : "text-orange-200"}`}>You need to export the video content as a vertical over-under of equidistant projection before you upload it to YouTube. The aspect ratio should be at 1:1, and the resolution should be from 5120×5120 to 8192×8192. Use square pixels. The video should have a horizontal layout and fill out the whole player window.</p>
+                    <p className={`mt-10 text-lg ${isDarkMode ? "text-zinc-500" : "text-orange-200"}`}>
                         By default, you can upload videos that are up to 15 minutes long. Verified accounts can upload videos longer than 15 minutes.
                     </p>
-                    <p className='mt-10 text-lg text-orange-200'>
+                    <p className={`mt-10 text-lg ${isDarkMode ? "text-zinc-500" : "text-orange-200"}`}>
                         The simplest way to avoid YouTube copyright claims is to soundtrack your content with copyright-free music that you know you have permission to use. Check out Uppbeat, a free music platform for creators, and download the best free music for YouTube. It's safe, free and you won't get any copyright claims!
                     </p>
                 </div>
                 <div className='border shadow-lg shadow-orange-400 border-gray-700 p-7 rounded-lg absolute' style={{ marginTop: "40px", width: "550px", marginLeft: "800px" }}>
                     {!showUploadForm ? (
                         <div>
-                            <Input className="mb-5" type="text" variant="underlined" value={videoTitle}
+                            <Input color="primary" className={`mb-5 ${isDarkMode ? "text-black" : "text-white"}`} type="text" variant="underlined" value={videoTitle}
                                 onChange={(e) => setVideoTitle(e.target.value)} label="Video title" />
-                            <Input className="mb-5" type="text" variant="underlined" label="Video description"
+                            <Input color="primary" className={`mb-5 ${isDarkMode ? "text-black" : "text-white"}`} type="text" variant="underlined" label="Video description"
                                 value={videoDescription}
                                 onChange={(e) => setVideoDescription(e.target.value)} />
                             <RadioGroup
@@ -191,8 +195,8 @@ const VideoUploadForm: React.FC = () => {
                                 label="Upload on your existing course"
                                 orientation="horizontal"
                             >
-                                <Radio onClick={(e) => setIsExistingCourse(true)} value="yes">Yes</Radio>
-                                <Radio onClick={(e) => setIsExistingCourse(false)} value="no">No</Radio>
+                                <Radio onClick={() => setIsExistingCourse(true)} value="yes">Yes</Radio>
+                                <Radio onClick={() => setIsExistingCourse(false)} value="no">No</Radio>
                             </RadioGroup>
                             {isExistingCourse ? (
                                 <div>
@@ -207,7 +211,6 @@ const VideoUploadForm: React.FC = () => {
                                             {courseList.map((course) => (
                                                 <SelectItem key={course.value} value={course.value}>
                                                     {course.label}
-
                                                 </SelectItem>
                                             ))}
                                         </Select>
@@ -222,11 +225,11 @@ const VideoUploadForm: React.FC = () => {
                                 </div>
                             ) : (
                                 <div>
-                                    <Input className="mb-5" type="text" value={courseName}
+                                    <Input color="primary" className={`mb-5 ${isDarkMode ? "text-black" : "text-white"}`} type="text" value={courseName}
                                         onChange={(e) => setCourseName(e.target.value)}
                                         variant="underlined" label="Course name" />
 
-                                    <Input className="mb-5" type="text"
+                                    <Input color="primary" className={`mb-5 ${isDarkMode ? "text-black" : "text-white"}`} type="text"
                                         onChange={(e) => setCourseDescription(e.target.value)}
                                         variant="underlined" label="Course description" />
 
@@ -255,11 +258,11 @@ const VideoUploadForm: React.FC = () => {
                                             type="text" variant="underlined" label="Course price" />
                                     }
                                     <Textarea
+                                    color="primary" className={`col-span-12 md:col-span-6 mb-6 md:mb-0 ${isDarkMode ? "text-black" : "text-white"}`}
                                         variant="underlined"
                                         label="Tags"
                                         labelPlacement="outside"
                                         placeholder="Enter your desired tags, separated by commas"
-                                        className="col-span-12 md:col-span-6 mb-6 md:mb-0"
                                         value={videotags}
                                         onChange={(event) => {
                                             const value = event.target.value;
