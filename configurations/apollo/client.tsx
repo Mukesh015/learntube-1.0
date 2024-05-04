@@ -1,5 +1,5 @@
 "use client";
-
+"use strict"
 import { ApolloLink, HttpLink } from "@apollo/client";
 import {
   ApolloNextAppProvider,
@@ -10,7 +10,7 @@ import {
 
 function makeClient() {
   const httpLink = new HttpLink({
-    uri: "http://localhost:9063/graphql",
+    uri: `${process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN}/graphql`,
   });
 
   return new NextSSRApolloClient({

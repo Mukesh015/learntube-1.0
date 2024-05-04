@@ -12,7 +12,6 @@ import { Card, Skeleton, Button } from "@nextui-org/react";
 import NextTopLoader from "nextjs-toploader";
 import { useRouter } from "next/navigation";
 
-
 const HOMEPAGE_DETAILS = gql`
   query GetAllVideoUrl {
     getAllVideoUrl {
@@ -102,7 +101,7 @@ const Home: React.FC = () => {
     if (user) {
       setEmail(user.email || "");
     }
-    if (!loading && !error && email) {
+    if (!loading && !error) {
       setHomePageDetails(data.getAllVideoUrl);
     }
     if (error) {
