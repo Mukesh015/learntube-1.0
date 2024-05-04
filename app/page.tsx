@@ -8,6 +8,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/configurations/firebase/config";
 import { useDarkMode } from "@/components/hooks/theme"
 import "react-toastify/dist/ReactToastify.css";
+import { Card, Skeleton, Button } from "@nextui-org/react";
 import NextTopLoader from "nextjs-toploader";
 import { useRouter } from "next/navigation";
 
@@ -36,7 +37,7 @@ const Home: React.FC = () => {
 
   const [homePageDetails, setHomePageDetails] = useState<any[]>([]);
   const [email, setEmail] = useState<string>("");
-  const [notificationToken, setNotificationToken] = useState<string>("");
+  const [isLoaded, setIsLoaded] = React.useState(false);
 
   const { loading, error, data } = useQuery(HOMEPAGE_DETAILS);
   const [user] = useAuthState(auth);
@@ -103,7 +104,10 @@ const Home: React.FC = () => {
     if (data) {
       setHomePageDetails(data.getAllVideoUrl);
     }
-  }, [data, setHomePageDetails, user, setEmail]);
+    if (error) {
+      router.push("/error/502")
+     }
+  }, [data, error, setHomePageDetails, user, setEmail]);
 
   const timeSinceUpload = (uploadAt: string) => {
     const uploadDate = new Date(uploadAt);
@@ -125,51 +129,75 @@ const Home: React.FC = () => {
       <div className={`${isDarkMode ? "bg-white" : "bg-black"}`}>
         <Navbar />
         <Sidebar />
-        <div className="py-14 ml-80 ">
-          <div
-            id="description-container"
-            className="gap-12 grid grid-cols-3 hover"
-            style={{ marginTop: "60px" }}
-          >
-            {homePageDetails.map((video: any, index: number) => (
-              <div key={index} id={`video-${index}`} className="video-card">
-                <div className=""> {/*relative*/}
-                  <img
-                    className="transition ease-in-out delay-150 cursor-pointer hover:-translate-y-1 hover:scale-110 duration-150 rounded-md"
-                    style={{ height: '250px', width: '350px' }}
-                    src={video.allThumbnailUrls}
-                    onClick={() => {
-                      handleRedirect(video.videoId, video.courseFees, video.courseId)
-                    }}
-                    alt=""
-                  />
-                  {video.courseFees !== null && (
-                    <div className="absolute top-0 left-0 m-1 bg-opacity-100 rounded-md p-1">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="#fcba03" height="20" viewBox="0 -960 960 960" width="20"><path d="m185-65 80-331L3-620l343-29 134-313 134 314 343 28-262 224 80 331-295-176L185-65Z" /></svg>
-                    </div>
-                  )}
+        {loading && homePageDetails ? (
+          <div className="pt-28 pb-10 pl-72 gap-8 grid grid-cols-3">
+            {[...Array(12)].map((_, index) => (
+              <Card key={index} className={`w-[385px] ${isDarkMode ? "bg-slate-100" : "bg-slate-800"} space-y-7 p-4 h-72" radius="lg`}>
+                <Skeleton isLoaded={isLoaded} className="rounded-lg">
+                  <div className="h-36 rounded-lg bg-gray-400"></div>
+                </Skeleton>
+                <div className="space-y-3">
+                  <Skeleton isLoaded={isLoaded} className="w-3/5 rounded-lg">
+                    <div className="h-3 w-full rounded-lg bg-gray-500"></div>
+                  </Skeleton>
+                  <Skeleton isLoaded={isLoaded} className="w-4/5 rounded-lg">
+                    <div className="h-3 w-full rounded-lg bg-gray-600"></div>
+                  </Skeleton>
+                  <Skeleton isLoaded={isLoaded} className="w-2/5 rounded-lg">
+                    <div className="h-3 w-full rounded-lg bg-gray-700"></div>
+                  </Skeleton>
                 </div>
-                <div className="flex mt-3 justify-center">
-                  <div>
-                    <img
-                      height={30}
-                      width={30}
-                      className="rounded-full m-1"
-                      src={video.channelLogo}
-                      alt=""
-                    />
-                  </div>
-                  <div className={`ml-3 text-sm font-semibold ${isDarkMode ? "text-black" : ""} cursor-default`}>
-                    <h1>{video.allVideoTitles}</h1>
-                    <p className="text-gray-500 text-sm">
-                      {timeSinceUpload(video.uploadAt)} - {video.views} views
-                    </p>
-                  </div>
-                </div>
-              </div>
+              </Card>
             ))}
           </div>
-        </div>
+
+        ) : (
+          <div className="py-14 ml-80 ">
+            <div
+              id="description-container"
+              className="gap-12 grid grid-cols-3 hover"
+              style={{ marginTop: "60px" }}
+            >
+              {homePageDetails.map((video: any, index: number) => (
+                <div key={index} id={`video-${index}`} className="video-card">
+                  <div className=""> {/*relative*/}
+                    <img
+                      className="transition ease-in-out delay-150 cursor-pointer hover:-translate-y-1 hover:scale-110 duration-150 rounded-md"
+                      style={{ height: '250px', width: '350px' }}
+                      src={video.allThumbnailUrls}
+                      onClick={() => {
+                        handleRedirect(video.videoId, video.courseFees, video.courseId)
+                      }}
+                      alt=""
+                    />
+                    {video.courseFees !== null && (
+                      <div className="absolute top-0 left-0 m-1 bg-opacity-100 rounded-md p-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="#fcba03" height="20" viewBox="0 -960 960 960" width="20"><path d="m185-65 80-331L3-620l343-29 134-313 134 314 343 28-262 224 80 331-295-176L185-65Z" /></svg>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex mt-3 justify-center">
+                    <div>
+                      <img
+                        height={30}
+                        width={30}
+                        className="rounded-full m-1"
+                        src={video.channelLogo}
+                        alt=""
+                      />
+                    </div>
+                    <div className={`ml-3 text-sm font-semibold ${isDarkMode ? "text-black" : ""} cursor-default`}>
+                      <h1>{video.allVideoTitles}</h1>
+                      <p className="text-gray-500 text-sm">
+                        {timeSinceUpload(video.uploadAt)} - {video.views} views
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
