@@ -101,7 +101,8 @@ const Home: React.FC = () => {
     if (user) {
       setEmail(user.email || "");
     }
-    if (!loading&&!error  && email) {
+    if (!loading&&!error) {
+      console.log("apollo gar marache")
       setHomePageDetails(data.getAllVideoUrl);
     }
   }, [data, setHomePageDetails, user, setEmail,loading, error]);

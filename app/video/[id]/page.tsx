@@ -430,7 +430,7 @@ const VideoPage: React.FC<Props> = ({ params }) => {
     return (
         <>
             <NextTopLoader />
-            <Navbar />
+            <Navbar query={''} />
             <div className={`py-20 ${isDarkMode ? "bg-white" : "bg-black"}  px-10 flex`}>
                 <div id="video-container" style={{ maxWidth: "950px" }}>
                     <ReactPlayer width={960} height={550} controls url={videoUrl} onPlay={startWatchTime}
