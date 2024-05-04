@@ -33,12 +33,13 @@ interface Props {
 const SerachResult: React.FC<Props> = ({ params }) => {
 
     const [email, setEmail] = useState<string>("");
+    
 
     const [searQuery, setSearchQuery] = useState<any[]>([]);
     const [user] = useAuthState(auth);
 
     const query: any = decodeURIComponent(params.query)
-
+    
     const { loading, error, data } = useQuery(searchQuery, {
         variables: { query: query },
     });

@@ -548,7 +548,7 @@ const queries = {
 
                     course.videos.forEach((video) => {
                         const { videoID, videoTitle, videoViews, videoThumbnail, videoDescription, videoPublishedAt } = video;
-                        // Push video details into courseVideos array
+                     
                         courseVideos.push({
                             videoUrl: video.videoUrl,
                             videoId: videoID,

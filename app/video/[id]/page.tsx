@@ -111,7 +111,7 @@ const VideoPage: React.FC<Props> = ({ params }) => {
     }
 
     const videoId: any = decodeURIComponent(params.id)
-    const { loading, error, data } = useQuery(VideoUrl, {
+    const { loading, error, data,refetch } = useQuery(VideoUrl, {
         variables: { email: email, videoId: videoId, channelId: channelId },
     });
 
@@ -262,10 +262,11 @@ const VideoPage: React.FC<Props> = ({ params }) => {
             });
             const data = await response.json();
             console.log(data);
+            setComment("")
         } catch (error) {
             console.error("Failed to add comment, server error", error);
         }
-    }, [creatorEmail, videoId, comment, logo, email]);
+    }, [creatorEmail, videoId, comment, logo, email,setComment]);
 
     const handleRedirect = useCallback(async (videoId: string, courseFees: any, courseId: string) => {
         try {
@@ -382,6 +383,7 @@ const VideoPage: React.FC<Props> = ({ params }) => {
         if (user) {
             setEmail(user.email || "");
             setLogo(user.photoURL || "");
+            refetch()
         }
     }, [user, setLogo, setEmail, channelId, setChannelId, setCreatorEmail, setAllVideos, setVideoPublishedAt, setChannelName, setChannelLogo,
         setVideoViews, setSubscribers, setVideoUrl, setVideoTitle, setVideoDescription, setVideoTags, setIsAddedToPlaylist, data, setComments]);
@@ -523,7 +525,7 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                         </div>
                         <div className="flex gap-7 mb-10">
                             <img className="h-10 mt-3 rounded-full" src="https://i.pravatar.cc/150?u=a04258114e29026702d" alt="" />
-                            <Input type="text" color='primary' className={`ml-0 ${isDarkMode ? "text-black" : "text-white"}`} onChange={(e) => setComment(e.target.value)} variant="underlined" label="Add a comment" />
+                            <Input type="text" color='primary' className={`ml-0 ${isDarkMode ? "text-black" : "text-white"}`} onChange={(e) => setComment(e.target.value)} value={comment} variant="underlined" label="Add a comment" />
                             <Button onPress={() => handleAddComment()} className={`ml-10 ${isDarkMode ? "text-black" : "text-white"}`} variant="bordered">
                                 Add
                             </Button>

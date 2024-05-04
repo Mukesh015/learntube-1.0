@@ -81,13 +81,13 @@ const Navbar: React.FC = () => {
         toggleDarkMode();
     }, [toggleDarkMode])
 
-    const { loading, error, data } = useQuery(VERIFY_CREATOR, {
+    const { loading, error, data, refetch } = useQuery(VERIFY_CREATOR, {
         variables: { email: email },
     });
 
     const handleInputClick = () => {
         toggleSearchDiv();
-        console.log(searchItem)
+
     };
 
     const toggleSearchDiv = () => {
@@ -248,9 +248,10 @@ const Navbar: React.FC = () => {
             });
             const data = await response.json();
             console.log(data);
-
+        
             if (response.ok) {
                 console.log("search String deleted successfully")
+                refetch();
             }
         } catch (error) {
             console.error("Failed to fetch", error);
@@ -283,14 +284,15 @@ const Navbar: React.FC = () => {
             setuserName(user.displayName || "");
             setavatar(user.photoURL || "");
             setEmail(user.email || "");
+            refetch();
         }
-        if (data && email !== "") {
+        if  (!loading && !error && email !== "") {
             const verifyIsCreator = data.getIsCreator[0].isCreator
             setIsCreator(verifyIsCreator);
             setSearchBarDetails(data.getSearchBarDetails)
             setNotification(data.getNotification)
         }
-    }, [user, setIsCreator, data, setSearchBarDetails, setNotification]);
+    }, [user, setIsCreator, data, setSearchBarDetails, setNotification,loading, error]);
 
     useEffect(() => {
         const handleSearchChange = (e: Event) => {
