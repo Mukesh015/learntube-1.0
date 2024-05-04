@@ -8,6 +8,8 @@ import { auth } from '@/configurations/firebase/config';
 import { useDarkMode } from "@/components/hooks/theme"
 import NextTopLoader from 'nextjs-toploader';
 import "react-toastify/dist/ReactToastify.css";
+import { Select, SelectItem } from "@nextui-org/react";
+import { Modal, Button, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Input } from "@nextui-org/react";
 
 
 const CREATOR_DETAILS = gql`
@@ -70,6 +72,7 @@ query GetAllVideoUrl ($email: String){
 
 const CardGrid: React.FC = () => {
     const { isDarkMode } = useDarkMode();
+    const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
 
     const [email, setEmail] = useState<string>("");
     const [home, setHome] = useState<any[]>([]);
@@ -77,7 +80,11 @@ const CardGrid: React.FC = () => {
     const [channelDeatails, setChannelDetails] = useState<any[]>([]);
     const [allCourses, setAllCourses] = useState<any[]>([]);
     const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
-
+    const [updateddata, setUpdateddata] = useState<string>("");
+    const [spinnerButton, setspinnerButton] = useState<boolean>(false);
+    const [headerText, setHeaderText] = useState<string>("");
+    const [changeLinkModel, setChangeLinkModel] = useState<boolean>(false);
+    const [toUpdate, setToUpdate] = useState<string>("");
 
     const [homeTab, setHomeTab] = useState<boolean>(true);
     const [shortTab, setShortTab] = useState<boolean>(false);
@@ -85,7 +92,6 @@ const CardGrid: React.FC = () => {
     const [courseStates, setCourseStates] = useState<{ [key: string]: boolean }>({});
     const [communityTab, setCommunityTab] = useState<boolean>(false);
     const [searchTab, setSearchTab] = useState<boolean>(false);
-    const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
 
     const [user] = useAuthState(auth);
 
@@ -93,26 +99,58 @@ const CardGrid: React.FC = () => {
         variables: { email: email },
     });
 
-    const formatTime = (timestampString: string) => {
-        // Convert the string timestamp to a number
-        const timestamp = parseInt(timestampString, 10);
+    const handlePlatformChange = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
+        const selectedPlatform = event.target.value;
+        setToUpdate(selectedPlatform);
+    }, [setToUpdate]);
 
-        // Check if the converted timestamp is a valid number
+
+    const handleModelOpen = useCallback(async (modelName: string) => {
+        if (modelName === "channelName") {
+            setHeaderText("Change your channel name");
+            setToUpdate("channelName")
+            onOpen();
+        }
+        else if (modelName === "RecoveryEmail") {
+            setHeaderText("Change your recovery email");
+            setToUpdate("RecoveryEmail")
+            onOpen();
+        }
+        else if (modelName === "channelDescription") {
+            setHeaderText("Change your channel description");
+            setToUpdate("channelDescription")
+            onOpen();
+        }
+        else if (modelName === "channelLogo") {
+            setHeaderText("Change your channel logo");
+            setToUpdate("channelLogo")
+            onOpen();
+        }
+        else if (modelName === "channelCoverPhoto") {
+            setHeaderText("Change your cover photo");
+            setToUpdate("channelCoverPhoto")
+            onOpen();
+        }
+        else if (modelName === "socialMedia") {
+            setHeaderText("Change your social media link");
+            setChangeLinkModel(true);
+            onOpen();
+        }
+    }, [setHeaderText, setToUpdate, setChangeLinkModel, onOpen]);
+
+    const formatTime = (timestampString: string) => {
+        const timestamp = parseInt(timestampString, 10);
         if (isNaN(timestamp)) {
             return "Invalid timestamp";
         }
-
         const currentDate = new Date();
         const publishedDate = new Date(timestamp);
         const diffInMs = currentDate.getTime() - publishedDate.getTime();
         const diffInSec = Math.floor(diffInMs / 1000);
 
-        // Handle case where timestamp is in the future
         if (diffInSec < 0) {
             return "Future timestamp";
         }
-
-        // Convert timestamp to readable format
         if (diffInSec < 60) {
             return `${diffInSec} seconds ago`;
         } else if (diffInSec < 3600) {
@@ -169,6 +207,32 @@ const CardGrid: React.FC = () => {
         }
     }, [setHomeTab, setShortTab, setCourseTab, setCommunityTab, setSearchTab])
 
+    const handleInfoChange = useCallback(async () => {
+        console.log("toUpdate: ", toUpdate)
+        console.log("updatedData: ", updateddata)
+        setspinnerButton(true);
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN}/features/${toUpdate}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email: email,
+                    [toUpdate]: updateddata
+                })
+            });
+            const result = await response.json();
+            console.log(result);
+            if (response.ok) {
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            }
+        } catch (error) {
+            console.log("Failed to change informations, server error", error);
+        }
+    }, [toUpdate, updateddata,setspinnerButton, email])
 
     useEffect(() => {
         if (user) {
@@ -378,7 +442,7 @@ const CardGrid: React.FC = () => {
                                             <div className='mt-5 flex'>
                                                 <p className='font-semibold'>Channel name:</p>
                                                 <span className='text-gray-400 ml-1'>{item.channelName}</span>
-                                                <li className='ml-1 p-1 list-none hover:bg-slate-200 justify-center item-center  rounded-full'>
+                                                <li onClick={() => { handleModelOpen("channelName") }} className='ml-1 p-1 list-none hover:bg-slate-200 justify-center item-center  rounded-full'>
                                                     <svg className='hover:fill-blue-500' xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 0 24 24" width="18px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M14.06 9.02l.92.92L5.92 19H5v-.92l9.06-9.06M17.66 3c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29zm-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z" /></svg>
                                                 </li>
 
@@ -386,7 +450,7 @@ const CardGrid: React.FC = () => {
                                             <div className='mt-5 flex'>
                                                 <p className='font-semibold'>Recovery email address:</p>
                                                 <span className='text-gray-400 ml-1'>{item.RecoveryEmail}</span>
-                                                <li className='ml-1 p-1 list-none hover:bg-slate-200 justify-center item-center  rounded-full'>
+                                                <li onClick={() => { handleModelOpen("RecoveryEmail") }} className='ml-1 p-1 list-none hover:bg-slate-200 justify-center item-center  rounded-full'>
                                                     <svg className='hover:fill-blue-500' xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 0 24 24" width="18px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M14.06 9.02l.92.92L5.92 19H5v-.92l9.06-9.06M17.66 3c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29zm-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z" /></svg>
                                                 </li>
                                             </div>
@@ -403,7 +467,7 @@ const CardGrid: React.FC = () => {
                                             <div>
                                                 <div className='flex'>
                                                     <p className='font-semibold'>Channel description:</p>
-                                                    <li className='ml-1 p-1 list-none hover:bg-slate-200 justify-center item-center  rounded-full'>
+                                                    <li onClick={() => { handleModelOpen("channelDescription") }} className='ml-1 p-1 list-none hover:bg-slate-200 justify-center item-center  rounded-full'>
                                                         <svg className='hover:fill-blue-500' xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 0 24 24" width="18px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M14.06 9.02l.92.92L5.92 19H5v-.92l9.06-9.06M17.66 3c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29zm-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z" /></svg>
                                                     </li>
                                                 </div>
@@ -412,7 +476,7 @@ const CardGrid: React.FC = () => {
                                             <div className='mt-5 '>
                                                 <div className='flex'>
                                                     <p className='font-semibold'>Provided links:</p>
-                                                    <li className='ml-1 p-1 list-none hover:bg-slate-200 justify-center item-center  rounded-full'>
+                                                    <li onClick={() => handleModelOpen("socialMedia")} className='ml-1 p-1 list-none hover:bg-slate-200 justify-center item-center  rounded-full'>
                                                         <svg className='hover:fill-blue-500' xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 0 24 24" width="18px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M14.06 9.02l.92.92L5.92 19H5v-.92l9.06-9.06M17.66 3c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29zm-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z" /></svg>
                                                     </li>
                                                 </div>
@@ -594,7 +658,7 @@ const CardGrid: React.FC = () => {
                                 {allCourses.map((course) => (
                                     <div
                                         key={course.courseId}
-                                        className={`ml-20 pt-3 ${isDarkMode?"bg-gray-300":"bg-gray-700"} pl-3 pr-3 pb-1 mr-20 rounded-lg mt-10 cursor-pointer`}
+                                        className={`ml-20 pt-3 ${isDarkMode ? "bg-gray-300" : "bg-gray-700"} pl-3 pr-3 pb-1 mr-20 rounded-lg mt-10 cursor-pointer`}
                                     >
                                         <div className="">
                                             <div
@@ -613,7 +677,7 @@ const CardGrid: React.FC = () => {
                                                 <div className="flex ml-5 justify-center mr-10">
                                                     <div className="ml-3">
                                                         {/* Course title */}
-                                                        <h1 className={`mb-3 ${isDarkMode?"text-black":"text-white"} font-bold  `}>{course.courseName}</h1>
+                                                        <h1 className={`mb-3 ${isDarkMode ? "text-black" : "text-white"} font-bold  `}>{course.courseName}</h1>
                                                         <p className="text-gray-500 text-sm">{course.courseDescription}</p>
                                                     </div>
                                                 </div>
@@ -635,8 +699,8 @@ const CardGrid: React.FC = () => {
                                                             <div className="flex mt-10 ml-5 justify-center mr-10">
                                                                 <div className="ml-3">
                                                                     {/* Video title */}
-                                                                    <h1 className={`font-bold ${isDarkMode?"text-black":"text-white"}`}>{video.videoTitle}</h1>
-                                                                    <p className={`mb-5 ${isDarkMode?"text-slate-600":"text-gray-300"} mt-5 text-sm`}>{video.videoDescription}</p>
+                                                                    <h1 className={`font-bold ${isDarkMode ? "text-black" : "text-white"}`}>{video.videoTitle}</h1>
+                                                                    <p className={`mb-5 ${isDarkMode ? "text-slate-600" : "text-gray-300"} mt-5 text-sm`}>{video.videoDescription}</p>
                                                                     <p className="text-sm text-gray-500">
                                                                         {video.videoViews} views - {formatTime(video.videoPublishedAt)}
                                                                     </p>
@@ -700,6 +764,101 @@ const CardGrid: React.FC = () => {
                     </div>
                 </div>
             </div>
+            <Modal
+                backdrop="opaque"
+                size="3xl"
+                isOpen={isOpen}
+                onClose={onClose}
+                motionProps={{
+                    variants: {
+                        enter: {
+                            y: 0,
+                            opacity: 1,
+                            transition: {
+                                duration: 0.3,
+                                ease: "easeInOut",
+                            },
+                        },
+                        exit: {
+                            y: -20,
+                            opacity: 0,
+                            transition: {
+                                duration: 0.2,
+                                ease: "easeIn",
+                            },
+                        },
+                    }
+                }}
+            >
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader id="model-header" className="flex flex-col gap-1">{headerText}</ModalHeader>
+                            <ModalBody>
+                                {changeLinkModel &&
+                                    <Select
+                                        variant="faded"
+                                        label="Select a platform"
+                                        className="w-full"
+                                        onChange={handlePlatformChange}
+                                    >
+                                        <SelectItem key="Github" value="Github">
+                                            Github
+                                        </SelectItem>
+                                        <SelectItem key="Discord" value="Discord">
+                                            Discord
+                                        </SelectItem>
+                                        <SelectItem key="LinkedIn" value="LinkedIn">
+                                            LinkedIn
+                                        </SelectItem>
+                                        <SelectItem key="Twitter" value="Twitter">
+                                            Twitter
+                                        </SelectItem>
+                                        <SelectItem key="Facebook" value="Facebook">
+                                            Facebook
+                                        </SelectItem>
+                                        <SelectItem key="Instagram" value="Instagram">
+                                            Instagram
+                                        </SelectItem>
+                                        <SelectItem key="any" value="any">
+                                            any
+                                        </SelectItem>
+                                    </Select>
+                                }
+                                <Input
+                                    onChange={(e) => setUpdateddata(e.target.value)}
+                                    classNames={{
+                                        base: "max-w-full h-10",
+                                        mainWrapper: "h-full",
+                                        input: "text-small",
+                                        inputWrapper: "h-full font-normal text-default-500 bg-default-400/20 dark:bg-default-500/20",
+                                    }}
+                                    placeholder="Enter something here..."
+                                    size="sm"
+                                    type="search"
+                                />
+                                <p className="text-red-500">
+                                    This operation have to performs page reload.
+                                </p>
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button color="danger" variant="light" onPress={onClose}>
+                                    Close
+                                </Button>
+                                {!spinnerButton ? (
+                                    <Button onClick={() => handleInfoChange()} color="primary" >
+                                        Change
+                                    </Button>
+                                ) : (
+                                    <Button isLoading color="primary" >
+                                        Changing...
+                                    </Button>
+                                )}
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
         </>
     );
 }

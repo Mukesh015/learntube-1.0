@@ -32,14 +32,14 @@ query Exam($email:String){
       }
       getNotifications(email: $email) {
         email
+        avatar
+        channelLogo
         isRead
         message
         notificationId
         timeStamp
         videoId
         videoThumbnail
-        avatar
-        channelLogo
       }
   }
 `
@@ -59,11 +59,12 @@ const Navbar: React.FC = () => {
     const [toggleVoiceSearches, settoggleVoiceSearches] = useState<boolean>(false);
     const [showNotifications, setShowNotifications] = useState<boolean>(false);
     const [showAllClear, setShowAllClear] = useState<boolean>(false);
+    const [unreadMessages, setUnreadMessages] = useState<number>(0);
 
     const [spinnerButton, setspinnerButton] = useState<boolean>(false);
     const [searchString, setsearchString] = useState<string>("");
     const [searchbarDetails, setSearchBarDetails] = useState<any[]>([]);
-    const [notification, setNotification] = useState<any[]>([]);
+    const [notifications, setNotifications] = useState<any[]>([]);
 
     const [text, setText] = useState("");
     const [isListening, setIsListening] = useState(false);
@@ -103,7 +104,6 @@ const Navbar: React.FC = () => {
             router.push("/creator/register")
         }
     }, [isCreator])
-
 
 
     const handleUpdateProfile = useCallback(async () => {
@@ -156,12 +156,6 @@ const Navbar: React.FC = () => {
 
     }, [newInfo, toUpdate])
 
-    const handleClearNotifications = useCallback(async () => {
-        setShowAllClear(true);
-        setTimeout(() => {
-            setShowAllClear(false);
-        }, 3000);
-    }, [setShowAllClear])
 
     const handleModelOpen = useCallback(async (modelName: string) => {
         if (modelName === "nameChange") {
@@ -201,6 +195,38 @@ const Navbar: React.FC = () => {
         }
     };
 
+    const formatTime = (timestampString: string) => {
+        // Convert the string timestamp to a number
+        const timestamp = parseInt(timestampString, 10);
+
+        // Check if the converted timestamp is a valid number
+        if (isNaN(timestamp)) {
+            return "Invalid timestamp";
+        }
+
+        const currentDate = new Date();
+        const publishedDate = new Date(timestamp);
+        const diffInMs = currentDate.getTime() - publishedDate.getTime();
+        const diffInSec = Math.floor(diffInMs / 1000);
+
+        // Handle case where timestamp is in the future
+        if (diffInSec < 0) {
+            return "Future timestamp";
+        }
+
+        // Convert timestamp to readable format
+        if (diffInSec < 60) {
+            return `${diffInSec} seconds ago`;
+        } else if (diffInSec < 3600) {
+            return `${Math.floor(diffInSec / 60)} minutes ago`;
+        } else if (diffInSec < 86400) {
+            return `${Math.floor(diffInSec / 3600)} hours ago`;
+        } else {
+            return `${Math.floor(diffInSec / 86400)} days ago`;
+        }
+    };
+
+
     const handleSearch = useCallback(async (recommendedSearchString: string | null) => {
 
         if (!recommendedSearchString) {
@@ -227,9 +253,7 @@ const Navbar: React.FC = () => {
             }
 
             const url = `${process.env.NEXT_PUBLIC_CLIENT_DOMAIN}/search/${searchstring}`;
-            window.location.href = url;
-
-            console.log(data);
+            router.push(url);
         } catch (error) {
             console.error("Failed to fetch", error);
         }
@@ -262,54 +286,6 @@ const Navbar: React.FC = () => {
         setShowNotifications(!showNotifications);
     }
 
-    useEffect(() => {
-        const handleClickOutside = () => {
-            setSearchItem(false);
-        };
-    
-        if (searchItem) {
-            document.addEventListener("click", handleClickOutside);
-        } else {
-            document.removeEventListener("click", handleClickOutside);
-        }
-    
-        return () => {
-            document.removeEventListener("click", handleClickOutside);
-        };
-    }, [searchItem, setSearchItem])
-
-
-    useEffect(() => {
-        if (user) {
-            setuserName(user.displayName || "");
-            setavatar(user.photoURL || "");
-            setEmail(user.email || "");
-        }
-        if (data && email !== "") {
-            const verifyIsCreator = data.getIsCreator[0].isCreator
-            setIsCreator(verifyIsCreator);
-            setSearchBarDetails(data.getSearchBarDetails)
-            setNotification(data.getNotification)
-        }
-    }, [user, setIsCreator, data, setSearchBarDetails, setNotification]);
-
-    useEffect(() => {
-        const handleSearchChange = (e: Event) => {
-            const input = e.target as HTMLInputElement;
-            const value = input.value.toLowerCase();
-            setsearchString(value);
-        };
-
-        const searchInput = document.querySelector<HTMLInputElement>("[data-search-content]");
-        if (searchInput) {
-            searchInput.addEventListener("input", handleSearchChange);
-
-            return () => {
-                searchInput.removeEventListener("input", handleSearchChange);
-            };
-        }
-    }, [setsearchString]);
-
     const startListening = async () => {
         setText("");
         setIsListening(true);
@@ -336,6 +312,105 @@ const Navbar: React.FC = () => {
         startListening();
     }, [isListening, text, handleSearch, startListening, settoggleVoiceSearches, stopListening]);
 
+    const handleClearAllNotification = useCallback(async () => {
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN}/features/clearallnotification`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email: email
+                })
+            });
+            const data = await response.json();
+            console.log(data);
+            if (response.ok) {
+                setShowAllClear(true);
+                setTimeout(() => {
+                    setShowAllClear(false);
+                }, 3000);
+            }
+        } catch (error) {
+            console.error("Failed to clear all notifications", error);
+        }
+    }, [email, setShowAllClear]);
+
+    const handleMarkAsRead = useCallback(async (notificationId: string) => {
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN}/features/markasread`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email: email,
+                    notificationId: notificationId
+                })
+            });
+            const data = await response.json();
+            console.log(data);
+        } catch (error) {
+            console.error("Failed to clear all notifications", error);
+        }
+    }, [email]);
+
+    useEffect(() => {
+        const handleClickOutside = () => {
+            setSearchItem(false);
+            settoggleVoiceSearches(false);
+        };
+
+        if (searchItem || toggleVoiceSearches) {
+            document.addEventListener("click", handleClickOutside);
+        } else {
+            document.removeEventListener("click", handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener("click", handleClickOutside);
+        };
+    }, [searchItem, toggleVoiceSearches, settoggleVoiceSearches, setSearchItem])
+
+
+    useEffect(() => {
+        if (user) {
+            setuserName(user.displayName || "");
+            setavatar(user.photoURL || "");
+            setEmail(user.email || "");
+        }
+        if (data && email !== "") {
+            const verifyIsCreator = data.getIsCreator[0].isCreator
+            setIsCreator(verifyIsCreator);
+            setSearchBarDetails(data.getSearchBarDetails)
+            setNotifications(data.getNotifications)
+            console.log(notifications)
+        }
+        if (notifications) {
+            const unreadCount = notifications.filter(notification => !notification.isRead).length;
+            setUnreadMessages(unreadCount);
+        }
+    }, [user, setIsCreator, setUnreadMessages, data, setSearchBarDetails, notifications, setNotifications]);
+
+    useEffect(() => {
+        const handleSearchChange = (e: Event) => {
+            const input = e.target as HTMLInputElement;
+            const value = input.value.toLowerCase();
+            setsearchString(value);
+        };
+
+        const searchInput = document.querySelector<HTMLInputElement>("[data-search-content]");
+        if (searchInput) {
+            searchInput.addEventListener("input", handleSearchChange);
+
+            return () => {
+                searchInput.removeEventListener("input", handleSearchChange);
+            };
+        }
+    }, [setsearchString]);
+
+
+
     useEffect(() => {
         if (!recognition) {
             if ("webkitSpeechRecognition" in window) {
@@ -351,11 +426,11 @@ const Navbar: React.FC = () => {
         if (recognition) {
             recognition.onresult = (event: SpeechRecognitionEvent) => {
                 console.log("onresult:", event);
-                
+
                 recognition.stop();
                 setTimeout(() => {
                     handleSearch(event.results[0][0].transcript);
-                    },1000)
+                }, 1000)
                 setText(event.results[0][0].transcript);
                 setIsListening(false);
 
@@ -485,7 +560,7 @@ const Navbar: React.FC = () => {
                     </li>
                     <li onClick={handleShowNotifications} className={`rounded-full px-1 ${isDarkMode ? "hover:bg-gray-300" : "hover:bg-gray-700"}  p-0.5 cursor-pointer`}>
                         <Tooltip color="warning" delay={700} showArrow={true} content="Notifications">
-                            <Badge content="2" shape="circle" color="danger">
+                            <Badge content={unreadMessages} shape="circle" color="danger">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     height="28px"
@@ -618,7 +693,7 @@ const Navbar: React.FC = () => {
                 </ModalContent>
             </Modal>
 
-            {searchItem && searchbarDetails &&(
+            {searchItem && searchbarDetails && (
                 <div className={`z-50 top-20 rounded-md fixed shadow-lg shadow-gray-500 ${isDarkMode ? "bg-white" : "bg-gray-700"}`} style={{ marginLeft: "440px", marginRight: "480px", width: "700px" }}>
                     <div className="flex cursor-pointer">
                         <div className="flex flex-col">
@@ -643,9 +718,9 @@ const Navbar: React.FC = () => {
                                     )
                                     .map((item, idx) => (
                                         <div key={idx}>
-                                            <div className="flex hover:bg-gray-600">
-                                                <svg className="mt-2 ml-2" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" /></svg>
-                                                <p className="p-2" onClick={() => handleSearch(item.videoTitle)}>{item.videoTitle}</p>
+                                            <div className={`flex ${isDarkMode ? "hover:bg-gray-300" : "hover:bg-gray-700"}`}>
+                                                <svg className="mt-2 ml-2" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill={isDarkMode ? '#000000' : '#FFFFFF'}><path d="M0 0h24v24H0V0z" fill="none" /><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" /></svg>
+                                                <p className={`p-2 ${isDarkMode ? "text-black" : "text-white"}`} onClick={() => handleSearch(item.videoTitle)}>{item.videoTitle}</p>
                                             </div>
                                         </div>
                                     ))
@@ -725,22 +800,31 @@ const Navbar: React.FC = () => {
                             height: "40rem",
                         }}
                     >
-                        <div id="notification" className={` cursor-pointer ${isDarkMode ? "hover:bg-gray-300" : "hover:bg-gray-700"} mb-3 p-1`}>
-                            <div className="flex ml-3 mr-3 mt-3">
-                                <img className="h-10 rounded-full mt-5" src="https://static.rfstat.com/renderforest/images/v2/landing-pics/youtube-logo/1124.jpg" alt="" />
-                                <h1 className="text-sm ml-3">Lorem ipsum dolor sit amet consectetur adipisicing elit. Optio saepe sunt commodi nesciunt molestiae.</h1>
-                                <img className="h-20 rounded-lg" src="https://marketplace.canva.com/EAFAMirCsX4/2/0/1600w/canva-purple-creative-livestream-youtube-thumbnail-X2eVuOzURSM.jpg" alt="" />
+                        {notifications.map((item, index) => (
+                            <div key={index} id="notification" className={` cursor-pointer ${isDarkMode ? "hover:bg-gray-300" : "hover:bg-gray-700"} pb-5 p-1`}>
+                                <div onClick={() => handleMarkAsRead(item.notificationId)} className="flex ml-3 mr-3 mt-3">
+                                    <img className="h-10 rounded-full mt-5" src={item.avatar} alt="" />
+                                    <div>
+                                        <h1 className="text-sm ml-3 max-w-64 mt-5">{item.message}</h1>
+                                        <span className="flex">
+                                            <span className="ml-3 text-sm text-gray-500">{formatTime(item.timeStamp)}</span>
+                                            {!item.isRead &&
+                                                <Tooltip color="warning" delay={700} showArrow={true} content="unread massage">
+                                                    <svg className="ml-3 animate-ping mt-1.5 fill-red-600" xmlns="http://www.w3.org/2000/svg" height="11" viewBox="0 -960 960 960" width="11"><path d="M480-200q-117 0-198.5-81.5T200-480q0-117 81.5-198.5T480-760q117 0 198.5 81.5T760-480q0 117-81.5 198.5T480-200Z" /></svg>
+                                                </Tooltip>
+                                            }
+                                        </span>
+                                    </div>
+                                    <img className="h-20 absolute right-2 rounded-lg" src={item.videoThumbnail} alt="" />
+                                </div>
                             </div>
-                            <span className="ml-20 text-sm text-gray-500">3 weeks ago</span>
-                        </div>
+                        ))}
                         <Tooltip color="warning" delay={700} showArrow={true} content="clear all">
                             {showAllClear ? (
                                 <svg className={`p-2 rounded-full ${isDarkMode ? "bg-gray-300" : "bg-gray-700"}  fixed bottom-20 ml-52`} xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 0 24 24" width="48px" fill={isDarkMode ? '#000000' : '#FFFFFF'}
                                 ><path d="M0 0h24v24H0V0z" fill="none" /><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" /></svg>
-
                             ) : (
-
-                                <svg onClick={handleClearNotifications} className={`p-2 rounded-full ${isDarkMode ? "bg-gray-300" : "bg-gray-700"}  fixed bottom-20 ml-52`} xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 0 24 24" width="48px" fill={isDarkMode ? '#000000' : '#FFFFFF'}
+                                <svg onClick={handleClearAllNotification} className={`p-2 rounded-full ${isDarkMode ? "bg-gray-300" : "bg-gray-700"}  fixed bottom-20 ml-52`} xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 0 24 24" width="48px" fill={isDarkMode ? '#000000' : '#FFFFFF'}
                                 ><path d="M0 0h24v24H0V0z" fill="none" /><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" /></svg>
                             )}
                         </Tooltip>

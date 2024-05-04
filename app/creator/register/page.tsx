@@ -59,6 +59,7 @@ const CreatorRegisterForm: React.FC = () => {
     const handleChannelInfoForm = useCallback(async () => {
         setOtpForm(true);
     }, [setOtpForm]);
+    
     const handlePlatformChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setPlatform(event.target.value);
     };
