@@ -38,7 +38,7 @@ const Home: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [notificationToken, setNotificationToken] = useState<string>("");
 
-  const { loading, error, data } = useQuery(HOMEPAGE_DETAILS);
+  const { loading, error, data,refetch } = useQuery(HOMEPAGE_DETAILS);
   const [user] = useAuthState(auth);
 
 
@@ -97,13 +97,14 @@ const Home: React.FC = () => {
   }, [email]);
 
   useEffect(() => {
+  
     if (user) {
       setEmail(user.email || "");
     }
-    if (data) {
+    if (!loading&&!error  && email) {
       setHomePageDetails(data.getAllVideoUrl);
     }
-  }, [data, setHomePageDetails, user, setEmail]);
+  }, [data, setHomePageDetails, user, setEmail,loading, error]);
 
   const timeSinceUpload = (uploadAt: string) => {
     const uploadDate = new Date(uploadAt);
@@ -123,7 +124,7 @@ const Home: React.FC = () => {
     <>
       <NextTopLoader />
       <div className={`${isDarkMode ? "bg-white" : "bg-black"}`}>
-        <Navbar />
+        <Navbar query={""} />
         <Sidebar />
         <div className="py-14 ml-80 ">
           <div
