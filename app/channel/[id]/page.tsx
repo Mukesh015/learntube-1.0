@@ -1,15 +1,92 @@
 "use client"
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "@/components/navbar";
 import Sidebar from "@/components/sidebar";
 import { Button } from "@nextui-org/button";
 import { Tabs, Tab } from "@nextui-org/react";
 import { useDarkMode } from "@/components/hooks/theme"
+import { gql, useQuery } from "@apollo/client";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "@/configurations/firebase/config";
 
-const ChannelPage: React.FC = () => {
+
+const CHANNEL_DETAILS = gql`
+query CHANNEL_DETAILS ($channelId: String, $email: String){
+            getdetailsByChanneld(channelId: $channelId){
+                channelId
+                channelDescription
+                channelLogo
+                channelName
+                coverPhoto
+            
+                noOfVideos
+                subscribers
+                link {
+                  Discord
+                  Facebook
+                  Github
+                  Instagram
+                  LinkedIn
+                  Twitter
+                  any
+                }
+              }
+              
+              getCoursesbyChannelID(channelId: $channelId) {
+                courseDescription
+                courseId
+                courseName
+                courseThumb
+                videos {
+                  videoDescription
+                  videoId
+                  videoPublishedAt
+                  videoThumbnail
+                  videoTitle
+                  videoUrl
+                  videoViews
+                }
+              }
+              getvideoByChannelId(channelId: $channelId) {
+                videoId
+                videoPublishedAt
+                videoThumbnail
+                videoTitle
+                viewsCount
+              }
+              getFeatures(email: $email,channelId: $channelId) {
+                subscribedchannel
+              }
+        }
+        
+`
+interface Props {
+    params: {
+        id: string;
+    };
+}
+
+const ChannelPage: React.FC<Props> = ({ params }) => {
     const { isDarkMode } = useDarkMode();
 
     const [isSubsCribed, setIsSubsribed] = useState<boolean>(false);
+
+    const [email, setEmail] = useState<string>("");
+    
+    const [user] = useAuthState(auth);
+
+    const channelId: any = decodeURIComponent(params.id)
+
+    const { loading, error, data,refetch } = useQuery(CHANNEL_DETAILS, {
+        variables: { channelId:channelId,email: email },
+    });
+
+    
+    useEffect(() => {
+        if (user) {
+            setEmail(user.email || "");
+        }
+    },[user,setEmail]);
 
     return (
         <>

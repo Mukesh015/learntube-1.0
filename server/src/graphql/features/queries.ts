@@ -13,4 +13,8 @@ getSubscribedChannels(email:String):[subscribedChannels]
 getCreatorCourses(email:String):[creatorCourses]
 getvideoThumbnail(videoId:String):[videoThumbnail]
 getNotifications(email:String):[notifications]
+getdetailsByChanneld(channelId:String):[detailsByChanneld]
+getCoursesbyChannelID(channelId:String):[coursebyChannelId]
+getvideoByChannelId(channelId:String):[videoByChannelId]
+
 `
