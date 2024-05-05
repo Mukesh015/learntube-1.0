@@ -15,6 +15,7 @@ import { useDarkMode } from "@/components/hooks/theme"
 import NextTopLoader from 'nextjs-toploader';
 import "react-toastify/dist/ReactToastify.css";
 import { Card, Skeleton } from "@nextui-org/react";
+import { push } from 'firebase/database';
 
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 
@@ -490,6 +491,7 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                                     <li>
                                         <Tooltip color="warning" delay={700} showArrow={true} content="Jane's channel">
                                             <User
+                                                onClick={() => router.push(`/channel/${channelId}`)}
                                                 className={`${isDarkMode ? "text-black" : "text-white"}`}
                                                 name={channelName}
                                                 description={`${subscribers} subscribers`}
@@ -502,7 +504,7 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                                     <li>
                                         <Tooltip color="warning" delay={700} showArrow={true} content="Subscribe">
                                             <Button
-                                                className={isSubsCribed ? "bg-transparent text-black border-default-200" : ""}
+                                                className={`${isSubsCribed ? `bg-transparent ${isDarkMode ? "text-black bg-gray-200" : "text-white bg-gray-700 "} border-default-200` : ""}`}
                                                 color="primary"
                                                 radius="full"
                                                 size="md"

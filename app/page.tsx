@@ -11,6 +11,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { Card, Skeleton, Button } from "@nextui-org/react";
 import NextTopLoader from "nextjs-toploader";
 import { useRouter } from "next/navigation";
+import Lottie from 'lottie-react';
+import animationData from "@/public/Animation - 1714890965505.json"
 
 const HOMEPAGE_DETAILS = gql`
   query GetAllVideoUrl {
@@ -40,10 +42,6 @@ const Home: React.FC = () => {
 
   const { loading, error, data, refetch } = useQuery(HOMEPAGE_DETAILS);
   const [user] = useAuthState(auth);
-
-  const handleRedirectToChannelPage = useCallback(async () => {
-    router.push("/channel/gaming")
-  }, [router])
 
 
   const handleRedirect = useCallback(async (videoId: string, courseFees: any, courseId: string) => {
@@ -164,24 +162,17 @@ const Home: React.FC = () => {
             >
               {homePageDetails.map((video: any, index: number) => (
                 <div key={index} id={`video-${index}`} className="video-card">
-                  <div className=""> {/*relative*/}
-                    <img
-                      className="transition ease-in-out delay-150 cursor-pointer hover:-translate-y-1 hover:scale-110 duration-150 rounded-md"
-                      style={{ height: '250px', width: '350px' }}
-                      src={video.allThumbnailUrls}
-                      onClick={() => {
-                        handleRedirect(video.videoId, video.courseFees, video.courseId)
-                      }}
-                      alt=""
-                    />
-                    {video.courseFees !== null && (
-                      <div className="absolute top-0 left-0 m-1 bg-opacity-100 rounded-md p-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="#fcba03" height="20" viewBox="0 -960 960 960" width="20"><path d="m185-65 80-331L3-620l343-29 134-313 134 314 343 28-262 224 80 331-295-176L185-65Z" /></svg>
-                      </div>
-                    )}
-                  </div>
+                  <img
+                    className="transition ease-in-out delay-150 cursor-pointer hover:-translate-y-1 hover:scale-110 duration-150 rounded-md"
+                    style={{ height: '250px', width: '350px' }}
+                    src={video.allThumbnailUrls}
+                    onClick={() => {
+                      handleRedirect(video.videoId, video.courseFees, video.courseId)
+                    }}
+                    alt=""
+                  />
                   <div className="flex mt-3 justify-center">
-                    <div className="cursor-pointer" onClick={handleRedirectToChannelPage}>
+                    <div className="cursor-pointer" onClick={()=>router.push(`/channel/${video.channelId}`)}>
                       <img
                         height={30}
                         width={30}
@@ -192,8 +183,11 @@ const Home: React.FC = () => {
                     </div>
                     <div className={`ml-3 text-sm font-semibold ${isDarkMode ? "text-black" : ""} cursor-default`}>
                       <h1>{video.allVideoTitles}</h1>
-                      <p className="text-gray-500 text-sm">
+                      <p className="text-gray-500 flex text-sm">
                         {timeSinceUpload(video.uploadAt)} - {video.views} views
+                        {video.courseFees !== null &&
+                          <Lottie className="h-5 ml-3" animationData={animationData} />
+                        }
                       </p>
                     </div>
                   </div>

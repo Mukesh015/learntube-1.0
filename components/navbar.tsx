@@ -392,7 +392,6 @@ const Navbar: React.FC<{ query: string }> = ({ query }) => {
             setIsCreator(verifyIsCreator);
             setSearchBarDetails(data.getSearchBarDetails)
             setNotifications(data.getNotifications)
-            console.log(notifications)
             refetch()
 
         }

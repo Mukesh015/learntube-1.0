@@ -335,7 +335,7 @@ const Sidebar: React.FC = () => {
                         {showSubscriptions &&
                             <div>
                                 {subscribedChannel.map((item, index) => (
-                                    <li key={index} className="py-2 px-2.5 hover:scale-110 rounded-lg flex ml-3 font-semibold pb-2 transition ease-in-out delay-150 hover:-translate-y-1 duration-150 hs-accordion hover:bg-gray-700">
+                                    <li onClick={() => router.push(`/channel/${item.channelId}`)} key={index} className="py-2 px-2.5 hover:scale-110 rounded-lg flex ml-3 font-semibold pb-2 transition ease-in-out delay-150 hover:-translate-y-1 duration-150 hs-accordion hover:bg-gray-700">
                                         <img className="h-8 rounded-full mr-2" src={item.channelLogo} alt="" />
                                         <p className="text-sm text-blue-500">{item.channelId}</p>
                                     </li>
