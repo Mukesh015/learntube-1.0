@@ -8,11 +8,13 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/configurations/firebase/config";
 import { useDarkMode } from "@/components/hooks/theme"
 import "react-toastify/dist/ReactToastify.css";
-import { Card, Skeleton, Button } from "@nextui-org/react";
+import { Card, Skeleton } from "@nextui-org/react";
 import NextTopLoader from "nextjs-toploader";
 import { useRouter } from "next/navigation";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
 import Lottie from 'lottie-react';
-import animationData from "@/public/Animation - 1714890965505.json"
+import animationData1 from "@/public/Animation - 1714890965505.json"
+import animationData2 from "@/public/Animation - 1714927249104.json"
 
 const HOMEPAGE_DETAILS = gql`
   query GetAllVideoUrl {
@@ -35,10 +37,11 @@ const Home: React.FC = () => {
 
   const { isDarkMode } = useDarkMode();
   const router = useRouter();
-
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [homePageDetails, setHomePageDetails] = useState<any[]>([]);
   const [email, setEmail] = useState<string>("");
   const [isLoaded, setIsLoaded] = React.useState(false);
+  const [purchaseItem, setPurchaseItem] = useState<string>("");
 
   const { loading, error, data, refetch } = useQuery(HOMEPAGE_DETAILS);
   const [user] = useAuthState(auth);
@@ -64,10 +67,6 @@ const Home: React.FC = () => {
     }
 
     // Check if course is free
-    if (courseFees === null) {
-      router.push(`/video/${videoId}`);
-      return;
-    }
 
     try {
       // Check if user is enrolled in the course
@@ -90,11 +89,14 @@ const Home: React.FC = () => {
         router.push(`/video/${videoId}`);
 
       } else {
-        const paymentUrl = `/payment/${courseId}`;
-        window.location.href = paymentUrl;
+        onOpen();
       }
     } catch (enrollError) {
       console.error("Failed to fetch enrollment status:", enrollError);
+    }
+
+    if (courseFees === null) {
+      router.push(`/video/${videoId}`);
     }
   }, [email]);
 
@@ -172,7 +174,7 @@ const Home: React.FC = () => {
                     alt=""
                   />
                   <div className="flex mt-3 justify-center">
-                    <div className="cursor-pointer" onClick={()=>router.push(`/channel/${video.channelId}`)}>
+                    <div className="cursor-pointer" onClick={() => router.push(`/channel/${video.channelId}`)}>
                       <img
                         height={30}
                         width={30}
@@ -186,7 +188,7 @@ const Home: React.FC = () => {
                       <p className="text-gray-500 flex text-sm">
                         {timeSinceUpload(video.uploadAt)} - {video.views} views
                         {video.courseFees !== null &&
-                          <Lottie className="h-5 ml-3" animationData={animationData} />
+                          <Lottie className="h-5 ml-3" animationData={animationData1} />
                         }
                       </p>
                     </div>
@@ -197,6 +199,46 @@ const Home: React.FC = () => {
           </div>
         )}
       </div>
+      <Modal
+        backdrop="opaque"
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        size="2xl"
+        radius="lg"
+        classNames={{
+          body: "py-6",
+          backdrop: "bg-[#292f46]/50 backdrop-opacity-40",
+          base: "border-[#292f46] bg-[#19172c] dark:bg-[#19172c] text-[#a8b0d3]",
+          header: "border-b-[1px] border-[#292f46]",
+          footer: "border-t-[1px] border-[#292f46]",
+          closeButton: "hover:bg-white/5 active:bg-white/10",
+        }}
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">Confirm Premium Course Purchase</ModalHeader>
+              <ModalBody>
+                <div className="flex">
+                  <Lottie className="mr-3" animationData={animationData2} />
+                  <div>
+                    <p className="mb-2 text-cyan-600 font-semibold"> Are you sure you want to purchasing the premium course?</p>
+                    <p className="text-slate-500"> Unlock exclusive content, advanced features, and premium support to supercharge your learning experience. By confirming, you agree to the terms and conditions of the purchase.</p>
+                  </div>
+                </div>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="light" onPress={onClose}>
+                  Close
+                </Button>
+                <Button className="bg-[#6f4ef2] shadow-lg shadow-indigo-500/20" onPress={() => router.push("")}>
+                  Purchase
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </>
   );
 };
