@@ -149,7 +149,7 @@ const WatchLater: React.FC = () => {
             {loading ? (
                 <div className={`pt-40 pl-72 pb-10  min-h-screen ${isDarkMode ? "bg-white" : "bg-black"}`}>
                     {[...Array(6)].map((_, index) => (
-                        <div className='flex mb-5'>
+                        <div key={index} className='flex mb-5'>
                             <Skeleton isLoaded={isLoaded} className="w-72 mb-5 rounded-lg">
                                 <div className="h-36 w-full rounded-lg bg-gray-500"></div>
                             </Skeleton>
@@ -186,7 +186,7 @@ const WatchLater: React.FC = () => {
                             style={{ marginTop: "40px" }}
                         >
                             {watchLater.map((item, index) => (
-                                <div id="video-content" className="flex mb-10">
+                                <div key={index} id="video-content" className="flex mb-10">
                                     {/* video content here*/}
                                     <img
                                         className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-150 rounded-md"

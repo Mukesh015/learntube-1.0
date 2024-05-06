@@ -278,8 +278,8 @@ const CardGrid: React.FC = () => {
                 <div>
                     <div className={`${isDarkMode ? "bg-white" : "bg-black"} pb-10`}>
                         <div id='cards' className="w-full px-6 py-6 mx-auto">
-                            {creatorCard.map((item, index) => (
-                                <div className="flex flex-wrap -mx-3">
+                            {creatorCard.map((item,index) => (
+                                <div key={index} className="flex flex-wrap -mx-3">
                                     {/* Card 1 */}
                                     <div className="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/4">
                                         <div className={`relative flex flex-col min-w-0 ${isDarkMode ? "bg-white shadow-lg shadow-gray-600" : "bg-gray-700"} break-words shadow-xl dark:bg-slate-850 dark:shadow-dark-xl rounded-2xl bg-clip-border`}>
@@ -396,7 +396,7 @@ const CardGrid: React.FC = () => {
                             ))}
                         </div>
                         {channelDeatails.map((item, index) => (
-                            <div>
+                            <div key={index}>
                                 <div className='ml-5 mr-5'>
                                     <Accordion variant="shadow">
                                         <AccordionItem key="1" aria-label="Accordion 1" title="Personal informations">
@@ -583,7 +583,7 @@ const CardGrid: React.FC = () => {
                                     </div>
                                 </div>
                                 {creatorCard.map((sub, index) => (
-                                    <div className={`mt-48 justify-center ${isDarkMode ? "text-black" : "text-white"} item-center text-center`} style={{ maxWidth: "600px", marginLeft: "480px" }}>
+                                    <div key={index} className={`mt-48 justify-center ${isDarkMode ? "text-black" : "text-white"} item-center text-center`} style={{ maxWidth: "600px", marginLeft: "480px" }}>
                                         <p>{item.channelId} - {sub.subscriber} subscribers - {home.length} videos</p>
                                         <p className='text-sm text-gray-500 mt-3'>{item.channelDescription}</p>
                                     </div>

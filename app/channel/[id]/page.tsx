@@ -219,7 +219,7 @@ const ChannelPage: React.FC<Props> = ({ params }) => {
                     <div className={`pb-20 ${isDarkMode ? "bg-white" : "bg-black"}`}>
                         <div style={{ maxWidth: "1400px", paddingLeft: "360px", paddingTop: "100px" }}>
                             {channelDetails.map((item, index) => (
-                                <div className="">
+                                <div key={index} className="">
                                     <img style={{ width: "1400px" }} className="h-40 rounded-xl" src={item.coverPhoto} alt="" />
                                     <div className="flex mt-10">
                                         <img className="rounded-full h-40" src={item.channelLogo} alt="" />

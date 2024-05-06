@@ -109,7 +109,7 @@ const MyCourses: React.FC = () => {
             {loading ? (
                 <div className={`pt-40 pl-72 pb-10 pr-10  min-h-screen ${isDarkMode ? "bg-white" : "bg-black"}`}>
                     {[...Array(6)].map((_, index) => (
-                        <Card className="w-full mb-5 space-y-5 p-4" radius="lg">
+                        <Card key={index} className="w-full mb-5 space-y-5 p-4" radius="lg">
                             <div className='flex'>
                                 <Skeleton isLoaded={isLoaded} className="w-72 mb-5 rounded-lg">
                                     <div className="h-36 w-full rounded-lg bg-gray-500"></div>

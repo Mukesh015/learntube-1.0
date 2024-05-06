@@ -9,7 +9,7 @@ const SubsCriptions: React.FC = () => {
     return (
         <>
             <NextTopLoader />
-            <Navbar />
+            <Navbar query={""} />
             <Sidebar />
             <nav className="mt-24 mr-20">
                 <ul className="flex flex-row-reverse gap-10">
