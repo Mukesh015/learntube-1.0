@@ -10,7 +10,7 @@ import {
 
 function makeClient() {
   const httpLink = new HttpLink({
-    uri: `${process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN}/graphql`,
+    uri: "https://learntube-server.onrender.com/graphql",
   });
 
   return new NextSSRApolloClient({
