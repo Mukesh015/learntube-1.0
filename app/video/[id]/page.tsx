@@ -607,7 +607,7 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                                 </Accordion>
                             </Tooltip>
                             <div className={`mt-5 ${isDarkMode ? "text-black" : "text-white"} flex`}>
-                               <h3>{comments.length ? `${comments.length} comments` : "No comments"}</h3>
+                                <h3>{comments.length ? `${comments.length} comments` : "No comments"}</h3>
                                 <Tooltip color="warning" delay={700} showArrow={true} content="Filter to read">
                                     <Button className={`flex ${isDarkMode ? "text-black" : "text-white"} ml-10`} variant="bordered">
                                         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill={isDarkMode ? '#000000' : '#FFFFFF'}
@@ -644,18 +644,23 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                         <div>
                             {allVideos.map((video, index) => (
                                 <Tooltip color="warning" delay={700} showArrow={true} content={video.allVideoTitles} key={index}>
-                                    <div className="ml-10 flex mb-5 cursor-pointer" onClick={() => {
-                                        handleRedirect(video.videoId, video.courseFees, video.courseId)
-                                    }}>
-                                        <img style={{ height: "130px", width: "200px" }} className="rounded-md" src={video.allThumbnailUrls} alt="" />
+                                    <div className="ml-10 flex mb-5 cursor-pointer" >
+                                        <img onClick={() => {
+                                            handleRedirect(video.videoId, video.courseFees, video.courseId)
+                                        }} style={{ height: "130px", width: "200px" }} className="rounded-md" src={video.allThumbnailUrls} alt="" />
                                         <div className="max-w-56 ml-3">
                                             <h1 className={`font-semibold ${isDarkMode ? "text-black" : "text-white"}`}>{video.allVideoTitles}</h1>
-                                            <h2 className="text-gray-500 text-sm">{video.channelName}</h2>
-                                            <h3 className="text-gray-500 text-sm">{video.views} views - {timeSinceUpload(video.uploadAt)}
-                                                {video.courseFees !== null &&
-                                                    <Lottie className="h-5 ml-3" animationData={animationData1} />
-                                                }
-                                            </h3>
+                                            <div onClick={() => router.push(`/channel/${video.channelId}`)} className="font-semibold text-medium flex mt-1">
+                                                <img className='h-7 rounded-full' src={video.channelLogo} alt="" />
+                                                <span className='ml-2 text-blue-600 font-semibold text-medium'>{video.channelName}</span>
+                                            </div>
+                                            <div className="text-gray-500 space-x-3 flex text-xs mt-1">
+                                                <span>{video.views} views</span>
+                                                <span>{timeSinceUpload(video.uploadAt)}</span>
+                                                <span>{video.courseFees !== null &&
+                                                    <Lottie className="h-5" animationData={animationData1} />
+                                                }</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </Tooltip>
