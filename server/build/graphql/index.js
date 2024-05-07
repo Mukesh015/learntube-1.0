@@ -27,6 +27,7 @@ function creategraphqlServer() {
             resolvers: {
                 Query: Object.assign(Object.assign({}, user_1.User.resolvers.queries), features_1.features.resolvers.queries),
             },
+            introspection: process.env.NODE_ENV !== 'production'
         });
         yield gqlServer.start();
         return gqlServer;
