@@ -422,6 +422,7 @@ const VideoPage: React.FC<Props> = ({ params }) => {
             setVideoTags(data.getVideoUrl[0].videoTags);
             setComments(data.getComments)
             setSubscribers(data.getFeatures[0].totalSubscriber)
+            console.log(data);
         }
         if (user) {
             setEmail(user.email || "");

@@ -18,6 +18,7 @@ import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-o
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Input } from "@nextui-org/react";
 import { gql, useQuery } from "@apollo/client";
 import NextTopLoader from "nextjs-toploader";
+import { strict } from "assert";
 
 const VERIFY_CREATOR = gql`
 query Exam($email:String){
@@ -40,6 +41,8 @@ query Exam($email:String){
         timeStamp
         videoId
         videoThumbnail
+        corseFees
+        courseId
       }
   }
 `
@@ -69,7 +72,7 @@ const Navbar: React.FC<{ query: string }> = ({ query }) => {
     const [text, setText] = useState("");
     const [isListening, setIsListening] = useState(false);
     const [recognition, setRecognition] = useState<any>(null);
-    const [searchitem, setSearchitem] = useState<string>('');
+    const [falseforError, setFalseforError] = useState<string>('');
 
     const router = useRouter();
     const [user] = useAuthState(auth);
@@ -341,7 +344,7 @@ const Navbar: React.FC<{ query: string }> = ({ query }) => {
         }
     }, [email, setShowAllClear]);
 
-    const handleMarkAsRead = useCallback(async (notificationId: string) => {
+    const handleMarkAsRead = useCallback(async (notificationId: string,videoId:string,courseFees:string,courseId:string) => {
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN}/features/markasread`, {
                 method: "POST",
@@ -355,7 +358,56 @@ const Navbar: React.FC<{ query: string }> = ({ query }) => {
             });
             const data = await response.json();
             console.log(data);
-            refetch()
+            try {
+                // Add video to history
+                const historyResponse = await fetch(`${process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN}/features/addtohistory`, {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json"
+                  },
+                  body: JSON.stringify({
+                    email: email,
+                    videoId: videoId
+                  })
+                });
+                const historyData = await historyResponse.json();
+                console.log("Video added to history:", historyData);
+              } catch (historyError) {
+                console.error("Failed to add video to history:", historyError);
+              }
+          
+              // Check if course is free
+          
+              try {
+                // Check if user is enrolled in the course
+                const enrollResponse = await fetch(`${process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN}/api/isenroll`, {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json"
+                  },
+                  body: JSON.stringify({
+                    email: email,
+                    courseId: courseId
+                  })
+                });
+                const enrollData = await enrollResponse.json();
+          
+                // Redirect based on enrollment status
+                if (enrollData.isEnrolled === true) {
+                  // const videoUrl = `/video/${videoId}`;
+                  // window.location.href = videoUrl;
+                  router.push(`/video/${videoId}`);
+          
+                } else {
+                  onOpen();
+                }
+              } catch (enrollError) {
+                console.error("Failed to fetch enrollment status:", enrollError);
+              }
+          
+              if (courseFees === null) {
+                router.push(`/video/${videoId}`);
+              }
 
         } catch (error) {
             console.error("Failed to clear all notifications", error);
@@ -526,9 +578,6 @@ const Navbar: React.FC<{ query: string }> = ({ query }) => {
                                 style={{ width: "600px" }}
                                 type="search"
                                 id="search-content"
-                                value={query}
-                                onChange={(e) => setSearchitem(e.target.value)}
-
                                 placeholder="Search here... or [ctrl+k]"
                                 className={`bg-inherit border ${isDarkMode ? "text-black" : "text-white"} border-gray-700 rounded-medium p-2 px-10 w-96`}
                                 onClick={handleInputClick}
@@ -815,7 +864,7 @@ const Navbar: React.FC<{ query: string }> = ({ query }) => {
                     >
                         {notifications.map((item, index) => (
                             <div key={index} id="notification" className={` cursor-pointer ${isDarkMode ? "hover:bg-gray-300" : "hover:bg-gray-700"} pb-5 p-1`}>
-                                <div onClick={() => handleMarkAsRead(item.notificationId)} className="flex ml-3 mr-3 mt-3">
+                                <div onClick={() => handleMarkAsRead(item.notificationId,item.videoId,item.corseFees,item.courseId)} className="flex ml-3 mr-3 mt-3">
                                     <img className="h-10 rounded-full mt-5" src={item.avatar} alt="" />
                                     <div>
                                         <h1 className="text-sm ml-3 max-w-64 mt-5">{item.message}</h1>

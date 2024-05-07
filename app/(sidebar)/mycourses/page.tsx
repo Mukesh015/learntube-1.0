@@ -9,7 +9,8 @@ import { auth } from "@/configurations/firebase/config";
 import NextTopLoader from "nextjs-toploader";
 import "react-toastify/dist/ReactToastify.css";
 import { useDarkMode } from "@/components/hooks/theme"
-import { Card,Skeleton } from "@nextui-org/react";
+import { Card, Skeleton } from "@nextui-org/react";
+import { useRouter } from 'next/navigation';
 
 
 const yourCourses = gql`
@@ -48,6 +49,7 @@ const MyCourses: React.FC = () => {
     const [showDropdown, setShowDropdown] = useState<boolean>(false);
     const [courseStates, setCourseStates] = useState<{ [key: string]: boolean }>({});
 
+    const router = useRouter();
 
     const handleShowDropdown = (courseId: string) => {
         setSelectedCourseId(courseId);
@@ -193,16 +195,19 @@ const MyCourses: React.FC = () => {
                                         {/* Course videos */}
                                         {courseStates[course.courseId] && selectedCourseId === course.courseId && (
                                             <div className="ml-20 mb-10">
+
                                                 {course.videos.map((video: any) => (
-                                                    <div className="flex mb-10" key={video.videoId}>
-                                                        {/* Video thumbnail */}
+                                                    <div className="flex mb-10" key={video.videoId} onClick={() => router.push(`/video/${video.videoId}`)}>
+
                                                         <img
                                                             className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-150 rounded-md"
                                                             height={100}
                                                             width={300}
                                                             src={video.videoThumbnail}
                                                             alt=""
+
                                                         />
+
                                                         <div className="flex mt-10 ml-5 justify-center mr-10">
                                                             <div className="ml-3">
                                                                 {/* Video title */}
