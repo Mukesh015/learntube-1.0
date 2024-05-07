@@ -606,7 +606,7 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                                 </Accordion>
                             </Tooltip>
                             <div className={`mt-5 ${isDarkMode ? "text-black" : "text-white"} flex`}>
-                                <h3>{comments.length ? `${comments.length} comments` : "No comments"}</h3>
+                               <h3>{comments.length ? `${comments.length} comments` : "No comments"}</h3>
                                 <Tooltip color="warning" delay={700} showArrow={true} content="Filter to read">
                                     <Button className={`flex ${isDarkMode ? "text-black" : "text-white"} ml-10`} variant="bordered">
                                         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill={isDarkMode ? '#000000' : '#FFFFFF'}
