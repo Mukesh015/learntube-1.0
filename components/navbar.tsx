@@ -54,7 +54,7 @@ const Navbar: React.FC<{ query: string }> = ({ query }) => {
     const [headerText, setHeaderText] = useState<string>("");
     const [newInfo, setnewInfo] = useState<string>("");
     const [toUpdate, settoUpdate] = useState<string>("");
-    const [isCreator, setIsCreator] = useState<string>("");
+    const [isCreator, setIsCreator] = useState<boolean>();
     const [searchItem, setSearchItem] = useState<boolean>(false);
     const [toggleVoiceSearches, settoggleVoiceSearches] = useState<boolean>(false);
     const [showNotifications, setShowNotifications] = useState<boolean>(false);
@@ -393,7 +393,6 @@ const Navbar: React.FC<{ query: string }> = ({ query }) => {
             setSearchBarDetails(data.getSearchBarDetails)
             setNotifications(data.getNotifications)
             refetch()
-
         }
         if (notifications) {
             const unreadCount = notifications.filter(notification => !notification.isRead).length;
@@ -401,7 +400,7 @@ const Navbar: React.FC<{ query: string }> = ({ query }) => {
             refetch()
 
         }
-    }, [user, setIsCreator, setUnreadMessages, data, setSearchBarDetails, notifications, setNotifications]);
+    }, [user, setIsCreator, setUnreadMessages, isCreator, data, setSearchBarDetails, notifications, setNotifications]);
 
     useEffect(() => {
         const handleSearchChange = (e: Event) => {

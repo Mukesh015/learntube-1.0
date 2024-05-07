@@ -8,7 +8,8 @@ import { useDarkMode } from "@/components/hooks/theme"
 import { gql, useQuery } from "@apollo/client";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/configurations/firebase/config";
-import Lottie from "lottie-react";
+import dynamic from 'next/dynamic';
+const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
 import animationData from "@/public/Animation - 1714908454989.json"
 
 

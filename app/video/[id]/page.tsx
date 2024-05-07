@@ -15,7 +15,9 @@ import { useDarkMode } from "@/components/hooks/theme"
 import NextTopLoader from 'nextjs-toploader';
 import "react-toastify/dist/ReactToastify.css";
 import { Card, Skeleton } from "@nextui-org/react";
-import { push } from 'firebase/database';
+import animationData1 from "@/public/Animation - 1714890965505.json"
+const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
+
 
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 
@@ -648,7 +650,11 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                                         <div className="max-w-56 ml-3">
                                             <h1 className={`font-semibold ${isDarkMode ? "text-black" : "text-white"}`}>{video.allVideoTitles}</h1>
                                             <h2 className="text-gray-500 text-sm">{video.channelName}</h2>
-                                            <h3 className="text-gray-500 text-sm">{video.views} views - {timeSinceUpload(video.uploadAt)}</h3>
+                                            <h3 className="text-gray-500 text-sm">{video.views} views - {timeSinceUpload(video.uploadAt)}
+                                                {video.courseFees !== null &&
+                                                    <Lottie className="h-5 ml-3" animationData={animationData1} />
+                                                }
+                                            </h3>
                                         </div>
                                     </div>
                                 </Tooltip>

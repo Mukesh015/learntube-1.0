@@ -1,6 +1,7 @@
 "use client"
 import React from "react";
-import Lottie from 'lottie-react';
+import dynamic from 'next/dynamic';
+const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
 import animationData1 from "@/public/Animation - 1714979030679.json"
 import animationData2 from "@/public/Animation - 1714979012618.json"
 import animationData3 from "@/public/Animation - 1714979079610.json"

@@ -4,12 +4,14 @@ import Sidebar from "@/components/sidebar";
 import { auth } from "@/configurations/firebase/config";
 import { gql, useQuery } from "@apollo/client";
 import NextTopLoader from "nextjs-toploader";
-import { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import "react-toastify/dist/ReactToastify.css";
 import { useDarkMode } from "@/components/hooks/theme"
 import { useRouter } from "next/navigation";
-
+import { Card, Skeleton } from "@nextui-org/react";
+import Lottie from "lottie-react";
+import animationData1 from "@/public/Animation - 1714890965505.json"
 
 
 const searchQuery = gql`
@@ -40,9 +42,10 @@ const SerachResult: React.FC<Props> = ({ params }) => {
     const { isDarkMode } = useDarkMode();
     const [searQuery, setSearchQuery] = useState<any[]>([]);
     const [user] = useAuthState(auth);
+    const [isLoaded, setIsLoaded] = React.useState(false);
 
     const query: any = decodeURIComponent(params.query)
-    
+
     const { loading, error, data } = useQuery(searchQuery, {
         variables: { query: query },
     });
@@ -116,38 +119,61 @@ const SerachResult: React.FC<Props> = ({ params }) => {
             <NextTopLoader />
             <Navbar query={query} />
             <Sidebar />
-            <div className={`pt-20 pl-72 pb-10 ${isDarkMode ? "bg-white" : "bg-black"}`}>
-                <h1 className={`mb-10 ${isDarkMode ? "text-black" : "text-white"} text-medium`}>Based on your search</h1>
-                {searQuery.map((video, index) => (
-                    <div key={index} className="flex cursor-pointer mb-10">
-                        <img
-                            height={250}
-                            width={350}
-                            className="rounded-lg"
-                            src={video.videoThumbnail}
-                            alt=""
-                            onClick={() => {
-                                handleRedirect(video.videoID, video.courseFees, video.courseID)
-                            }}
-                        />
-                        <div className="ml-6">
-                            <p className={`text-xl ${isDarkMode ? "text-black" : "text-white"}`}>{video.videoTitle}</p>
-                            <p className="text-sm text-gray-600 mt-3">
-                                {video.videoViews} views - 9 months ago
-                            </p>
-                            <div className="mt-5 mb-2 flex">
-                                <img
-                                    className="h-8 rounded-full"
-                                    src={video.channelLogo}
-                                    alt=""
-                                />
-                                <p className={`font-semibold ${isDarkMode ? "text-black" : "text-white"} ml-3`}>{video.channelName}</p>
+            {loading ? (
+                <div className={`pt-44 pl-72 pb-10  min-h-screen ${isDarkMode ? "bg-white" : "bg-black"}`}>
+                    {[...Array(6)].map((_, index) => (
+                        <div key={index} className='flex mb-5'>
+                            <Skeleton isLoaded={isLoaded} className="w-72 mb-5 rounded-lg">
+                                <div className="h-36 w-full rounded-lg bg-gray-500"></div>
+                            </Skeleton>
+                            <div className="w-full flex items-center gap-3 ml-7">
+                                <div>
+                                    <Skeleton className="flex rounded-full w-12 h-12" />
+                                </div>
+                                <div className="w-full flex flex-col gap-2">
+                                    <Skeleton className="h-3 w-3/5 rounded-lg" />
+                                    <Skeleton className="h-3 w-4/5 rounded-lg" />
+                                </div>
                             </div>
-                            <p className="text-sm text-gray-600">{video.videoDescription}</p>
                         </div>
-                    </div>
-                ))}
-            </div>
+                    ))}
+                </div>
+            ) : (
+                <div className={`pt-20 pl-72 pb-10 ${isDarkMode ? "bg-white" : "bg-black"}`}>
+                    <h1 className={`mb-10 ${isDarkMode ? "text-black" : "text-white"} text-medium`}>Based on your search</h1>
+                    {searQuery.map((video, index) => (
+                        <div key={index} className="flex cursor-pointer mb-10">
+                            <img
+                                width={350}
+                                className="rounded-lg"
+                                src={video.videoThumbnail}
+                                alt=""
+                                onClick={() => {
+                                    handleRedirect(video.videoID, video.courseFees, video.courseID)
+                                }}
+                            />
+                            <div className="ml-6">
+                                <p className={`text-xl ${isDarkMode ? "text-black" : "text-white"}`}>{video.videoTitle}</p>
+                                <p className="text-medium text-gray-600 mt-3 flex font-semibold">
+                                    {video.videoViews} views - 9 months ago
+                                    {video.courseFees !== null &&
+                                        <Lottie className="h-5 ml-3" animationData={animationData1} />
+                                    }
+                                </p>
+                                <div className="mt-5 mb-2 flex">
+                                    <img
+                                        className="h-8 rounded-full"
+                                        src={video.channelLogo}
+                                        alt=""
+                                    />
+                                    <p className={`font-semibold ${isDarkMode ? "text-black" : "text-white"} ml-3`}>{video.channelName}</p>
+                                </div>
+                                <p className="text-sm text-gray-600">{video.videoDescription}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
         </>
     );
 };

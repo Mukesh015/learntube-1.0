@@ -28,7 +28,7 @@ interface UserDocument extends Document {
     EnrolledCourses?: string[];
     WatchTime?: number;
 
-    notification: { isRead: boolean; message: string,user: string ,timeStamp:number,notificationId:string,videoId:string}[];
+    notification: { isRead: boolean; message: string, user: string, timeStamp: number, notificationId: string, videoId: string }[];
 }
 
 const userSchema = new mongoose.Schema<UserDocument>(
@@ -135,16 +135,16 @@ const userSchema = new mongoose.Schema<UserDocument>(
         },
         notification: [
             {
-                isRead: { type: Boolean,default: false },
-                message: { type: String,  required: false},
+                isRead: { type: Boolean, default: false },
+                message: { type: String, required: false },
                 user: { type: String, required: false },
-                timeStamp: { type: Date,},
+                timeStamp: { type: Date, },
                 notificationId: { type: String, required: false },
-                videoId:{ type: String, required: false}
+                videoId: { type: String, required: false }
             }
         ],
-        EnrolledCourses:[{type:String,}],
-        WatchTime: { 
+        EnrolledCourses: [{ type: String, }],
+        WatchTime: {
             type: Number,
             required: false
         },
@@ -153,4 +153,5 @@ const userSchema = new mongoose.Schema<UserDocument>(
 
 const UserModel: Model<UserDocument> = mongoose.model<UserDocument>("Users", userSchema);
 
-export { UserModel, UserDocument };
+export { UserModel };
+export type { UserDocument };

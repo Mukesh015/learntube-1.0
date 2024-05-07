@@ -10,7 +10,8 @@ import NextTopLoader from 'nextjs-toploader';
 import "react-toastify/dist/ReactToastify.css";
 import { Select, SelectItem } from "@nextui-org/react";
 import { Modal, Button, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Input } from "@nextui-org/react";
-import Lottie from 'lottie-react';
+import dynamic from 'next/dynamic';
+const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
 import animationData from "@/public/Animation - 1714889196835.json"
 
 const CREATOR_DETAILS = gql`
@@ -278,7 +279,7 @@ const CardGrid: React.FC = () => {
                 <div>
                     <div className={`${isDarkMode ? "bg-white" : "bg-black"} pb-10`}>
                         <div id='cards' className="w-full px-6 py-6 mx-auto">
-                            {creatorCard.map((item,index) => (
+                            {creatorCard.map((item, index) => (
                                 <div key={index} className="flex flex-wrap -mx-3">
                                     {/* Card 1 */}
                                     <div className="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/4">

@@ -12,9 +12,11 @@ import { Card, Skeleton } from "@nextui-org/react";
 import NextTopLoader from "nextjs-toploader";
 import { useRouter } from "next/navigation";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
-import Lottie from 'lottie-react';
-import animationData1 from "@/public/Animation - 1714890965505.json"
+import animationData from "@/public/Animation - 1714890965505.json"
 import animationData2 from "@/public/Animation - 1714927249104.json"
+import dynamic from 'next/dynamic';
+
+const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
 
 const HOMEPAGE_DETAILS = gql`
   query GetAllVideoUrl {
@@ -133,7 +135,7 @@ const Home: React.FC = () => {
       <div className={`${isDarkMode ? "bg-white" : "bg-black"}`}>
         <Navbar query={""} />
         <Sidebar />
-        {loading && homePageDetails ? (
+        {loading ? (
           <div className="pt-28 pb-10 pl-72 gap-8 grid grid-cols-3">
             {[...Array(12)].map((_, index) => (
               <Card key={index} className={`w-[385px] ${isDarkMode ? "bg-slate-100" : "bg-slate-800"} space-y-7 p-4 h-72" radius="lg`}>
@@ -185,12 +187,12 @@ const Home: React.FC = () => {
                     </div>
                     <div className={`ml-3 text-sm font-semibold ${isDarkMode ? "text-black" : ""} cursor-default`}>
                       <h1>{video.allVideoTitles}</h1>
-                      <p className="text-gray-500 flex text-sm">
+                      <div className="text-gray-500 flex text-sm">
                         {timeSinceUpload(video.uploadAt)} - {video.views} views
                         {video.courseFees !== null &&
-                          <Lottie className="h-5 ml-3" animationData={animationData1} />
+                          <Lottie className="h-5 ml-3" animationData={animationData} />
                         }
-                      </p>
+                      </div>
                     </div>
                   </div>
                 </div>

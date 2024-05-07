@@ -384,7 +384,7 @@ const CreatorRegisterForm: React.FC = () => {
                             <h1 className='text-3xl font-bold mt-40 text-orange-500'>Create your channel settings</h1>
                             <p className='mt-10 text-lg text-orange-200'>Content creation is a key part of content marketing, which is a long-term strategy that involves developing and sharing content across channels to reach and engage your target audience. Content creation is important for many reasons.</p>
                             <p className='mt-10 text-lg text-orange-200'>
-                                Your content educates your readers, engages your audience and establishes you as an authoritative subject matter source. If you're not already set up for content success, here are some ways to give your brand the content makeover it needs.
+                                Your content educates your readers, engages your audience and establishes you as an authoritative subject matter source. If youre not already set up for content success, here are some ways to give your brand the content makeover it needs.
                             </p>
                         </div>
                     ) : (

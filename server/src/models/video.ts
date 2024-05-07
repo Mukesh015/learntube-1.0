@@ -85,4 +85,6 @@ const videoSchema = new mongoose.Schema<VideoDocument>(
 
 const VideoModel: Model<VideoDocument> = mongoose.model<VideoDocument>("Videos", videoSchema);
 
-export { VideoModel, VideoDocument };
+export { VideoModel };
+
+export type { VideoDocument };

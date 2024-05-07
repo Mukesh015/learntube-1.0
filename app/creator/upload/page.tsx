@@ -179,7 +179,7 @@ const VideoUploadForm: React.FC = () => {
                         By default, you can upload videos that are up to 15 minutes long. Verified accounts can upload videos longer than 15 minutes.
                     </p>
                     <p className={`mt-10 text-lg ${isDarkMode ? "text-zinc-500" : "text-orange-200"}`}>
-                        The simplest way to avoid YouTube copyright claims is to soundtrack your content with copyright-free music that you know you have permission to use. Check out Uppbeat, a free music platform for creators, and download the best free music for YouTube. It's safe, free and you won't get any copyright claims!
+                        The simplest way to avoid YouTube copyright claims is to soundtrack your content with copyright-free music that you know you have permission to use. Check out Uppbeat, a free music platform for creators, and download the best free music for YouTube. Its safe, free and you wont get any copyright claims!
                     </p>
                 </div>
                 <div className='border shadow-lg shadow-orange-400 border-gray-700 p-7 rounded-lg absolute' style={{ marginTop: "40px", width: "550px", marginLeft: "800px" }}>

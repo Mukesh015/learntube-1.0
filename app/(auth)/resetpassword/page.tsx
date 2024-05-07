@@ -46,7 +46,7 @@ const ResetPassword :React.FC = ()=> {
                         </p>
                     </div>
                     <p className="text-slate-500 ml-10">
-                        It's a free video sharing website that makes it easy to watch online videos. You can even create and upload your own videos to share with others.
+                        Its a free video sharing website that makes it easy to watch online videos. You can even create and upload your own videos to share with others.
                     </p>
                     <div className="m-10">
                         <div className="">
@@ -62,7 +62,7 @@ const ResetPassword :React.FC = ()=> {
                                 </p>
                             </div>
                             <p className="text-slate-500 ml-14 text-sm">
-                                India's Super App for learning, contents, creativity and more.
+                                India Super App for learning, contents, creativity and more.
                             </p>
                         </div>
                         <div className="mt-10">
