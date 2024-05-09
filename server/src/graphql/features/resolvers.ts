@@ -769,6 +769,7 @@ const queries = {
                 courseFees: course?.courseFees.price,
                 courseId: course?.courseId,
                 courseThumbnail: course?.courseThumbUrl,
+                totalVideo: course?.videos.length
             }]
         }
         catch (error) {

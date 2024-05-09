@@ -12,12 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.makepayment = exports.dynamicChanges = exports.clearAllNotifiacation = exports.clearNotification = exports.markAsRead = exports.calculateWatchTime = exports.addToDislikedVideo = exports.addSubscription = exports.addToMyVideos = exports.addToWatchLater = exports.addToLikedVideo = exports.removeSearchHistory = exports.addSearchHistory = exports.addToHistory = exports.addToPlaylist = void 0;
+exports.dynamicChanges = exports.clearAllNotifiacation = exports.clearNotification = exports.markAsRead = exports.calculateWatchTime = exports.addToDislikedVideo = exports.addSubscription = exports.addToMyVideos = exports.addToWatchLater = exports.addToLikedVideo = exports.removeSearchHistory = exports.addSearchHistory = exports.addToHistory = exports.addToPlaylist = void 0;
 const user_1 = require("../models/user");
 const video_1 = require("../models/video");
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config({ path: "./.env" });
-const stripe = require('stripe')(process.env.stripe_secret);
 function addToPlaylist(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         var _a, _b, _c;
@@ -443,36 +442,3 @@ function dynamicChanges(req, res) {
     });
 }
 exports.dynamicChanges = dynamicChanges;
-function makepayment(req, res) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const { course, customerDetails } = req.body;
-        try {
-            // Define line items for the Checkout session
-            const lineItems = {
-                price_data: {
-                    currency: "inr",
-                    product_data: {
-                        name: 'Student'
-                    },
-                    unit_amount: 1000000, // Amount in smallest currency unit (here 10000 INR)
-                },
-                quantity: 1,
-            };
-            // Create the Checkout session with payment method types, line items, and other parameters
-            const session = yield stripe.checkout.sessions.create({
-                payment_method_types: ["card"],
-                line_items: [lineItems],
-                mode: "payment",
-                success_url: "http://localhost:3000/success",
-                cancel_url: "http://localhost:3000/cancel",
-            });
-            res.send({ id: session.id });
-            console.log(session.id);
-        }
-        catch (error) {
-            console.error('Error creating Checkout session:', error);
-            res.status(500).send({ error: 'Internal Server Error' });
-        }
-    });
-}
-exports.makepayment = makepayment;

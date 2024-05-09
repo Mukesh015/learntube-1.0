@@ -21,6 +21,7 @@ const body_parser_1 = __importDefault(require("body-parser"));
 const video_1 = __importDefault(require("./routes/video"));
 const static_1 = __importDefault(require("./routes/static"));
 const feature_1 = __importDefault(require("./routes/feature"));
+const payment_1 = __importDefault(require("./routes/payment"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const graphql_1 = __importDefault(require("./graphql"));
 dotenv_1.default.config({ path: "./.env" });
@@ -42,6 +43,7 @@ function init() {
         app.use("/api", static_1.default);
         app.use("/video", video_1.default);
         app.use("/features", feature_1.default);
+        app.use("/pay", payment_1.default);
         try {
             yield mongoose_1.default.connect(DB);
             console.log("DB connected");

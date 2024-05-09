@@ -8,6 +8,7 @@ import bodyParser from 'body-parser';
 import VideoRouter from './routes/video';
 import UserRouter from './routes/static';
 import FeaturesRouter from './routes/feature';
+import PaymentRouter from './routes/payment';
 import dotenv from "dotenv";
 import creategraphqlServer from "./graphql";
 dotenv.config({ path: "./.env" });
@@ -31,6 +32,8 @@ async function init() {
     app.use("/api", UserRouter);
     app.use("/video", VideoRouter);
     app.use("/features", FeaturesRouter);
+    app.use("/pay", PaymentRouter);
+
     try {
         await mongoose.connect(DB);
         console.log("DB connected");

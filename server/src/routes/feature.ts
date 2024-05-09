@@ -22,5 +22,4 @@ FeatureRouter.post("/clearallnotification",clearAllNotifiacation)
 FeatureRouter.post("/:modify",dynamicChanges)
 
 
-
 export default FeatureRouter;

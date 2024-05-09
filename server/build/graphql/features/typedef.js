@@ -191,5 +191,6 @@ type Video {
     courseDescription: String
     courseId: String
     courseThumbnail: String
+    totalVideo: String
  }
 `;

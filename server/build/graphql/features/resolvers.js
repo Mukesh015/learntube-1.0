@@ -655,6 +655,7 @@ const queries = {
                     courseFees: course === null || course === void 0 ? void 0 : course.courseFees.price,
                     courseId: course === null || course === void 0 ? void 0 : course.courseId,
                     courseThumbnail: course === null || course === void 0 ? void 0 : course.courseThumbUrl,
+                    totalVideo: course === null || course === void 0 ? void 0 : course.videos.length
                 }];
         }
         catch (error) {
