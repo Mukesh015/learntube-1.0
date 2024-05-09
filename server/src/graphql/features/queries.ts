@@ -16,5 +16,5 @@ getNotifications(email:String):[notifications]
 getdetailsByChanneld(channelId:String):[detailsByChanneld]
 getCoursesbyChannelID(channelId:String):[coursebyChannelId]
 getvideoByChannelId(channelId:String):[videoByChannelId]
-
+getPaymentDetails(courseId:String):[paymentDetails]
 `

@@ -673,7 +673,7 @@ const queries = {
                     email: notification.user,
                     message: displayMessage,
                     videoThumbnail: (await getVideoThumbnailAndCourseDetails(notification.videoId)).videoThumbnail,
-                    corseFees:(await getVideoThumbnailAndCourseDetails(notification.videoId)).courseFees,
+                    corseFees: (await getVideoThumbnailAndCourseDetails(notification.videoId)).courseFees,
                     courseId: (await getVideoThumbnailAndCourseDetails(notification.videoId)).courseId,
                     avatar,
                     channelLogo
@@ -714,7 +714,7 @@ const queries = {
                 subscribers,
                 noOfVideos,
                 channelId,
-                creatorEmail:userEmail
+                creatorEmail: userEmail
             }]
 
         } catch (error) {
@@ -754,7 +754,29 @@ const queries = {
             throw new Error('An error occurred while fetching user details');
         }
 
+    },
+    getPaymentDetails: async (_: any, { courseId }: { courseId: string }) => {
+        try {
+            const video = await VideoModel.findOne({ "courses.courseId": courseId });
+            if (!video) {
+                throw new Error('course details not found');
+            }
+            const course = video.courses.find(course => course.courseId === courseId);
+            return [{
+                email: video.email,
+                courseName: course?.courseName,
+                courseDescription: course?.courseDescription,
+                courseFees: course?.courseFees.price,
+                courseId: course?.courseId,
+                courseThumbnail: course?.courseThumbUrl,
+            }]
+        }
+        catch (error) {
+            console.error('Error fetching user details:', error);
+            throw new Error('An error occurred while fetching user details');
+        }
     }
+
 
 }
 export const resolvers = { queries };

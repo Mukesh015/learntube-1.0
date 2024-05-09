@@ -640,6 +640,27 @@ const queries = {
             console.error('Error fetching user details:', error);
             throw new Error('An error occurred while fetching user details');
         }
+    }),
+    getPaymentDetails: (_18, _27) => __awaiter(void 0, [_18, _27], void 0, function* (_, { courseId }) {
+        try {
+            const video = yield video_1.VideoModel.findOne({ "courses.courseId": courseId });
+            if (!video) {
+                throw new Error('course details not found');
+            }
+            const course = video.courses.find(course => course.courseId === courseId);
+            return [{
+                    email: video.email,
+                    courseName: course === null || course === void 0 ? void 0 : course.courseName,
+                    courseDescription: course === null || course === void 0 ? void 0 : course.courseDescription,
+                    courseFees: course === null || course === void 0 ? void 0 : course.courseFees.price,
+                    courseId: course === null || course === void 0 ? void 0 : course.courseId,
+                    courseThumbnail: course === null || course === void 0 ? void 0 : course.courseThumbUrl,
+                }];
+        }
+        catch (error) {
+            console.error('Error fetching user details:', error);
+            throw new Error('An error occurred while fetching user details');
+        }
     })
 };
 exports.resolvers = { queries };

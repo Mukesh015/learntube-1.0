@@ -1,13 +1,50 @@
 "use client"
-import React from "react";
+import React, { useEffect, useState } from "react";
 import dynamic from 'next/dynamic';
 const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
 import animationData1 from "@/public/Animation - 1714979030679.json"
 import animationData2 from "@/public/Animation - 1714979012618.json"
 import animationData3 from "@/public/Animation - 1714979079610.json"
 import animationData4 from "@/public/Animation - 1714979114638.json"
+import { gql, useQuery } from "@apollo/client";
 
-const PaymentPage: React.FC = () => {
+const PAYMENT_DETAILS = gql`
+
+query PaymentQuery($courseId: String) {
+    getPaymentDetails(courseId: $courseId) {
+      courseId
+      courseDescription
+      courseFees
+      courseName
+      courseThumbnail
+      email
+    }
+  }
+
+`
+interface Props {
+    params: {
+        courseId: string;
+    };
+}
+
+const PaymentPage: React.FC<Props> = ({ params }) => {
+
+    const [paymentDetails, setPaymentDetails] = useState<any[]>([]);
+
+    const courseId: any = decodeURIComponent(params.courseId)
+
+    const { loading, error, data } = useQuery(PAYMENT_DETAILS, {
+        variables: { courseId:  courseId },
+    });
+    
+    useEffect(() =>{
+        if(data){
+            console.log(data)
+            setPaymentDetails(data.getPaymentDetails)
+        }
+    },[setPaymentDetails,data])
+
     return (
         <>
             <div className="flex max-h-screen p-10">

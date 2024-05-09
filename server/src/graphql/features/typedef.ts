@@ -181,4 +181,12 @@ type Video {
     videoPublishedAt: String
     videoThumbnail:  String
  }
+ type paymentDetails{
+    email: String
+    courseName: String
+    courseFees: String
+    courseDescription: String
+    courseId: String
+    courseThumbnail: String
+ }
 `;
