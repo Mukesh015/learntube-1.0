@@ -45,6 +45,7 @@ query GetVideoUrl( $email: String, $videoId: String,$channelId: String) {
         uploadAt
         videoId
         views
+        channelId
       }
       getVideoUrl (email: $email, videoID: $videoId) {
         channelId
@@ -121,7 +122,7 @@ const VideoPage: React.FC<Props> = ({ params }) => {
     }
 
     const videoId: any = decodeURIComponent(params.id)
-    const { loading, error, data, refetch } = useQuery(VideoUrl, {
+    const { loading, error, data } = useQuery(VideoUrl, {
         variables: { email: email, videoId: videoId, channelId: channelId },
     });
 
@@ -314,7 +315,7 @@ const VideoPage: React.FC<Props> = ({ params }) => {
         } catch (error) {
             console.error("Failed to add comment, server error", error);
         }
-    }, [creatorEmail,setToastMessage, setShowToast, videoId, comment, logo, email, setComment]);
+    }, [creatorEmail, setToastMessage, setShowToast, videoId, comment, logo, email, setComment]);
 
     const handleRedirect = useCallback(async (videoId: string, courseFees: any, courseId: string) => {
         try {
@@ -405,6 +406,7 @@ const VideoPage: React.FC<Props> = ({ params }) => {
 
     useEffect(() => {
         startWatchTime();
+
         return () => {
             stopWatchTime();
         };
@@ -443,7 +445,10 @@ const VideoPage: React.FC<Props> = ({ params }) => {
             setEmail(user.email || "");
             setLogo(user.photoURL || "");
         }
-    }, [user, setLogo, setEmail, channelId, setChannelId, setCreatorEmail, setAllVideos, setVideoPublishedAt, setChannelName, setChannelLogo,
+        if (error) {
+            router.push("/error/502")
+        }
+    }, [user, setLogo, error, setEmail, channelId, setChannelId, setCreatorEmail, setAllVideos, setVideoPublishedAt, setChannelName, setChannelLogo,
         setVideoViews, setSubscribers, setVideoUrl, setVideoTitle, setVideoDescription, setVideoTags, setIsAddedToPlaylist, data, setComments]);
 
     return (

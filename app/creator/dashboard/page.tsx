@@ -13,6 +13,7 @@ import { Modal, Button, ModalContent, ModalHeader, ModalBody, ModalFooter, useDi
 import dynamic from 'next/dynamic';
 const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
 import animationData from "@/public/Animation - 1714889196835.json"
+import { useRouter } from 'next/navigation';
 
 const CREATOR_DETAILS = gql`
 query GetAllVideoUrl ($email: String){
@@ -73,6 +74,8 @@ query GetAllVideoUrl ($email: String){
 `
 
 const CardGrid: React.FC = () => {
+
+    const router = useRouter();
     const { isDarkMode } = useDarkMode();
     const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
 
@@ -658,7 +661,7 @@ const CardGrid: React.FC = () => {
                                     className="gap-12 grid grid-cols-3 hover m-20"
                                 >
                                     {home.map((video, index) => (
-                                        <div key={index} className='cursor-pointer' id="video-content">
+                                        <div key={index} className='cursor-pointer' id="video-content" onClick={() => router.push(`/video/${video.videoId}`)}>
                                             <img
                                                 className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-150 rounded-md"
                                                 height={350}
@@ -713,7 +716,7 @@ const CardGrid: React.FC = () => {
                                                     {courseStates[course.courseId] && selectedCourseId === course.courseId && (
                                                         <div className="ml-20 mb-10">
                                                             {course.videos.map((video: any) => (
-                                                                <div className="flex mb-10" key={video.videoId}>
+                                                                <div className="flex mb-10" key={video.videoId} onClick={() => router.push(`/video/${video.videoId}`)}>
                                                                     {/* Video thumbnail */}
                                                                     <img
                                                                         className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-150 rounded-md"

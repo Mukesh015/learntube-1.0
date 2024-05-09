@@ -16,6 +16,7 @@ interface VideoInfo {
     videoViews: number;
     channelLogo: string | undefined;
     channelName: string | undefined;
+    channelId: string | undefined;
 }
 interface User {
     channelId: any;
@@ -89,6 +90,7 @@ const queries = {
                         const channelLogoResponse = await queries.getChannelLogo(undefined, { email: video.email });
                         const channelLogo = channelLogoResponse.find((logo: { email: string; }) => logo.email === video.email)?.channelLogo;
                         const channelName = channelLogoResponse.find((logo: { email: string; }) => logo.email === video.email)?.channelName;
+                        const channelId = channelLogoResponse.find((logo: { email: string; }) => logo.email === video.email)?.channelId;
                         const courseFees = course.courseFess.price === null ? null : course.courseFess.price;
                         const courseId = course.courseId
                         allVideoThumbUrls.push({
@@ -102,7 +104,8 @@ const queries = {
                             channelLogo: channelLogo,
                             channelName: channelName,
                             courseFees: courseFees,
-                            courseId: courseId
+                            courseId: courseId,
+                            channelId: channelId
                         });
                     }
                 }
@@ -118,7 +121,8 @@ const queries = {
                 channelLogo: videothumb.channelLogo,
                 channelName: videothumb.channelName,
                 courseFees: videothumb.courseFees,
-                courseId: videothumb.courseId
+                courseId: videothumb.courseId,
+                channelId: videothumb.channelId
             }));
         } catch (error) {
             console.error('Error fetching video URLs:', error);
@@ -250,7 +254,7 @@ const queries = {
             throw new Error('Error fetching search query details');
         }
     }
-    
+
 
 };
 

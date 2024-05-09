@@ -19,14 +19,14 @@ const ServerError: React.FC = () => {
                         </div>
                     </div>
                     <p className="text-gray-300 mt-5 lg:text-lg">Oops something went wrong. Try to refresh this page or <br /> feel free to contact us if the problem persists.</p>
+                    <button
+                        type="button"
+                        onClick={() => router.push("/")}
+                        className="flex active:scale-110 duration-100 will-change-transform relative transition-all disabled:opacity-70 bg-rose-800 text-white font-semibold mt-5 rounded-2xl px-20 py-3 ml-32"
+                    >
+                        Go back
+                    </button>
                 </div>
-                <button
-                    type="button"
-                    onClick={() => router.push("/")}
-                    className="flex active:scale-110 duration-100 will-change-transform relative transition-all disabled:opacity-70 bg-green-800 text-white font-semibold rounded-2xl px-6 py-1 mt-2"
-                >
-                    Go back
-                </button>
             </div>
         </>
     )
