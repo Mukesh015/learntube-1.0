@@ -17,7 +17,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { Card, Skeleton } from "@nextui-org/react";
 import animationData1 from "@/public/Animation - 1714890965505.json"
 const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
-
+import Toast from '@/components/toast';
 
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 
@@ -90,6 +90,8 @@ const VideoPage: React.FC<Props> = ({ params }) => {
     const [allVideos, setAllVideos] = useState<any[]>([]);
     const [comments, setComments] = useState<any[]>([]);
     const [subscribers, setSubscribers] = useState<string>("");
+    const [showToast, setShowToast] = useState<boolean>(false);
+    const [toastMessage, setToastMessage] = useState<string>("");
 
     const [videoTitle, setVideoTitle] = useState<string>("");
     const [videoDescription, setVideoDescription] = useState<string>("");
@@ -299,13 +301,20 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                     creatorEmail: creatorEmail
                 })
             });
+            if (response.ok) {
+                setToastMessage("Comment added successfully");
+                setShowToast(true);
+                setTimeout(() => {
+                    setShowToast(false);
+                }, 3000);
+            }
             const data = await response.json();
             console.log(data);
             setComment("")
         } catch (error) {
             console.error("Failed to add comment, server error", error);
         }
-    }, [creatorEmail, videoId, comment, logo, email, setComment]);
+    }, [creatorEmail,setToastMessage, setShowToast, videoId, comment, logo, email, setComment]);
 
     const handleRedirect = useCallback(async (videoId: string, courseFees: any, courseId: string) => {
         try {
@@ -404,30 +413,35 @@ const VideoPage: React.FC<Props> = ({ params }) => {
 
     useEffect(() => {
         if (data) {
-            setVideoUrl(data.getVideoUrl[0].videoURl);
-            setChannelId(data.getVideoUrl[0].channelId);
-            setIsAddedToPlaylist(data.getFeatures[0].haveInPlaylist)
-            setIsAddedToWatchLater(data.getFeatures[0].haveInWatchLater)
-            setIsLikedVideo(data.getFeatures[0].isLiked)
-            setIsSubsribed(data.getFeatures[0].subscribedchannel)
-            setIsDisLikedVideo(data.getFeatures[0].dislikedVideos)
+
+            data.getVideoUrl.map((video: any) => {
+                setVideoUrl(video.videoURl);
+                setChannelId(video.channelId);
+                setVideoDescription(video.videoDescription);
+                setCreatorEmail(video.creatorEmail);
+                setVideoTitle(video.videoTitle);
+                setChannelName(video.channelName);
+                setChannelLogo(video.channelLogo);
+                setVideoViews(video.videoViews);
+                setVideoPublishedAt(video.videoPublishedAt);
+                setVideoTags(video.videoTags);
+            })
+
+            data.getFeatures.map((features: any) => {
+                setIsAddedToPlaylist(features.haveInPlaylist)
+                setIsAddedToWatchLater(features.haveInWatchLater)
+                setIsLikedVideo(features.isLiked)
+                setIsSubsribed(features.subscribedchannel)
+                setIsDisLikedVideo(features.dislikedVideos)
+                setSubscribers(features.totalSubscriber)
+            })
+
             setAllVideos(data.getAllVideoUrl);
-            setCreatorEmail(data.getVideoUrl[0].creatorEmail);
-            setVideoTitle(data.getVideoUrl[0].videoTitle);
-            setVideoDescription(data.getVideoUrl[0].videoDescription);
-            setChannelName(data.getVideoUrl[0].channelName);
-            setChannelLogo(data.getVideoUrl[0].channelLogo);
-            setVideoViews(data.getVideoUrl[0].videoViews);
-            setVideoPublishedAt(data.getVideoUrl[0].videoPublishedAt);
-            setVideoTags(data.getVideoUrl[0].videoTags);
             setComments(data.getComments)
-            setSubscribers(data.getFeatures[0].totalSubscriber)
-            console.log(data);
         }
         if (user) {
             setEmail(user.email || "");
             setLogo(user.photoURL || "");
-            refetch()
         }
     }, [user, setLogo, setEmail, channelId, setChannelId, setCreatorEmail, setAllVideos, setVideoPublishedAt, setChannelName, setChannelLogo,
         setVideoViews, setSubscribers, setVideoUrl, setVideoTitle, setVideoDescription, setVideoTags, setIsAddedToPlaylist, data, setComments]);
@@ -436,6 +450,9 @@ const VideoPage: React.FC<Props> = ({ params }) => {
         <>
             <NextTopLoader />
             <Navbar query={''} />
+            {showToast &&
+                <Toast message={`${toastMessage}`} />
+            }
             {loading ? (
                 <div className={`p-10 ${isDarkMode ? "bg-white" : "bg-black"} pt-24 flex`}>
                     <div style={{ width: "1000px" }}>
@@ -607,7 +624,7 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                                 </Accordion>
                             </Tooltip>
                             <div className={`mt-5 ${isDarkMode ? "text-black" : "text-white"} flex`}>
-                                <h3>{comments.length ? `${comments.length} comments` : "No comments"}</h3>
+                                <h3>{comments.length} comments</h3>
                                 <Tooltip color="warning" delay={700} showArrow={true} content="Filter to read">
                                     <Button className={`flex ${isDarkMode ? "text-black" : "text-white"} ml-10`} variant="bordered">
                                         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill={isDarkMode ? '#000000' : '#FFFFFF'}
@@ -632,7 +649,7 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                                         </p>
                                     </div>
                                     <p className={`ml-16 text-sm ${isDarkMode ? "text-black" : "tuserId}hite"}`}>{comment.comments}</p>
-                                    <p className='text-blue-500 text-sm ml-14 mt-2'>
+                                    <p className='text-gray-500 text-sm ml-14 mt-2'>
                                         <span>{formatTime(comment.timeStamp)}</span>
                                         <span className='hover:underline ml-5 hover:text-blue-950 cursor-pointer'>reply</span>
                                     </p>
@@ -654,11 +671,11 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                                                 <img className='h-7 rounded-full' src={video.channelLogo} alt="" />
                                                 <span className='ml-2 text-blue-600 font-semibold text-medium'>{video.channelName}</span>
                                             </div>
-                                            <div className="text-gray-500 space-x-3 flex text-xs mt-1">
+                                            <div className="text-gray-500 ml-9 space-x-3 flex text-xs">
                                                 <span>{video.views} views</span>
                                                 <span>{timeSinceUpload(video.uploadAt)}</span>
                                                 <span>{video.courseFees !== null &&
-                                                    <Lottie className="h-5" animationData={animationData1} />
+                                                    <Lottie className="h-3" animationData={animationData1} />
                                                 }</span>
                                             </div>
                                         </div>
@@ -669,7 +686,6 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                     </div>
                 </div >
             )}
-
         </>
     )
 }

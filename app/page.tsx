@@ -50,6 +50,9 @@ const Home: React.FC = () => {
 
 
   const handleRedirect = useCallback(async (videoId: string, courseFees: any, courseId: string) => {
+    if (courseFees === null) {
+      router.push(`/video/${videoId}`);
+    }
     try {
       // Add video to history
       const historyResponse = await fetch(`${process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN}/features/addtohistory`, {
@@ -83,22 +86,13 @@ const Home: React.FC = () => {
         })
       });
       const enrollData = await enrollResponse.json();
-
-      // Redirect based on enrollment status
       if (enrollData.isEnrolled === true) {
-        // const videoUrl = `/video/${videoId}`;
-        // window.location.href = videoUrl;
         router.push(`/video/${videoId}`);
-
       } else {
         onOpen();
       }
     } catch (enrollError) {
       console.error("Failed to fetch enrollment status:", enrollError);
-    }
-
-    if (courseFees === null) {
-      router.push(`/video/${videoId}`);
     }
   }, [email]);
 
