@@ -1,7 +1,4 @@
 {
   "/page": "app/page.js",
-  "/video/[id]/page": "app/video/[id]/page.js",
-  "/error/502/page": "app/error/502/page.js",
-  "/channel/[id]/page": "app/channel/[id]/page.js",
-  "/favicon.ico/route": "app/favicon.ico/route.js"
+  "/payment/[courseId]/page": "app/payment/[courseId]/page.js"
 }

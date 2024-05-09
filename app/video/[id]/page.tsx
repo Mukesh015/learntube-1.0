@@ -170,8 +170,6 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                     channelId: channelId,
                 }),
             });
-            const data = await response.json();
-            console.log(data);
             if (response.ok) {
                 toggleSubscribe();
             }
@@ -192,13 +190,27 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                     videoId: videoId
                 })
             });
-            const data = await response.json();
-            console.log(data);
             if (response.ok) {
                 setIsDisLikedVideo(true);
                 setIsLikedVideo(false);
+                setToastMessage("Successfully disliked video");
+                setShowToast(true);
+                setTimeout(() => {
+                    setShowToast(false);
+                }, 3000);
+            } else {
+                setToastMessage("Failed to disliked video");
+                setShowToast(true);
+                setTimeout(() => {
+                    setShowToast(false);
+                }, 3000);
             }
         } catch (error) {
+            setToastMessage("Failed to disliked video");
+            setShowToast(true);
+            setTimeout(() => {
+                setShowToast(false);
+            }, 3000);
             console.error("Failed to fetch", error);
         }
     }, [setIsDisLikedVideo, setIsLikedVideo, email, videoId]);
@@ -220,8 +232,24 @@ const VideoPage: React.FC<Props> = ({ params }) => {
             if (response.ok) {
                 setIsLikedVideo(true);
                 setIsDisLikedVideo(false);
+                setToastMessage("Added to liked video");
+                setShowToast(true);
+                setTimeout(() => {
+                    setShowToast(false);
+                }, 3000);
+            } else {
+                setToastMessage("Failed to liked video");
+                setShowToast(true);
+                setTimeout(() => {
+                    setShowToast(false);
+                }, 3000);
             }
         } catch (error) {
+            setToastMessage("Failed to liked video");
+            setShowToast(true);
+            setTimeout(() => {
+                setShowToast(false);
+            }, 3000);
             console.error("Failed to like this video", error)
         }
     }, [setIsLikedVideo, email, setIsDisLikedVideo, videoId]);
@@ -238,8 +266,6 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                     videoId: videoId
                 })
             });
-            const data = await response.json();
-            console.log(data);
             if (response.ok) {
                 toggleAddToWatchLater();
             }
@@ -263,7 +289,6 @@ const VideoPage: React.FC<Props> = ({ params }) => {
             });
             if (response.ok) {
                 toggleAddToPlaylist();
-                console.log("video added successfully")
             }
         } catch (error) {
             console.error("Failed to add to playlist", error);
@@ -308,12 +333,23 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                 setTimeout(() => {
                     setShowToast(false);
                 }, 3000);
+            } else {
+                setToastMessage("Failed to add comment");
+                setShowToast(true);
+                setTimeout(() => {
+                    setShowToast(false);
+                }, 3000);
             }
             const data = await response.json();
             console.log(data);
             setComment("")
         } catch (error) {
             console.error("Failed to add comment, server error", error);
+            setToastMessage("Failed to add comment");
+            setShowToast(true);
+            setTimeout(() => {
+                setShowToast(false);
+            }, 3000);
         }
     }, [creatorEmail, setToastMessage, setShowToast, videoId, comment, logo, email, setComment]);
 
@@ -456,7 +492,7 @@ const VideoPage: React.FC<Props> = ({ params }) => {
             <NextTopLoader />
             <Navbar query={''} />
             {showToast &&
-                <Toast message={`${toastMessage}`} />
+                <Toast message={`${toastMessage}`} position={''} />
             }
             {loading ? (
                 <div className={`p-10 ${isDarkMode ? "bg-white" : "bg-black"} pt-24 flex`}>

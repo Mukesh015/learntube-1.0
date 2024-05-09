@@ -64,7 +64,7 @@ const queries = {
         }
     }),
     getAllVideoUrl: () => __awaiter(void 0, void 0, void 0, function* () {
-        var _c, _d;
+        var _c, _d, _e;
         try {
             const videoDetailsResponse = yield axios_1.default.post(`${process.env.server_domain}/video/getvideodetails`);
             const allVideoThumbUrls = [];
@@ -74,6 +74,7 @@ const queries = {
                         const channelLogoResponse = yield queries.getChannelLogo(undefined, { email: video.email });
                         const channelLogo = (_c = channelLogoResponse.find((logo) => logo.email === video.email)) === null || _c === void 0 ? void 0 : _c.channelLogo;
                         const channelName = (_d = channelLogoResponse.find((logo) => logo.email === video.email)) === null || _d === void 0 ? void 0 : _d.channelName;
+                        const channelId = (_e = channelLogoResponse.find((logo) => logo.email === video.email)) === null || _e === void 0 ? void 0 : _e.channelId;
                         const courseFees = course.courseFess.price === null ? null : course.courseFess.price;
                         const courseId = course.courseId;
                         allVideoThumbUrls.push({
@@ -87,7 +88,8 @@ const queries = {
                             channelLogo: channelLogo,
                             channelName: channelName,
                             courseFees: courseFees,
-                            courseId: courseId
+                            courseId: courseId,
+                            channelId: channelId
                         });
                     }
                 }
@@ -103,7 +105,8 @@ const queries = {
                 channelLogo: videothumb.channelLogo,
                 channelName: videothumb.channelName,
                 courseFees: videothumb.courseFees,
-                courseId: videothumb.courseId
+                courseId: videothumb.courseId,
+                channelId: videothumb.channelId
             }));
         }
         catch (error) {
@@ -111,8 +114,8 @@ const queries = {
             throw new Error('Error fetching video URLs');
         }
     }),
-    getVideoUrl: (_3, _e) => __awaiter(void 0, [_3, _e], void 0, function* (_, { email, videoID }) {
-        var _f, _g, _h, _j;
+    getVideoUrl: (_3, _f) => __awaiter(void 0, [_3, _f], void 0, function* (_, { email, videoID }) {
+        var _g, _h, _j, _k;
         try {
             const entry = yield video_1.VideoModel.findOneAndUpdate({ "courses.videos.videoID": videoID }, {
                 $push: {
@@ -130,10 +133,10 @@ const queries = {
             }
             const video = entry.courses.flatMap(course => course.videos).find(video => video.videoID === videoID);
             const channelLogoResponse = yield queries.getChannelLogo(undefined, { email: entry.email });
-            const channelLogo = (_f = channelLogoResponse.find((logo) => logo.email === entry.email)) === null || _f === void 0 ? void 0 : _f.channelLogo;
-            const channelName = (_g = channelLogoResponse.find((name) => name.email === entry.email)) === null || _g === void 0 ? void 0 : _g.channelName;
-            const creatorEmail = (_h = channelLogoResponse.find((name) => name.email === entry.email)) === null || _h === void 0 ? void 0 : _h.email;
-            const channelId = (_j = channelLogoResponse.find((name) => name.email === entry.email)) === null || _j === void 0 ? void 0 : _j.channelId;
+            const channelLogo = (_g = channelLogoResponse.find((logo) => logo.email === entry.email)) === null || _g === void 0 ? void 0 : _g.channelLogo;
+            const channelName = (_h = channelLogoResponse.find((name) => name.email === entry.email)) === null || _h === void 0 ? void 0 : _h.channelName;
+            const creatorEmail = (_j = channelLogoResponse.find((name) => name.email === entry.email)) === null || _j === void 0 ? void 0 : _j.email;
+            const channelId = (_k = channelLogoResponse.find((name) => name.email === entry.email)) === null || _k === void 0 ? void 0 : _k.channelId;
             if (!video) {
                 throw new Error("videoID not found");
             }
@@ -151,7 +154,7 @@ const queries = {
             throw new Error("Internal Server Error");
         }
     }),
-    getSearchBarDetails: (_4, _k) => __awaiter(void 0, [_4, _k], void 0, function* (_, { email }) {
+    getSearchBarDetails: (_4, _l) => __awaiter(void 0, [_4, _l], void 0, function* (_, { email }) {
         try {
             const response = yield axios_1.default.post(`${process.env.server_domain}/video/getvideodetails`);
             const videos = response.data.videoDetails;
@@ -174,7 +177,7 @@ const queries = {
             throw new Error('Error fetching search bar details');
         }
     }),
-    getSearchQueryDetails: (_5, _l) => __awaiter(void 0, [_5, _l], void 0, function* (_, { query }) {
+    getSearchQueryDetails: (_5, _m) => __awaiter(void 0, [_5, _m], void 0, function* (_, { query }) {
         try {
             const videos = yield video_1.VideoModel.find({
                 $or: [

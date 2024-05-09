@@ -18,6 +18,7 @@ import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-o
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Input } from "@nextui-org/react";
 import { gql, useQuery } from "@apollo/client";
 import NextTopLoader from "nextjs-toploader";
+import Toast from "./toast";
 
 const VERIFY_CREATOR = gql`
 query Exam($email:String){
@@ -47,7 +48,8 @@ query Exam($email:String){
 const Navbar: React.FC<{ query: string }> = ({ query }) => {
 
     const { isDarkMode, toggleDarkMode } = useDarkMode();
-
+    const [showToast, setShowToast] = useState<boolean>(false);
+    const [toastMessage, setToastMessage] = useState<string>("");
     const [userName, setuserName] = useState<string>("");
     const [email, setEmail] = useState<string>("");
     const [avatar, setavatar] = useState<string>("");
@@ -332,16 +334,26 @@ const Navbar: React.FC<{ query: string }> = ({ query }) => {
             refetch()
             if (response.ok) {
                 setShowAllClear(true);
+                setToastMessage("marked all as read")
+                setShowToast(true);
                 setTimeout(() => {
+                    setShowToast(false);
                     setShowAllClear(false);
+                }, 3000);
+
+            } else {
+                setToastMessage("Failed to clear all notifications")
+                setShowToast(true);
+                setTimeout(() => {
+                    setShowToast(false);
                 }, 3000);
             }
         } catch (error) {
             console.error("Failed to clear all notifications", error);
         }
-    }, [email, setShowAllClear]);
+    }, [email, setToastMessage, setShowToast, setShowAllClear]);
 
-    const handleMarkAsRead = useCallback(async (notificationId: string) => {
+    const handleMarkAsRead = useCallback(async (notificationId: string, videoId: string) => {
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN}/features/markasread`, {
                 method: "POST",
@@ -353,14 +365,26 @@ const Navbar: React.FC<{ query: string }> = ({ query }) => {
                     notificationId: notificationId
                 })
             });
-            const data = await response.json();
-            console.log(data);
-            refetch()
+            if (response.ok) {
+                setToastMessage("Failed to mark as read")
+                setShowToast(true);
+                setTimeout(() => {
+                    setShowToast(false);
+                    router.push(`/video/${videoId}`)
+                }, 3000);
+            }
+            else {
+                setToastMessage("Failed to mark as read")
+                setShowToast(true);
+                setTimeout(() => {
+                    setShowToast(false);
+                }, 3000);
+            }
 
         } catch (error) {
             console.error("Failed to clear all notifications", error);
         }
-    }, [email]);
+    }, [email, setToastMessage, setShowToast]);
 
     useEffect(() => {
         const handleClickOutside = () => {
@@ -454,6 +478,9 @@ const Navbar: React.FC<{ query: string }> = ({ query }) => {
 
     return (
         <>
+            {showToast &&
+                <Toast message={`${toastMessage}`} position={"right-48"} />
+            }
             <NextTopLoader />
             <nav
                 id="navbar"
@@ -810,7 +837,7 @@ const Navbar: React.FC<{ query: string }> = ({ query }) => {
             <div id="notification-container" className="">
                 {showNotifications &&
                     <div
-                        className={`z-50 ${isDarkMode ? "text-black bg-white shadow-gray-500 shadow-md" : "text-white bg-gray-800"} scrollbar-w-2 scrollbar-thumb-rounded-full scrollbar-track-bg-gray-300 scrollbar-thumb-bg-gray-500 scrollbar-track-rounded-full overflow-y-auto top-20 fixed rounded-md right-10`}
+                        className={`z-20 ${isDarkMode ? "text-black bg-white shadow-gray-500 shadow-md" : "text-white bg-gray-800"} scrollbar-w-2 scrollbar-thumb-rounded-full scrollbar-track-bg-gray-300 scrollbar-thumb-bg-gray-500 scrollbar-track-rounded-full overflow-y-auto top-20 fixed rounded-md right-10`}
                         style={{
                             width: "30rem",
                             height: "40rem",
@@ -818,7 +845,7 @@ const Navbar: React.FC<{ query: string }> = ({ query }) => {
                     >
                         {notifications.map((item, index) => (
                             <div key={index} id="notification" className={` cursor-pointer ${isDarkMode ? "hover:bg-gray-300" : "hover:bg-gray-700"} pb-5 p-1`}>
-                                <div onClick={() => handleMarkAsRead(item.notificationId)} className="flex ml-3 mr-3 mt-3">
+                                <div onClick={() => handleMarkAsRead(item.notificationId, item.videoId)} className="flex ml-3 mr-3 mt-3">
                                     <img className="h-10 rounded-full mt-5" src={item.avatar} alt="" />
                                     <div>
                                         <h1 className="text-sm ml-3 max-w-64 mt-5">{item.message}</h1>

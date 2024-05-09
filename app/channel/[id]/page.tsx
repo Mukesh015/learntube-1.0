@@ -11,7 +11,7 @@ import { auth } from "@/configurations/firebase/config";
 import dynamic from 'next/dynamic';
 const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
 import animationData from "@/public/Animation - 1714908454989.json"
-
+import { useRouter } from 'next/navigation';
 
 const CHANNEL_DETAILS = gql`
 query CHANNEL_DETAILS ($channelId: String, $email: String){
@@ -69,6 +69,9 @@ interface Props {
 }
 
 const ChannelPage: React.FC<Props> = ({ params }) => {
+
+    const router = useRouter();
+
     const { isDarkMode } = useDarkMode();
     const [homeTab, setHomeTab] = useState<boolean>(true);
     const [shortTab, setShortTab] = useState<boolean>(false);
@@ -305,7 +308,7 @@ const ChannelPage: React.FC<Props> = ({ params }) => {
                                             className="gap-12 grid grid-cols-3 mt-10"
                                         >
                                             {videos.map((video, index) => (
-                                                <div key={index} className='cursor-pointer' id="video-content">
+                                                <div key={index} className='cursor-pointer' id="video-content" onClick={() => router.push(`/video/${video.videoId}`)}>
                                                     <img
                                                         className="transition h-48 ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-150 rounded-md"
                                                         width={350}
@@ -358,7 +361,7 @@ const ChannelPage: React.FC<Props> = ({ params }) => {
                                                             {courseStates[course.courseId] && selectedCourseId === course.courseId && (
                                                                 <div className="ml-20 mb-10">
                                                                     {course.videos.map((video: any) => (
-                                                                        <div className="flex mb-10" key={video.videoId}>
+                                                                        <div onClick={() => router.push(`/video/${video.videoId}`)} className="flex mb-10" key={video.videoId}>
                                                                             {/* Video thumbnail */}
                                                                             <img
                                                                                 width={250}

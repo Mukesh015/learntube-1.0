@@ -25,6 +25,7 @@ type videoUrl{
     channelName:String
     courseFees:String
     courseId:String
+    channelId:String
 }
 type url{
     videoURl: String

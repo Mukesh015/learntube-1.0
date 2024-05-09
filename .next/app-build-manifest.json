@@ -18,21 +18,10 @@
       "static/chunks/main-app.js",
       "static/chunks/app/loading.js"
     ],
-    "/video/[id]/page": [
+    "/payment/[courseId]/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/css-node_modules_react-toastify_dist_ReactToastify_css-node_modules_next_font_google_target_css.css",
-      "static/chunks/app/video/[id]/page.js"
-    ],
-    "/channel/[id]/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/channel/[id]/page.js"
-    ],
-    "/error/502/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/error/502/page.js"
+      "static/chunks/app/payment/[courseId]/page.js"
     ]
   }
 }
