@@ -602,7 +602,8 @@ const queries = {
                     link,
                     subscribers,
                     noOfVideos,
-                    channelId
+                    channelId,
+                    creatorEmail: userEmail
                 }];
         }
         catch (error) {

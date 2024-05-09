@@ -23,6 +23,7 @@ query CHANNEL_DETAILS ($channelId: String, $email: String){
                 coverPhoto
                 noOfVideos
                 subscribers
+                creatorEmail
                 link {
                   Discord
                   Facebook

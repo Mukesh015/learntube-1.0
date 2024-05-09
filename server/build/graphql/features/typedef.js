@@ -167,6 +167,7 @@ type Video {
     link: SocialMediaLinks
     subscribers: String
     noOfVideos: String
+    creatorEmail: String
   
  }
  type coursebyChannelId{
