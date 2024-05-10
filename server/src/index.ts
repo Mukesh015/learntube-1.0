@@ -1,7 +1,6 @@
 import express, { Request, Response } from 'express';
 import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
-import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4'
 import cors from "cors";
 import bodyParser from 'body-parser';

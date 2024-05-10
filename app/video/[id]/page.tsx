@@ -17,7 +17,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { Card, Skeleton } from "@nextui-org/react";
 import animationData1 from "@/public/Animation - 1714890965505.json"
 const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
-
+import Toast from '@/components/toast';
 
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 
@@ -91,6 +91,8 @@ const VideoPage: React.FC<Props> = ({ params }) => {
     const [allVideos, setAllVideos] = useState<any[]>([]);
     const [comments, setComments] = useState<any[]>([]);
     const [subscribers, setSubscribers] = useState<string>("");
+    const [showToast, setShowToast] = useState<boolean>(false);
+    const [toastMessage, setToastMessage] = useState<string>("");
 
     const [videoTitle, setVideoTitle] = useState<string>("");
     const [videoDescription, setVideoDescription] = useState<string>("");
@@ -120,7 +122,7 @@ const VideoPage: React.FC<Props> = ({ params }) => {
     }
 
     const videoId: any = decodeURIComponent(params.id)
-    const { loading, error, data, refetch } = useQuery(VideoUrl, {
+    const { loading, error, data } = useQuery(VideoUrl, {
         variables: { email: email, videoId: videoId, channelId: channelId },
     });
 
@@ -168,8 +170,6 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                     channelId: channelId,
                 }),
             });
-            const data = await response.json();
-            console.log(data);
             if (response.ok) {
                 toggleSubscribe();
             }
@@ -190,13 +190,27 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                     videoId: videoId
                 })
             });
-            const data = await response.json();
-            console.log(data);
             if (response.ok) {
                 setIsDisLikedVideo(true);
                 setIsLikedVideo(false);
+                setToastMessage("Successfully disliked video");
+                setShowToast(true);
+                setTimeout(() => {
+                    setShowToast(false);
+                }, 3000);
+            } else {
+                setToastMessage("Failed to disliked video");
+                setShowToast(true);
+                setTimeout(() => {
+                    setShowToast(false);
+                }, 3000);
             }
         } catch (error) {
+            setToastMessage("Failed to disliked video");
+            setShowToast(true);
+            setTimeout(() => {
+                setShowToast(false);
+            }, 3000);
             console.error("Failed to fetch", error);
         }
     }, [setIsDisLikedVideo, setIsLikedVideo, email, videoId]);
@@ -218,8 +232,24 @@ const VideoPage: React.FC<Props> = ({ params }) => {
             if (response.ok) {
                 setIsLikedVideo(true);
                 setIsDisLikedVideo(false);
+                setToastMessage("Added to liked video");
+                setShowToast(true);
+                setTimeout(() => {
+                    setShowToast(false);
+                }, 3000);
+            } else {
+                setToastMessage("Failed to liked video");
+                setShowToast(true);
+                setTimeout(() => {
+                    setShowToast(false);
+                }, 3000);
             }
         } catch (error) {
+            setToastMessage("Failed to liked video");
+            setShowToast(true);
+            setTimeout(() => {
+                setShowToast(false);
+            }, 3000);
             console.error("Failed to like this video", error)
         }
     }, [setIsLikedVideo, email, setIsDisLikedVideo, videoId]);
@@ -236,8 +266,6 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                     videoId: videoId
                 })
             });
-            const data = await response.json();
-            console.log(data);
             if (response.ok) {
                 toggleAddToWatchLater();
             }
@@ -261,7 +289,6 @@ const VideoPage: React.FC<Props> = ({ params }) => {
             });
             if (response.ok) {
                 toggleAddToPlaylist();
-                console.log("video added successfully")
             }
         } catch (error) {
             console.error("Failed to add to playlist", error);
@@ -300,13 +327,31 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                     creatorEmail: creatorEmail
                 })
             });
+            if (response.ok) {
+                setToastMessage("Comment added successfully");
+                setShowToast(true);
+                setTimeout(() => {
+                    setShowToast(false);
+                }, 3000);
+            } else {
+                setToastMessage("Failed to add comment");
+                setShowToast(true);
+                setTimeout(() => {
+                    setShowToast(false);
+                }, 3000);
+            }
             const data = await response.json();
             console.log(data);
             setComment("")
         } catch (error) {
             console.error("Failed to add comment, server error", error);
+            setToastMessage("Failed to add comment");
+            setShowToast(true);
+            setTimeout(() => {
+                setShowToast(false);
+            }, 3000);
         }
-    }, [creatorEmail, videoId, comment, logo, email, setComment]);
+    }, [creatorEmail, setToastMessage, setShowToast, videoId, comment, logo, email, setComment]);
 
     const handleRedirect = useCallback(async (videoId: string, courseFees: any, courseId: string) => {
         try {
@@ -397,6 +442,7 @@ const VideoPage: React.FC<Props> = ({ params }) => {
 
     useEffect(() => {
         startWatchTime();
+
         return () => {
             stopWatchTime();
         };
@@ -419,7 +465,7 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                 setVideoTags(video.videoTags);
             })
 
-            data.getFeatures.map((features:any) => {
+            data.getFeatures.map((features: any) => {
                 setIsAddedToPlaylist(features.haveInPlaylist)
                 setIsAddedToWatchLater(features.haveInWatchLater)
                 setIsLikedVideo(features.isLiked)
@@ -435,13 +481,19 @@ const VideoPage: React.FC<Props> = ({ params }) => {
             setEmail(user.email || "");
             setLogo(user.photoURL || "");
         }
-    }, [user, setLogo, setEmail, channelId, setChannelId, setCreatorEmail, setAllVideos, setVideoPublishedAt, setChannelName, setChannelLogo,
+        if (error) {
+            router.push("/error/502")
+        }
+    }, [user, setLogo, error, setEmail, channelId, setChannelId, setCreatorEmail, setAllVideos, setVideoPublishedAt, setChannelName, setChannelLogo,
         setVideoViews, setSubscribers, setVideoUrl, setVideoTitle, setVideoDescription, setVideoTags, setIsAddedToPlaylist, data, setComments]);
 
     return (
         <>
             <NextTopLoader />
             <Navbar query={''} />
+            {showToast &&
+                <Toast message={`${toastMessage}`} position={''} />
+            }
             {loading ? (
                 <div className={`p-10 ${isDarkMode ? "bg-white" : "bg-black"} pt-24 flex`}>
                     <div style={{ width: "1000px" }}>
@@ -638,7 +690,7 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                                         </p>
                                     </div>
                                     <p className={`ml-16 text-sm ${isDarkMode ? "text-black" : "tuserId}hite"}`}>{comment.comments}</p>
-                                    <p className='text-blue-500 text-sm ml-14 mt-2'>
+                                    <p className='text-gray-500 text-sm ml-14 mt-2'>
                                         <span>{formatTime(comment.timeStamp)}</span>
                                         <span className='hover:underline ml-5 hover:text-blue-950 cursor-pointer'>reply</span>
                                     </p>
@@ -650,18 +702,23 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                         <div>
                             {allVideos.map((video, index) => (
                                 <Tooltip color="warning" delay={700} showArrow={true} content={video.allVideoTitles} key={index}>
-                                    <div className="ml-10 flex mb-5 cursor-pointer" onClick={() => {
-                                        handleRedirect(video.videoId, video.courseFees, video.courseId)
-                                    }}>
-                                        <img style={{ height: "130px", width: "200px" }} className="rounded-md" src={video.allThumbnailUrls} alt="" />
+                                    <div className="ml-10 flex mb-5 cursor-pointer" >
+                                        <img onClick={() => {
+                                            handleRedirect(video.videoId, video.courseFees, video.courseId)
+                                        }} style={{ height: "130px", width: "200px" }} className="rounded-md" src={video.allThumbnailUrls} alt="" />
                                         <div className="max-w-56 ml-3">
                                             <h1 className={`font-semibold ${isDarkMode ? "text-black" : "text-white"}`}>{video.allVideoTitles}</h1>
-                                            <h2 className="text-gray-500 text-sm">{video.channelName}</h2>
-                                            <h3 className="text-gray-500 text-sm">{video.views} views - {timeSinceUpload(video.uploadAt)}
-                                                {video.courseFees !== null &&
-                                                    <Lottie className="h-5 ml-3" animationData={animationData1} />
-                                                }
-                                            </h3>
+                                            <div onClick={() => router.push(`/channel/${video.channelId}`)} className="font-semibold text-medium flex mt-1">
+                                                <img className='h-7 rounded-full' src={video.channelLogo} alt="" />
+                                                <span className='ml-2 text-blue-600 font-semibold text-medium'>{video.channelName}</span>
+                                            </div>
+                                            <div className="text-gray-500 ml-9 space-x-3 flex text-xs">
+                                                <span>{video.views} views</span>
+                                                <span>{timeSinceUpload(video.uploadAt)}</span>
+                                                <span>{video.courseFees !== null &&
+                                                    <Lottie className="h-3" animationData={animationData1} />
+                                                }</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </Tooltip>
@@ -670,7 +727,6 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                     </div>
                 </div >
             )}
-
         </>
     )
 }

@@ -74,6 +74,8 @@ query GetAllVideoUrl ($email: String){
 `
 
 const CardGrid: React.FC = () => {
+
+    const router = useRouter();
     const { isDarkMode } = useDarkMode();
     const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
 
@@ -98,8 +100,6 @@ const CardGrid: React.FC = () => {
 
     const [user] = useAuthState(auth);
 
-
-    const router = useRouter();
     const { loading, error, data } = useQuery(CREATOR_DETAILS, {
         variables: { email: email },
     });

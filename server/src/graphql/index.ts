@@ -20,6 +20,7 @@ async function creategraphqlServer() {
             
 
         },
+        introspection: process.env.NODE_ENV !== 'production'
     });
 
     await gqlServer.start();
