@@ -1,0 +1,24 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const feature_1 = require("../controllers/feature");
+const FeatureRouter = express_1.default.Router();
+FeatureRouter.post("/addtoplaylist", feature_1.addToPlaylist);
+FeatureRouter.post("/addtosubscriptions", feature_1.addSubscription);
+FeatureRouter.post("/addtomyvideos", feature_1.addToMyVideos);
+FeatureRouter.post("/addtowatchlater", feature_1.addToWatchLater);
+FeatureRouter.post("/addtolikedvideos", feature_1.addToLikedVideo);
+FeatureRouter.post("/addtohistory", feature_1.addToHistory);
+FeatureRouter.post("/addtodislikevideo", feature_1.addToDislikedVideo);
+FeatureRouter.post("/addtodislikevideo", feature_1.addToDislikedVideo);
+FeatureRouter.post("/addtosearchhistory", feature_1.addSearchHistory);
+FeatureRouter.post("/removefromsearchHistory", feature_1.removeSearchHistory);
+FeatureRouter.post("/calculatewatchtime", feature_1.calculateWatchTime);
+FeatureRouter.post("/markasread", feature_1.markAsRead);
+FeatureRouter.post("/clearnotification", feature_1.clearNotification);
+FeatureRouter.post("/clearallnotification", feature_1.clearAllNotifiacation);
+FeatureRouter.post("/:modify", feature_1.dynamicChanges);
+exports.default = FeatureRouter;
