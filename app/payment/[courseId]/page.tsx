@@ -44,7 +44,7 @@ const PaymentPage: React.FC<Props> = ({ params }) => {
 
     const makePayment = useCallback(async () => {
         const stripe = await loadStripe(`${process.env.STRIPE_PK}`)
-        const response = await fetch('http://localhost:9063/pay/makepayment', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN}/pay/makepayment`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -54,11 +54,8 @@ const PaymentPage: React.FC<Props> = ({ params }) => {
             })
         });
         const session = await response.json();
-        console.log(session)
-        const result = await stripe?.redirectToCheckout({
-            sessionId: session.id
-        })
-    },[])
+        
+    },[paymentDetails])
 
     useEffect(() => {
         if (data) {

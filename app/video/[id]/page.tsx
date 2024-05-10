@@ -58,6 +58,7 @@ query GetVideoUrl( $email: String, $videoId: String,$channelId: String) {
         videoTitle
         videoURl
         videoViews
+        videoThumb
       }
       getComments(videoID: $videoId) {
         count

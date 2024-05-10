@@ -20,24 +20,25 @@ function makePayment(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const { courseDetails } = req.body;
         try {
-            const lineItems = {
+            const lineItems = courseDetails.map((detail) => ({
                 price_data: {
                     currency: "inr",
                     product_data: {
-                        name: 'Student'
+                        name: detail.courseName,
+                        images: [detail.courseThumbnail]
                     },
-                    unit_amount: 1000000,
+                    unit_amount: parseInt(detail.courseFees) * 100,
                 },
                 quantity: 1,
-            };
+            }));
             const session = yield stripe.checkout.sessions.create({
                 payment_method_types: ["card"],
-                line_items: [lineItems],
+                line_items: lineItems,
                 mode: "payment",
                 success_url: `${process.env.client_domain}/payment/success`,
                 cancel_url: `${process.env.client_domain}/payment/failed`,
             });
-            res.send({ id: session.id });
+            return res.redirect(303, session.url);
         }
         catch (error) {
             console.error('Error creating Checkout session:', error);
