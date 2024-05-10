@@ -54,7 +54,7 @@ const PaymentPage: React.FC<Props> = ({ params }) => {
             })
         });
         const session = await response.json();
-        
+        window.location.href = session.url
     },[paymentDetails])
 
     useEffect(() => {

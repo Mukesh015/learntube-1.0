@@ -44,6 +44,13 @@ function init() {
         app.use("/video", video_1.default);
         app.use("/features", feature_1.default);
         app.use("/pay", payment_1.default);
+        app.use(express_1.default.json({
+            verify: function (req, res, buf) {
+                if (req.originalUrl.startsWith('/pay/webhook')) {
+                    req.rawBody = buf.toString();
+                }
+            },
+        }));
         try {
             yield mongoose_1.default.connect(DB);
             console.log("DB connected");

@@ -27,12 +27,21 @@ async function init() {
     app.use(bodyParser.json());
     app.use(cookieParser());
 
-    app.use("/graphql", expressMiddleware(await creategraphqlServer(), ));
+    app.use("/graphql", expressMiddleware(await creategraphqlServer(),));
     app.use("/api", UserRouter);
     app.use("/video", VideoRouter);
     app.use("/features", FeaturesRouter);
     app.use("/pay", PaymentRouter);
+    app.use(
+        express.json({
 
+            verify: function (req: Request, res: Response, buf: Buffer) {
+                if (req.originalUrl.startsWith('/pay/webhook')) {
+                    (req as any).rawBody = buf.toString();
+                }
+            },
+        })
+    );
     try {
         await mongoose.connect(DB);
         console.log("DB connected");
