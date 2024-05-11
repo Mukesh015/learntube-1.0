@@ -23,9 +23,10 @@ function makePayment(req, res) {
         try {
             const lineItems = courseDetails.map((detail) => ({
                 price_data: {
-                    currency: "inr",
+                    currency: 'inr',
                     product_data: {
                         name: detail.courseName,
+                        description: detail.courseDescription,
                         images: [detail.courseThumbnail]
                     },
                     unit_amount: parseInt(detail.courseFees) * 100,
@@ -38,6 +39,8 @@ function makePayment(req, res) {
                 mode: "payment",
                 success_url: `${process.env.client_domain}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
                 cancel_url: `${process.env.client_domain}/payment/failed`,
+                customer_email: 'sudip2003kundu@gmail.com',
+                client_reference_id: 5400,
             });
             res.json({ url: session.url });
         }
