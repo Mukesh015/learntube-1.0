@@ -11,7 +11,7 @@ const stripe = require('stripe')(process.env.stripe_secret)
 export async function makePayment(req: Request, res: Response) {
 
   const { courseDetails,userName,email } = req.body;
-
+  console.log(email)
     try {
 
         const price=await stripe.prices.create({

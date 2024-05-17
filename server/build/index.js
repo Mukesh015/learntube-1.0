@@ -24,7 +24,6 @@ const feature_1 = __importDefault(require("./routes/feature"));
 const payment_1 = __importDefault(require("./routes/payment"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const graphql_1 = __importDefault(require("./graphql"));
-const payment_2 = require("./controllers/payment");
 dotenv_1.default.config({ path: "./.env" });
 function init() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -45,7 +44,13 @@ function init() {
         app.use("/video", video_1.default);
         app.use("/features", feature_1.default);
         app.use("/pay", payment_1.default);
-        app.post('/webhook', express_1.default.raw({ type: 'application/json' }), payment_2.webhookCheckout);
+        app.use(express_1.default.json({
+            verify: function (req, res, buf) {
+                if (req.originalUrl.startsWith('/pay/webhook')) {
+                    req.rawBody = buf.toString();
+                }
+            },
+        }));
         try {
             yield mongoose_1.default.connect(DB);
             console.log("DB connected");

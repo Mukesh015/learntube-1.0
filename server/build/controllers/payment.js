@@ -19,6 +19,7 @@ const stripe = require('stripe')(process.env.stripe_secret);
 function makePayment(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const { courseDetails, userName, email } = req.body;
+        console.log(email);
         try {
             const price = yield stripe.prices.create({
                 currency: 'inr',
