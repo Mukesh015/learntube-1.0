@@ -1,6 +1,5 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
   "/page": "app/page.js",
-  "/favicon.ico/route": "app/favicon.ico/route.js",
-  "/payment/[courseId]/page": "app/payment/[courseId]/page.js"
+  "/payment/[courseId]/page": "app/payment/[courseId]/page.js",
+  "/payment/success/page": "app/payment/success/page.js"
 }

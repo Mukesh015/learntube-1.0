@@ -751,7 +751,10 @@ const queries = {
             if (!video) {
                 throw new Error('course details not found');
             }
+            const channelLogoResponse = await queries.getChannelLogo(undefined, { email:video.email });
+            const username = channelLogoResponse.find((logo: { email: string; }) => logo.email === video.email)?.usernames;
             const course = video.courses.find(course => course.courseId === courseId);
+
             return [{
                 email: video.email,
                 courseName: course?.courseName,
@@ -759,7 +762,8 @@ const queries = {
                 courseFees: course?.courseFees.price,
                 courseId: course?.courseId,
                 courseThumbnail: course?.courseThumbUrl,
-                totalVideo: course?.videos.length
+                totalVideo: course?.videos.length,
+                userName:username
             }]
         }
         catch (error) {

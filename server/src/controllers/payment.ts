@@ -6,78 +6,88 @@ dotenv.config({ path: "./.env" });
 
 
 const stripe = require('stripe')(process.env.stripe_secret)
-const endpointSecret=process.env.webhook_secret
 
 
 export async function makePayment(req: Request, res: Response) {
-    const { courseDetails } = req.body;
+
+  const { courseDetails,userName,email } = req.body;
 
     try {
-        const lineItems = courseDetails.map((detail: any) => ({
-            price_data: {
-                currency: 'inr',
-                product_data: {
-                    name: detail.courseName,
-                    description: detail.courseDescription,
-                    images: [detail.courseThumbnail]
-                },
-                unit_amount: parseInt(detail.courseFees) * 100,
-            },
-            quantity: 1,
-        }));
 
+        const price=await stripe.prices.create({
+          currency: 'inr',
+          unit_amount: parseInt(courseDetails[0].courseFees) * 100,
+          product_data: {
+            name: courseDetails[0].courseName,
+      
+          },
+          metadata: {
+            description: courseDetails[0].courseId,
+            images: `${courseDetails[0].courseThumbnail}`
+          }
+        })
+        const customer = await stripe.customers.create({
+          name: userName,
+          email: email,
+          address: {
+            line1: '510 Townsend St',
+            postal_code: '98140',
+            city: 'San Francisco',
+            state: 'CA',
+            country: 'US',
+          },
+        });
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ["card"],
-            line_items: lineItems,
+            line_items: [{
+              price: price.id,
+              quantity: 1,
+            }],
             mode: "payment",
             success_url: `${process.env.client_domain}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${process.env.client_domain}/payment/failed`,
-            customer_email:'sudip2003kundu@gmail.com',
-            client_reference_id: 5400,
-            
+            billing_address_collection: 'required',
+      
+            customer: customer.id,
+            client_reference_id: courseDetails[0].courseId,
+            metadata: {
+              courseId: courseDetails[0].courseId
+            }
         });
 
-        res.json({ url: session.url })
+        res.status(200).json({
+          status: 'success',
+          session
+        });
     } catch (error) {
         console.error('Error creating Checkout session:', error);
         res.status(500).send({ error: 'Internal Server Error' });
     }
-}
+};
 
-export async function webHook(req: Request, res: Response) {
+const createBookingCheckout = async (sessionData: { metadata: { courseId: any; }; client_reference_id: any; customer:any }) => {
+  console.log(sessionData.metadata);
+  console.log(sessionData.client_reference_id);
+  console.log(sessionData.customer);
+};
 
-    let event = req.body;
-  
-  if (endpointSecret) {
-
-    const signature = req.headers['stripe-signature'];
-    try {
-      event = stripe.webhooks.constructEvent(
-        req.body,
-        signature,
-        endpointSecret
-      );
-    } catch (error) {
-      console.log(`⚠️  Webhook signature verification failed.`, error);
-      return res.sendStatus(400);
-    }
+export async function webhookCheckout (req: Request, res: Response)  {
+  const endpointSecret = process.env.WEBHOOK_SECRET;
+  const sig = req.headers['stripe-signature'];
+  console.log("webhook checkout executed")
+  let event;
+  try {
+    event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+  } catch (err) {
+    console.log(err);
+    return res.status(400).send(`webhook error - ${err}`);
   }
-
-  switch (event.type) {
-    case 'payment_intent.succeeded':
-      const paymentIntent = event.data.object;
-      console.log(`PaymentIntent for ${paymentIntent.amount} was successful!`);
-    
-      break;
-    case 'payment_method.attached':
-      const paymentMethod = event.data.object;
-
-      break;
-    default:
-
-      console.log(`Unhandled event type ${event.type}.`);
+  if (event.type === 'checkout.session.completed') {
+    console.log(event.data.object);
+    createBookingCheckout(event.data.object);
   }
+  res.status(200).json({
+    received: true
+  });
+};
 
-
-  res.send();
-}

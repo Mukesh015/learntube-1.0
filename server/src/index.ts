@@ -10,6 +10,7 @@ import FeaturesRouter from './routes/feature';
 import PaymentRouter from './routes/payment';
 import dotenv from "dotenv";
 import creategraphqlServer from "./graphql";
+import {webhookCheckout} from './controllers/payment'
 dotenv.config({ path: "./.env" });
 
 async function init() {
@@ -32,16 +33,8 @@ async function init() {
     app.use("/video", VideoRouter);
     app.use("/features", FeaturesRouter);
     app.use("/pay", PaymentRouter);
-    app.use(
-        express.json({
 
-            verify: function (req: Request, res: Response, buf: Buffer) {
-                if (req.originalUrl.startsWith('/pay/webhook')) {
-                    (req as any).rawBody = buf.toString();
-                }
-            },
-        })
-    );
+    app.post('/webhook', express.raw({ type: 'application/json' }), webhookCheckout);
     try {
         await mongoose.connect(DB);
         console.log("DB connected");

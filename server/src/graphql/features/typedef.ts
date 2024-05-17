@@ -189,5 +189,6 @@ type Video {
     courseId: String
     courseThumbnail: String
     totalVideo: String
+    userName: String
  }
 `;

@@ -19,6 +19,9 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure
 import { gql, useQuery } from "@apollo/client";
 import NextTopLoader from "nextjs-toploader";
 import Toast from "./toast";
+import animationData from "@/public/Animation - 1715340783502.json"
+import dynamic from 'next/dynamic';
+import Lottie from "lottie-react";
 
 const VERIFY_CREATOR = gql`
 query Exam($email:String){
@@ -556,8 +559,6 @@ const Navbar: React.FC<{ query: string }> = ({ query }) => {
                                 style={{ width: "600px" }}
                                 type="search"
                                 id="search-content"
-                                value={query}
-                                onChange={(e) => setSearchitem(e.target.value)}
 
                                 placeholder="Search here... or [ctrl+k]"
                                 className={`bg-inherit border ${isDarkMode ? "text-black" : "text-white"} border-gray-700 rounded-medium p-2 px-10 w-96`}
@@ -774,7 +775,7 @@ const Navbar: React.FC<{ query: string }> = ({ query }) => {
             )
             }
 
-            {toggleVoiceSearches && recognition && (
+            {toggleVoiceSearches && recognition &&  (
                 <div id="voicesearch-container">
                     {/* Backdrop */}
                     <div
@@ -817,12 +818,7 @@ const Navbar: React.FC<{ query: string }> = ({ query }) => {
 
                         {/* Content */}
                         <div className="flex mr-10 mt-28 ml-10">
-                            {isListening ? (
-                                <svg xmlns="http://www.w3.org/2000/svg" height="240" fill="#eb4034" viewBox="0 -960 960 960" width="240"><path d="M480.12-400q-51.04 0-86.58-35.46Q358-470.91 358-522v-242q0-51.09 35.42-86.54Q428.84-886 479.88-886q51.04 0 86.58 35.46Q602-815.09 602-764v242q0 51.09-35.42 86.54Q531.16-400 480.12-400ZM436-96v-128.85q-113-13.31-185.5-98.42Q178-408.39 178-522h86q0 90 63.18 152T480-308q89.64 0 152.82-62Q696-432 696-522h86q0 114.39-73.5 199.12Q635-238.16 522-224.85V-96h-86Z" /></svg>
-                            ) : (
-                                <svg xmlns="http://www.w3.org/2000/svg" height="240" fill={isDarkMode ? '#000000' : '#FFFFFF'}
-                                    viewBox="0 -960 960 960" width="240"><path d="M480.12-400q-51.04 0-86.58-35.46Q358-470.91 358-522v-242q0-51.09 35.42-86.54Q428.84-886 479.88-886q51.04 0 86.58 35.46Q602-815.09 602-764v242q0 51.09-35.42 86.54Q531.16-400 480.12-400ZM436-96v-128.85q-113-13.31-185.5-98.42Q178-408.39 178-522h86q0 90 63.18 152T480-308q89.64 0 152.82-62Q696-432 696-522h86q0 114.39-73.5 199.12Q635-238.16 522-224.85V-96h-86Z" /></svg>
-                            )}
+                            <Lottie className="h-80" animationData={animationData} />
                             {recognition ? (
                                 <p className="text-4xl mt-20 ml-20">{text ? text : "Listening ..."}</p>
                             ) : (
