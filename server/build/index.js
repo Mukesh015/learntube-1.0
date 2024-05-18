@@ -25,8 +25,7 @@ const payment_1 = __importDefault(require("./routes/payment"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const graphql_1 = __importDefault(require("./graphql"));
 dotenv_1.default.config({ path: "./.env" });
-const stripe = require('stripe')(process.env.stripe_secret);
-const endpointSecret = "whsec_HE0gOF31VbdOno14SqmGP2KGQaN28oMS";
+const payment_2 = require("./controllers/payment");
 function init() {
     return __awaiter(this, void 0, void 0, function* () {
         const DB = process.env.DB;
@@ -46,44 +45,7 @@ function init() {
         app.use("/video", video_1.default);
         app.use("/features", feature_1.default);
         app.use("/pay", payment_1.default);
-        app.post('/webhook', express_1.default.raw({ type: 'application/json' }), (request, response) => {
-            const sig = request.headers['stripe-signature'];
-            console.log("webhook executed successfully");
-            let event;
-            try {
-                event = stripe.webhooks.constructEvent(request.body, sig, endpointSecret);
-            }
-            catch (err) {
-                response.status(400).send(`Webhook Error: ${err}`);
-                return;
-            }
-            switch (event.type) {
-                case 'checkout.session.async_payment_failed':
-                    const checkoutSessionAsyncPaymentFailed = event.data.object;
-                    console.log('paymentFailed', checkoutSessionAsyncPaymentFailed);
-                    break;
-                case 'checkout.session.async_payment_succeeded':
-                    const checkoutSessionAsyncPaymentSucceeded = event.data.object;
-                    // Then define and call a function to handle the event checkout.session.async_payment_succeeded
-                    console.log('Checkout async payment succeeded', checkoutSessionAsyncPaymentSucceeded);
-                    break;
-                case 'checkout.session.completed':
-                    const checkoutSessionCompleted = event.data.object;
-                    // Then define and call a function to handle the event checkout.session.completed
-                    console.log('Checkout async checkoutSessionCompleted', checkoutSessionCompleted);
-                    break;
-                case 'checkout.session.expired':
-                    const checkoutSessionExpired = event.data.object;
-                    // Then define and call a function to handle the event checkout.session.expired
-                    console.log('checkout session expired', checkoutSessionExpired);
-                    break;
-                // ... handle other event types
-                default:
-                    console.log(`Unhandled event type ${event.type}`);
-            }
-            // Return a 200 response to acknowledge receipt of the event
-            response.send();
-        });
+        app.post('/webhook', express_1.default.raw({ type: 'application/json' }), payment_2.webhookCheckout);
         try {
             yield mongoose_1.default.connect(DB);
             console.log("DB connected");
