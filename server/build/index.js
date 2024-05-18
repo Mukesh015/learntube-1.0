@@ -24,8 +24,8 @@ const feature_1 = __importDefault(require("./routes/feature"));
 const payment_1 = __importDefault(require("./routes/payment"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const graphql_1 = __importDefault(require("./graphql"));
-dotenv_1.default.config({ path: "./.env" });
 const payment_2 = require("./controllers/payment");
+dotenv_1.default.config({ path: "./.env" });
 function init() {
     return __awaiter(this, void 0, void 0, function* () {
         const DB = process.env.DB;

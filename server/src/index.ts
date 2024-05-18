@@ -12,7 +12,6 @@ import dotenv from "dotenv";
 import creategraphqlServer from "./graphql";
 import { webhookCheckout } from './controllers/payment';
 dotenv.config({ path: "./.env" });
-const stripe = require('stripe')(process.env.stripe_secret)
 
 async function init() {
     const DB: string | undefined = process.env.DB;
@@ -29,16 +28,15 @@ async function init() {
     app.use(bodyParser.json());
     app.use(cookieParser());
 
-    app.use("/graphql", expressMiddleware(await creategraphqlServer(),));
+    app.use("/graphql", expressMiddleware(await creategraphqlServer()));
     app.use("/api", UserRouter);
     app.use("/video", VideoRouter);
     app.use("/features", FeaturesRouter);
     app.use("/pay", PaymentRouter);
 
-
-    app.post('/webhook', express.raw({type: 'application/json'}),webhookCheckout);
-
     
+    app.post('/webhook', express.raw({ type: 'application/json' }), webhookCheckout);
+
     try {
         await mongoose.connect(DB);
         console.log("DB connected");
