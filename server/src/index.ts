@@ -10,8 +10,10 @@ import FeaturesRouter from './routes/feature';
 import PaymentRouter from './routes/payment';
 import dotenv from "dotenv";
 import creategraphqlServer from "./graphql";
+import { webhookCheckout } from './controllers/payment';
 dotenv.config({ path: "./.env" });
-import {webhookCheckout} from "./controllers/payment"
+const stripe = require('stripe')(process.env.stripe_secret)
+
 async function init() {
     const DB: string | undefined = process.env.DB;
     const PORT: string | undefined = process.env.PORT;
