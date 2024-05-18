@@ -5,7 +5,7 @@ import {makePayment,webhookCheckout} from '../controllers/payment'
 
 
 PaymentRouter.post("/makepayment", makePayment)
-PaymentRouter.post("/webhook", webhookCheckout)
+PaymentRouter.post("/webhook",express.raw({type: 'application/json'}), webhookCheckout)
 
 
 export default PaymentRouter;
