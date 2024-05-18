@@ -12,7 +12,7 @@ import dotenv from "dotenv";
 import creategraphqlServer from "./graphql";
 dotenv.config({ path: "./.env" });
 const stripe = require('stripe')(process.env.stripe_secret)
-const endpointSecret = "whsec_HE0gOF31VbdOno14SqmGP2KGQaN28oMS";
+
 async function init() {
     const DB: string | undefined = process.env.DB;
     const PORT: string | undefined = process.env.PORT;
