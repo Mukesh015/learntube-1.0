@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.webhookCheckout = exports.makePayment = void 0;
+exports.makePayment = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config({ path: "./.env" });
 const stripe = require('stripe')(process.env.stripe_secret);
@@ -72,42 +72,47 @@ function makePayment(req, res) {
 }
 exports.makePayment = makePayment;
 ;
-const createBookingCheckout = (sessionData) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(sessionData.metadata);
-    console.log(sessionData.client_reference_id);
-    console.log(sessionData.customer);
-});
-function webhookCheckout(req, res) {
-    return __awaiter(this, void 0, void 0, function* () {
-        console.log("hi");
-        const endpointSecret = process.env.WEBHOOK_SECRET;
-        const sig = req.headers['stripe-signature'];
-        let event;
-        try {
-            event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
-        }
-        catch (err) {
-            console.log(err);
-            res.status(400).send(`Webhook Error: ${err}`);
-            return;
-        }
-        switch (event.type) {
-            case 'checkout.session.async_payment_succeeded':
-                const checkoutSessionAsyncPaymentSucceeded = event.data.object;
-                // Then define and call a function to handle the event checkout.session.async_payment_succeeded
-                console.log('Checkout async payment succeeded');
-                break;
-            case 'checkout.session.completed':
-                const checkoutSessionCompleted = event.data.object;
-                console.log('Checkout async checkoutSessionCompleted', checkoutSessionCompleted);
-                break;
-            // ... handle other event types
-            default:
-                console.log(`Unhandled event type ${event.type}`);
-        }
-        // Return a 200 response to acknowledge receipt of the event
-        res.send();
-    });
-}
-exports.webhookCheckout = webhookCheckout;
-;
+/*
+const createBookingCheckout = async (sessionData: { metadata: { courseId: any; }; client_reference_id: any; customer:any }) => {
+  console.log(sessionData.metadata);
+  console.log(sessionData.client_reference_id);
+  console.log(sessionData.customer);
+};
+
+export async function webhookCheckout (req: Request, res: Response)  {
+  console.log("hi")
+  const endpointSecret = process.env.WEBHOOK_SECRET;
+  const sig = req.headers['stripe-signature'];
+
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+  } catch (err) {
+    console.log(err);
+    res.status(400).send(`Webhook Error: ${err}`);
+    return;
+  }
+
+  switch (event.type) {
+    case 'checkout.session.async_payment_succeeded':
+      const checkoutSessionAsyncPaymentSucceeded = event.data.object;
+      // Then define and call a function to handle the event checkout.session.async_payment_succeeded
+      console.log('Checkout async payment succeeded')
+      break;
+    case 'checkout.session.completed':
+      const checkoutSessionCompleted = event.data.object;
+
+      console.log('Checkout async checkoutSessionCompleted',checkoutSessionCompleted)
+
+      break;
+    // ... handle other event types
+    default:
+      console.log(`Unhandled event type ${event.type}`);
+  }
+
+  // Return a 200 response to acknowledge receipt of the event
+  res.send();
+};
+
+*/ 

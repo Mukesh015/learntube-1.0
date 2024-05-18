@@ -65,6 +65,7 @@ export async function makePayment(req: Request, res: Response) {
     }
 };
 
+/*
 const createBookingCheckout = async (sessionData: { metadata: { courseId: any; }; client_reference_id: any; customer:any }) => {
   console.log(sessionData.metadata);
   console.log(sessionData.client_reference_id);
@@ -107,3 +108,4 @@ export async function webhookCheckout (req: Request, res: Response)  {
   res.send();
 };
 
+*/
