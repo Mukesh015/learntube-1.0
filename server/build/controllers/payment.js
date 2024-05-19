@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.webhookCheckout = exports.makePayment = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config({ path: "./.env" });
+const user_1 = require("../models/user");
 const stripe = require('stripe')(process.env.stripe_secret);
 const endpointSecret = process.env.WEBHOOK_SECRET;
 function makePayment(req, res) {
@@ -73,10 +74,26 @@ function makePayment(req, res) {
 }
 exports.makePayment = makePayment;
 ;
-const createBookingCheckout = (sessionData) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(sessionData.metadata);
-    console.log(sessionData.client_reference_id);
-    console.log(sessionData.customer);
+const EnrollCourse = (sessionData, req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const courseId = sessionData.metadata.tourId || sessionData.client_reference_id;
+    const email = sessionData.email;
+    if (!courseId) {
+        return res.status(400).json({ message: "Course ID is missing" });
+    }
+    try {
+        const user = yield user_1.UserModel.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        (_a = user.EnrolledCourses) === null || _a === void 0 ? void 0 : _a.push(courseId);
+        yield user.save();
+        return res.status(200).json({ message: "Course enrolled successfully" });
+    }
+    catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
 });
 function webhookCheckout(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -104,7 +121,8 @@ function webhookCheckout(req, res) {
             case 'checkout.session.completed':
                 const checkoutSessionCompleted = event.data.object;
                 // Then define and call a function to handle the event checkout.session.completed
-                console.log("payment completed", checkoutSessionCompleted);
+                console.log("payment completed");
+                EnrollCourse(checkoutSessionCompleted, req, res);
                 break;
             case 'checkout.session.expired':
                 const checkoutSessionExpired = event.data.object;

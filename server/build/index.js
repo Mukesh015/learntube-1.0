@@ -37,9 +37,7 @@ function init() {
         const app = (0, express_1.default)();
         app.use((0, cors_1.default)());
         app.use((0, cookie_parser_1.default)());
-        // Define the webhook endpoint with express.raw middleware
         app.post('/webhook', express_1.default.raw({ type: 'application/json' }), payment_2.webhookCheckout);
-        // Use other middlewares after defining the webhook
         app.use(express_1.default.json());
         app.use(express_1.default.urlencoded({ extended: false }));
         app.use(body_parser_1.default.json());

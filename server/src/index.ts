@@ -25,10 +25,10 @@ async function init() {
     app.use(cors());
     app.use(cookieParser());
 
-    // Define the webhook endpoint with express.raw middleware
+
     app.post('/webhook', express.raw({ type: 'application/json' }), webhookCheckout);
 
-    // Use other middlewares after defining the webhook
+
     app.use(express.json());
     app.use(express.urlencoded({ extended: false }));
     app.use(bodyParser.json());
