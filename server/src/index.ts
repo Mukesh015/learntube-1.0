@@ -23,19 +23,21 @@ async function init() {
 
     const app = express();
     app.use(cors());
+    app.use(cookieParser());
+
+    // Define the webhook endpoint with express.raw middleware
+    app.post('/webhook', express.raw({ type: 'application/json' }), webhookCheckout);
+
+    // Use other middlewares after defining the webhook
     app.use(express.json());
     app.use(express.urlencoded({ extended: false }));
     app.use(bodyParser.json());
-    app.use(cookieParser());
 
     app.use("/graphql", expressMiddleware(await creategraphqlServer()));
     app.use("/api", UserRouter);
     app.use("/video", VideoRouter);
     app.use("/features", FeaturesRouter);
     app.use("/pay", PaymentRouter);
-
-    
-    app.post('/webhook', express.raw({ type: 'application/json' }), webhookCheckout);
 
     try {
         await mongoose.connect(DB);

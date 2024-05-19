@@ -36,16 +36,18 @@ function init() {
         }
         const app = (0, express_1.default)();
         app.use((0, cors_1.default)());
+        app.use((0, cookie_parser_1.default)());
+        // Define the webhook endpoint with express.raw middleware
+        app.post('/webhook', express_1.default.raw({ type: 'application/json' }), payment_2.webhookCheckout);
+        // Use other middlewares after defining the webhook
         app.use(express_1.default.json());
         app.use(express_1.default.urlencoded({ extended: false }));
         app.use(body_parser_1.default.json());
-        app.use((0, cookie_parser_1.default)());
         app.use("/graphql", (0, express4_1.expressMiddleware)(yield (0, graphql_1.default)()));
         app.use("/api", static_1.default);
         app.use("/video", video_1.default);
         app.use("/features", feature_1.default);
         app.use("/pay", payment_1.default);
-        app.post('/webhook', express_1.default.raw({ type: 'application/json' }), payment_2.webhookCheckout);
         try {
             yield mongoose_1.default.connect(DB);
             console.log("DB connected");

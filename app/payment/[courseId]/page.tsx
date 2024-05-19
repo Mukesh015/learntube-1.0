@@ -86,7 +86,7 @@ const PaymentPage: React.FC<Props> = ({ params }) => {
         if(user){
             setEmail(user.email || "");
             setuserName(user.displayName || "");
-
+            console.log("User")
         }
         if (data) {
             console.log(data)
