@@ -77,7 +77,8 @@ exports.makePayment = makePayment;
 const EnrollCourse = (sessionData) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const courseId = sessionData.metadata.tourId || sessionData.client_reference_id;
-    const email = sessionData.email;
+    const email = sessionData.customer_details.email;
+    console.log(email, courseId);
     if (!courseId) {
         return { status: 400, message: "Course ID is missing" };
     }

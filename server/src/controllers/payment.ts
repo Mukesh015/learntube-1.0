@@ -12,6 +12,7 @@ const endpointSecret = process.env.WEBHOOK_SECRET;
 
 
 interface SessionData {
+  customer_details: any;
   metadata: {
     tourId?: string;
   };
@@ -81,8 +82,8 @@ export async function makePayment(req: Request, res: Response) {
 
 const EnrollCourse = async (sessionData: SessionData): Promise<{ status: number, message: string }> => {
   const courseId = sessionData.metadata.tourId || sessionData.client_reference_id;
-  const email = sessionData.email;
-  
+  const email = sessionData.customer_details.email;
+  console.log(email, courseId)
   if (!courseId) {
     return { status: 400, message: "Course ID is missing" };
   }
