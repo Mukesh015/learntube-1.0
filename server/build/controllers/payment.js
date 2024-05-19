@@ -74,25 +74,25 @@ function makePayment(req, res) {
 }
 exports.makePayment = makePayment;
 ;
-const EnrollCourse = (sessionData, req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const EnrollCourse = (sessionData) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const courseId = sessionData.metadata.tourId || sessionData.client_reference_id;
     const email = sessionData.email;
     if (!courseId) {
-        return res.status(400).json({ message: "Course ID is missing" });
+        return { status: 400, message: "Course ID is missing" };
     }
     try {
         const user = yield user_1.UserModel.findOne({ email });
         if (!user) {
-            return res.status(404).json({ message: "User not found" });
+            return { status: 404, message: "User not found" };
         }
         (_a = user.EnrolledCourses) === null || _a === void 0 ? void 0 : _a.push(courseId);
         yield user.save();
-        return res.status(200).json({ message: "Course enrolled successfully" });
+        return { status: 200, message: "Course enrolled successfully" };
     }
     catch (error) {
         console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+        return { status: 500, message: "Internal server error" };
     }
 });
 function webhookCheckout(req, res) {
@@ -122,7 +122,8 @@ function webhookCheckout(req, res) {
                 const checkoutSessionCompleted = event.data.object;
                 // Then define and call a function to handle the event checkout.session.completed
                 console.log("payment completed");
-                EnrollCourse(checkoutSessionCompleted, req, res);
+                const enrollResult = yield EnrollCourse(checkoutSessionCompleted);
+                console.log(enrollResult.message);
                 break;
             case 'checkout.session.expired':
                 const checkoutSessionExpired = event.data.object;

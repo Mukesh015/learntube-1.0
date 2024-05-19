@@ -9,6 +9,18 @@ import { UserModel, UserDocument } from "../models/user";
 const stripe = require('stripe')(process.env.stripe_secret)
 
 const endpointSecret = process.env.WEBHOOK_SECRET;
+
+
+interface SessionData {
+  metadata: {
+    tourId?: string;
+  };
+  client_reference_id?: string;
+  email: string;
+}
+
+
+
 export async function makePayment(req: Request, res: Response) {
 
   const { courseDetails, userName, email } = req.body;
@@ -67,25 +79,25 @@ export async function makePayment(req: Request, res: Response) {
 };
 
 
-const EnrollCourse = async (sessionData:any,req: Request, res: Response) => {
+const EnrollCourse = async (sessionData: SessionData): Promise<{ status: number, message: string }> => {
   const courseId = sessionData.metadata.tourId || sessionData.client_reference_id;
-  const email=sessionData.email
- 
+  const email = sessionData.email;
+  
   if (!courseId) {
-    return res.status(400).json({ message: "Course ID is missing" });
+    return { status: 400, message: "Course ID is missing" };
   }
 
   try {
     const user = await UserModel.findOne({ email });
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return { status: 404, message: "User not found" };
     }
     user.EnrolledCourses?.push(courseId);
     await user.save();
-    return res.status(200).json({ message: "Course enrolled successfully" });
+    return { status: 200, message: "Course enrolled successfully" };
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Internal server error" });
+    return { status: 500, message: "Internal server error" };
   }
 };
 
@@ -119,7 +131,8 @@ export async function webhookCheckout(req: Request, res: Response) {
       const checkoutSessionCompleted = event.data.object;
       // Then define and call a function to handle the event checkout.session.completed
       console.log("payment completed")
-      EnrollCourse(checkoutSessionCompleted,req,res)
+      const enrollResult = await EnrollCourse(checkoutSessionCompleted);
+      console.log(enrollResult.message);
       
       break;
     case 'checkout.session.expired':
