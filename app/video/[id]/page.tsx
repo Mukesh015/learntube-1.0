@@ -58,6 +58,7 @@ query GetVideoUrl( $email: String, $videoId: String,$channelId: String) {
         videoTitle
         videoURl
         videoViews
+        videoThumb
       }
       getComments(videoID: $videoId) {
         count
@@ -125,7 +126,6 @@ const VideoPage: React.FC<Props> = ({ params }) => {
     const [logo, setLogo] = useState<string>("");
     const [watchTime, setWatchTime] = useState<number>(0);
     const [totalWatchTime, setTotalWatchTime] = useState(0);;
-
     const toggleSubscribe = () => {
         setIsSubsribed(!isSubsCribed);
     }

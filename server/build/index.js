@@ -21,8 +21,10 @@ const body_parser_1 = __importDefault(require("body-parser"));
 const video_1 = __importDefault(require("./routes/video"));
 const static_1 = __importDefault(require("./routes/static"));
 const feature_1 = __importDefault(require("./routes/feature"));
+const payment_1 = __importDefault(require("./routes/payment"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const graphql_1 = __importDefault(require("./graphql"));
+const payment_2 = require("./controllers/payment");
 dotenv_1.default.config({ path: "./.env" });
 function init() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -34,14 +36,16 @@ function init() {
         }
         const app = (0, express_1.default)();
         app.use((0, cors_1.default)());
+        app.use((0, cookie_parser_1.default)());
+        app.post('/webhook', express_1.default.raw({ type: 'application/json' }), payment_2.webhookCheckout);
         app.use(express_1.default.json());
         app.use(express_1.default.urlencoded({ extended: false }));
         app.use(body_parser_1.default.json());
-        app.use((0, cookie_parser_1.default)());
         app.use("/graphql", (0, express4_1.expressMiddleware)(yield (0, graphql_1.default)()));
         app.use("/api", static_1.default);
         app.use("/video", video_1.default);
         app.use("/features", feature_1.default);
+        app.use("/pay", payment_1.default);
         try {
             yield mongoose_1.default.connect(DB);
             console.log("DB connected");

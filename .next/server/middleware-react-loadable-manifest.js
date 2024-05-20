@@ -1,1 +1,0 @@
-self.__REACT_LOADABLE_MANIFEST="{\"app\\\\video\\\\[id]\\\\page.tsx -> lottie-react\":{\"id\":\"app\\\\video\\\\[id]\\\\page.tsx -> lottie-react\",\"files\":[]}}"

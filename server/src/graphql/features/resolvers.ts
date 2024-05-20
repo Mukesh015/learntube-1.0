@@ -701,6 +701,7 @@ const queries = {
                 channelLogo,
                 coverPhoto,
                 link,
+                creatorEmail: userEmail,
                 subscribers,
                 noOfVideos,
                 channelId
@@ -743,6 +744,32 @@ const queries = {
             throw new Error('An error occurred while fetching user details');
         }
 
+    },
+    getPaymentDetails: async (_: any, { courseId }: { courseId: string }) => {
+        try {
+            const video = await VideoModel.findOne({ "courses.courseId": courseId });
+            if (!video) {
+                throw new Error('course details not found');
+            }
+            const channelLogoResponse = await queries.getChannelLogo(undefined, { email:video.email });
+            const username = channelLogoResponse.find((logo: { email: string; }) => logo.email === video.email)?.usernames;
+            const course = video.courses.find(course => course.courseId === courseId);
+
+            return [{
+                email: video.email,
+                courseName: course?.courseName,
+                courseDescription: course?.courseDescription,
+                courseFees: course?.courseFees.price,
+                courseId: course?.courseId,
+                courseThumbnail: course?.courseThumbUrl,
+                totalVideo: course?.videos.length,
+                userName:username
+            }]
+        }
+        catch (error) {
+            console.error('Error fetching user details:', error);
+            throw new Error('An error occurred while fetching user details');
+        }
     }
 
 }

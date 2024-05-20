@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useState } from "react";
+import React, { FormEvent, useCallback, useEffect, useState } from "react";
 import dynamic from 'next/dynamic';
 const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
 import animationData1 from "@/public/Animation - 1714979030679.json"
@@ -8,6 +8,10 @@ import animationData3 from "@/public/Animation - 1714979079610.json"
 import animationData4 from "@/public/Animation - 1714979114638.json"
 import animationData5 from "@/public/Animation - 1715323623543.json"
 import { gql, useQuery } from "@apollo/client";
+import { loadStripe } from '@stripe/stripe-js'
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "@/configurations/firebase/config";
+
 
 const PAYMENT_DETAILS = gql`
 
@@ -19,6 +23,7 @@ query PaymentQuery($courseId: String) {
       courseName
       courseThumbnail
       email
+      totalVideo
     }
   }
 
@@ -34,20 +39,63 @@ const PaymentPage: React.FC<Props> = ({ params }) => {
     const [courseName, setCourseName] = useState<string>("");
     const [courseFees, setCourseFees] = useState<number>(0);
     const [courseDiscount, setCourseDiscount] = useState<number>(10);
+    const [paymentDetails, setPaymentDetails] = useState<any[]>([]);
+    const [userName, setuserName] = useState<string>("");
+    const [email, setEmail] = useState<string>("");
 
     const courseId: any = decodeURIComponent(params.courseId)
-
+    const [user] = useAuthState(auth);
+    const [input, setInput] = useState({ customDonation: '' });
     const { loading, error, data } = useQuery(PAYMENT_DETAILS, {
         variables: { courseId: courseId },
     });
 
+    const makePayment = useCallback(async () => {
+        try {
+
+            const stripe = await loadStripe(`${process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}`)
+            const response = await fetch(`${process.env.NEXT_PUBLIC_FIREBASE_SERVER_DOMAIN}/pay/makepayment`, {
+                method: "post",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    courseDetails: paymentDetails,userName,email
+                })
+
+            });
+            const session = await response.json();
+            console.log(session)
+            if (session) {
+                await stripe?.redirectToCheckout({
+                    sessionId: session.session.id
+                });
+
+            } else {
+
+                console.error("Error creating Stripe Checkout Session");
+            }
+        } catch (error) {
+            console.error("Error making payment:", error);
+        }
+    }, [paymentDetails,userName,email,])
+
+
     useEffect(() => {
+        if(user){
+            setEmail(user.email || "");
+            setuserName(user.displayName || "");
+            console.log("User")
+        }
         if (data) {
             console.log(data)
             setCourseName(data.getPaymentDetails.courseName)
             setCourseFees(data.getPaymentDetails.courseFees)
+            setPaymentDetails(data.getPaymentDetails)
         }
-    }, [setCourseName, setCourseFees, data])
+    }, [setPaymentDetails, data, setCourseFees, setCourseName,user,setEmail,setuserName])
+
 
     return (
         <>
@@ -89,6 +137,7 @@ const PaymentPage: React.FC<Props> = ({ params }) => {
                         <div className="mt-10">
                             <button
                                 type="submit"
+                                onClick={makePayment}
                                 className="flex active:scale-110 hover:bg-[#ca0c47] duration-300 will-change-transform relative transition-all disabled:opacity-70 bg-[#e91f64] text-white font-semibold rounded-2xl px-[265px] py-3 mt-2"
                             >
                                 Make payment
@@ -108,5 +157,5 @@ const PaymentPage: React.FC<Props> = ({ params }) => {
         </>
     )
 }
-
 export default PaymentPage;
+

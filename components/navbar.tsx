@@ -559,8 +559,6 @@ const Navbar: React.FC<{ query: string }> = ({ query }) => {
                                 style={{ width: "600px" }}
                                 type="search"
                                 id="search-content"
-                                value={query}
-                                onChange={(e) => setSearchitem(e.target.value)}
 
                                 placeholder="Search here... or [ctrl+k]"
                                 className={`bg-inherit border ${isDarkMode ? "text-black" : "text-white"} border-gray-700 rounded-medium p-2 px-10 w-96`}

@@ -144,6 +144,8 @@ type Video {
     email: String
     message: String
     videoThumbnail: String
+    corseFees: String
+    courseId: String
     avatar: String
     channelLogo: String
  }
@@ -165,6 +167,7 @@ type Video {
     link: SocialMediaLinks
     subscribers: String
     noOfVideos: String
+    creatorEmail: String
   
  }
  type coursebyChannelId{
@@ -180,5 +183,15 @@ type Video {
     viewsCount: String
     videoPublishedAt: String
     videoThumbnail:  String
+ }
+ type paymentDetails{
+    email: String
+    courseName: String
+    courseFees: String
+    courseDescription: String
+    courseId: String
+    courseThumbnail: String
+    totalVideo: String
+    userName: String
  }
 `;

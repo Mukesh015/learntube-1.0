@@ -90,7 +90,7 @@ const queries = {
                         const channelLogoResponse = await queries.getChannelLogo(undefined, { email: video.email });
                         const channelLogo = channelLogoResponse.find((logo: { email: string; }) => logo.email === video.email)?.channelLogo;
                         const channelName = channelLogoResponse.find((logo: { email: string; }) => logo.email === video.email)?.channelName;
-                        const channelId = channelLogoResponse.find((logo: { email: string; }) => logo.email === video.email)?.channelId;
+                        const channelId=channelLogoResponse.find((logo: { email: string; }) => logo.email === video.email)?.channelId;
                         const courseFees = course.courseFess.price === null ? null : course.courseFess.price;
                         const courseId = course.courseId
                         allVideoThumbUrls.push({
@@ -170,6 +170,7 @@ const queries = {
                 videoURl: video.videoUrl, videoDescription: video.videoDescription, videoTitle: video.videoTitle,
                 videoViews: video.videoViews.length, videoPublishedAt: video.videoPublishedAt, videoTags: video.videoTags,
                 channelLogo: channelLogo, channelName: channelName, creatorEmail: creatorEmail, channelId: channelId,
+                videoThumb:video.videoThumbnail
             }];
         } catch (error) {
             console.error("Error redirecting:", error);
@@ -254,7 +255,7 @@ const queries = {
             throw new Error('Error fetching search query details');
         }
     }
-
+    
 
 };
 

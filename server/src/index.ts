@@ -7,8 +7,10 @@ import bodyParser from 'body-parser';
 import VideoRouter from './routes/video';
 import UserRouter from './routes/static';
 import FeaturesRouter from './routes/feature';
+import PaymentRouter from './routes/payment';
 import dotenv from "dotenv";
 import creategraphqlServer from "./graphql";
+import { webhookCheckout } from './controllers/payment';
 dotenv.config({ path: "./.env" });
 
 async function init() {
@@ -21,15 +23,22 @@ async function init() {
 
     const app = express();
     app.use(cors());
+    app.use(cookieParser());
+
+
+    app.post('/webhook', express.raw({ type: 'application/json' }), webhookCheckout);
+
+
     app.use(express.json());
     app.use(express.urlencoded({ extended: false }));
     app.use(bodyParser.json());
-    app.use(cookieParser());
 
-    app.use("/graphql", expressMiddleware(await creategraphqlServer(), ));
+    app.use("/graphql", expressMiddleware(await creategraphqlServer()));
     app.use("/api", UserRouter);
     app.use("/video", VideoRouter);
     app.use("/features", FeaturesRouter);
+    app.use("/pay", PaymentRouter);
+
     try {
         await mongoose.connect(DB);
         console.log("DB connected");

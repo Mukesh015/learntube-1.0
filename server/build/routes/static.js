@@ -17,6 +17,5 @@ UserRouter.post('/getuserdetails', user_1.getUserDetails);
 UserRouter.post("/generateotp", user_1.generateOtp);
 UserRouter.post("/validation", user_1.userValidation);
 UserRouter.post("/subscribe", user_1.subscribe);
-UserRouter.post("/enroll", user_1.courseEnrollment);
 UserRouter.post("/isenroll", user_1.isEnrolled);
 exports.default = UserRouter;

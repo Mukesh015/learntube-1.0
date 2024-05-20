@@ -1,4 +1,4 @@
-// File: D:\Projects\Project Management\learntube-1.0\app\video\[id]\page.tsx
+// File: D:\Learn Tube\app\video\[id]\page.tsx
 import * as entry from '../../../../../app/video/[id]/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
