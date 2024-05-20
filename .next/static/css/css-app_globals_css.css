@@ -887,6 +887,9 @@ video {
 .ml-96 {
   margin-left: 24rem;
 }
+.ml-\[200px\] {
+  margin-left: 200px;
+}
 .ml-\[220px\] {
   margin-left: 220px;
 }
@@ -904,6 +907,9 @@ video {
 }
 .ml-\[600px\] {
   margin-left: 600px;
+}
+.ml-\[700px\] {
+  margin-left: 700px;
 }
 .mr-10 {
   margin-right: 2.5rem;
@@ -1576,6 +1582,10 @@ video {
 }
 .translate-y-10 {
   --tw-translate-y: 2.5rem;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+.-translate-y-1 {
+  --tw-translate-y: -0.25rem;
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 .rotate-0 {
@@ -5373,6 +5383,10 @@ body {
 
 .hover\:opacity-80:hover {
   opacity: 0.8;
+}
+
+.hover\:opacity-60:hover {
+  opacity: 0.6;
 }
 
 .hover\:file\:bg-teal-700::file-selector-button:hover {

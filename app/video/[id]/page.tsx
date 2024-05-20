@@ -20,8 +20,6 @@ import animationData1 from "@/public/Animation - 1714890965505.json"
 const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
 import Toast from '@/components/toast';
 
-const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
-
 const VideoUrl = gql`
 query GetVideoUrl( $email: String, $videoId: String,$channelId: String) {
     getFeatures(email: $email, videoID: $videoId, channelId: $channelId) {
@@ -80,12 +78,27 @@ interface Props {
 
 const VideoPage: React.FC<Props> = ({ params }) => {
 
+    const router = useRouter();
+
+    //video player
     const videoPlayerRef = useRef<any>();
+    const videoRef = useRef(null);
+    const intervalRef = useRef(null)
+
+    const [isPlaying, setIsPlaying] = useState<boolean>(true);
+    const [isMuted, setIsMuted] = useState<boolean>(false);
+    const [isloop, setIsLoop] = useState<boolean>(false);
+    const [currentTime, setCurrentTime] = useState(0);
+    const [videoLoaded, setVideoLoaded] = useState<boolean>(false);
+    const [sliderValue, setSliderValue] = useState(0);
+    const [duration, setDuration] = useState(0);
+    const [showSoundSlider, setShowSoundSlider] = useState<boolean>(false);
+    const [nextVideoId, setNextVideoId] = useState<string>("");
+    const [showControls, setShowControls] = useState<boolean>(false);
 
     const [user] = useAuthState(auth);
     const { isDarkMode, savePreviousVideoId, prevVideoId } = useDarkMode();
     const [isLoaded, setIsLoaded] = React.useState(false);
-    const router = useRouter();
     const [isAddedToPlaylist, setIsAddedToPlaylist] = useState<boolean>(false);
     const [isAddedToWatchLater, setIsAddedToWatchLater] = useState<boolean>(false);
     const [isLikedVideo, setIsLikedVideo] = useState<boolean>(false);
@@ -97,8 +110,6 @@ const VideoPage: React.FC<Props> = ({ params }) => {
     const [subscribers, setSubscribers] = useState<string>("");
     const [showToast, setShowToast] = useState<boolean>(false);
     const [toastMessage, setToastMessage] = useState<string>("");
-    const [isplaying, setIsPlaying] = useState<boolean>(true);
-    const [showSoundSlider, setShowSoundSlider] = useState<boolean>(false);
     const [showBuffering, setShowBuffering] = useState<boolean>(false);
     const [videoTitle, setVideoTitle] = useState<string>("");
     const [videoDescription, setVideoDescription] = useState<string>("");
@@ -113,7 +124,7 @@ const VideoPage: React.FC<Props> = ({ params }) => {
     const [comment, setComment] = useState<string>("");
     const [logo, setLogo] = useState<string>("");
     const [watchTime, setWatchTime] = useState<number>(0);
-    const [nextVideoId, setNextVideoId] = useState<string>("");
+    const [totalWatchTime, setTotalWatchTime] = useState(0);;
 
     const toggleSubscribe = () => {
         setIsSubsribed(!isSubsCribed);
@@ -162,15 +173,6 @@ const VideoPage: React.FC<Props> = ({ params }) => {
             return `${Math.floor(diffInSec / 86400)} days ago`;
         }
     };
-
-
-    const handlePlayNextVideo = useCallback(async () => {
-        router.push(`/video/${nextVideoId}`)
-    }, [nextVideoId])
-
-    const handlePlayPrevVideo = useCallback(async () => {
-        router.push(`/video/${prevVideoId}`)
-    }, [prevVideoId])
 
     const handleSubscribe = useCallback(async () => {
         try {
@@ -229,6 +231,7 @@ const VideoPage: React.FC<Props> = ({ params }) => {
             console.error("Failed to fetch", error);
         }
     }, [setIsDisLikedVideo, setIsLikedVideo, email, videoId]);
+
 
     const handleLikedVideo = useCallback(async () => {
         try {
@@ -452,17 +455,142 @@ const VideoPage: React.FC<Props> = ({ params }) => {
         }
     };
 
-    const rewindHandler = useCallback(async () => {
-        console.log(videoPlayerRef);
-        const currentTime = videoPlayerRef.current.getCurrentTime();
-        videoPlayerRef.current.seekTo(currentTime - 10);
-    }, [videoPlayerRef]);
+    const formatDuration = (seconds: number) => {
 
-    const forwordHandler = useCallback(async () => {
-        console.log(videoPlayerRef);
-        const currentTime = videoPlayerRef.current.getCurrentTime();
-        videoPlayerRef.current.seekTo(currentTime + 10);
-    }, [videoPlayerRef]);
+        let hours = Math.floor(seconds / 3600);
+        let minutes = Math.floor((seconds % 3600) / 60);
+        let remainingSeconds = Math.floor(seconds % 60);
+
+        // Adjust for decimal inputs
+        if (hours === 0 && minutes === 0) {
+            remainingSeconds = Math.round(seconds);
+        }
+
+        if (hours === 0) {
+            if (minutes === 0) {
+                return `00:${remainingSeconds}`;
+            } else {
+                return `${minutes}:${remainingSeconds}`;
+            }
+        } else {
+            return `${hours}:${minutes}:${remainingSeconds}`;
+        }
+    }
+
+    const handleSliderChange = (value: number) => {
+        console.log("Slider value:", value);
+        const video = videoPlayerRef.current;
+        console.log("Video element:", video);
+        if (video) {
+            console.log("Setting current time to:", value);
+            video.currentTime = value;
+            setCurrentTime(value);
+            if (!isPlaying) {
+                console.log("Starting playback");
+                video.play(); // Start playing the video if it's paused
+                setIsPlaying(true);
+            }
+        }
+    };
+    const handlePlayNextVideo = useCallback(async () => {
+        setTimeout(() => {
+            router.push(`/video/${nextVideoId}`)
+        }, 3000);
+    }, [nextVideoId])
+    const handlePlayPrevVideo = useCallback(async () => {
+        router.push(`/video/${prevVideoId}`)
+    }, [prevVideoId])
+
+    const handlePlayVideo = () => {
+        if (videoPlayerRef.current) {
+            videoPlayerRef.current.pause();
+            setIsPlaying(false);
+        }
+    }
+    const handlePauseVideo = () => {
+        if (videoPlayerRef.current) {
+            videoPlayerRef.current.play();
+            setIsPlaying(true);
+        }
+    }
+
+    const rewindHandler = useCallback(() => {
+        const video = document.getElementById("video-player");
+        if (video) {
+            // @ts-ignore
+            const currentTime = video.currentTime;
+            setTotalWatchTime(currentTime - 10);
+            if (!isNaN(currentTime)) {
+                // @ts-ignore
+                video.currentTime = Math.max(0, currentTime - 10);
+            }
+        }
+    }, []);
+
+    const forwordHandler = useCallback(() => {
+        const video = document.getElementById("video-player");
+        if (video) {
+            // @ts-ignore
+            const currentTime = video.currentTime;
+            setTotalWatchTime(currentTime + 10);
+            if (!isNaN(currentTime)) {
+                // @ts-ignore
+                video.currentTime = Math.max(0, currentTime + 10);
+            }
+        }
+    }, []);
+
+    const handleStartCounter = () => {
+        const video = videoRef.current;
+        if (duration >= totalWatchTime) {
+            const updateTime = () => {
+                if (video) {
+                    // @ts-ignore
+                    setCurrentTime(video.currentTime);
+                }
+                setTotalWatchTime(prevTime => prevTime + 1);
+            };
+            if (isPlaying) {
+                // @ts-ignore
+                intervalRef.current = setInterval(updateTime, 1000);
+            } else {
+                // @ts-ignore
+                clearInterval(intervalRef.current); // Clear interval when video is paused
+            }
+        }
+    };
+
+    // Add an effect to clear the interval when the component unmounts or when isPlaying changes
+    useEffect(() => {
+        // @ts-ignore
+        return () => clearInterval(intervalRef.current);
+    }, [isPlaying]);
+
+
+    const formatTimer = (timeInSeconds: number) => {
+        const hours = Math.floor(timeInSeconds / 3600);
+        const minutes = Math.floor((timeInSeconds % 3600) / 60);
+        const seconds = Math.floor(timeInSeconds % 60);
+
+        if (hours === 0) {
+            if (minutes === 0) {
+                return `00:${seconds}`;
+            } else {
+                return `${minutes}:${seconds}`;
+            }
+        } else {
+            return `${hours}:${minutes}:${seconds}`;
+        }
+    };
+
+    const handleToggleFullScren = () => {
+        const video = document.getElementById("video-player");
+        if (video) {
+            if (video.requestFullscreen) {
+                video.requestFullscreen();
+            }
+        }
+    }
 
     useEffect(() => {
         startWatchTime();
@@ -513,7 +641,16 @@ const VideoPage: React.FC<Props> = ({ params }) => {
             setNextVideoId(allVideos[0]?.videoId)
         }
         savePreviousVideoId(videoId)
-    }, [allVideos, savePreviousVideoId, setNextVideoId, nextVideoId])
+    }, [allVideos, savePreviousVideoId, setNextVideoId])
+
+    useEffect(() => {
+        const video = document.getElementById("video-player")
+        if (video) {
+            // @ts-ignore
+            const duration = video.duration;
+            setDuration(duration);
+        }
+    }, [videoLoaded, setDuration])
 
     return (
         <>
@@ -572,99 +709,40 @@ const VideoPage: React.FC<Props> = ({ params }) => {
                 <div className={`py-20 ${isDarkMode ? "bg-white" : "bg-black"}  px-10 flex`}>
                     <div id="video-container" style={{ maxWidth: "950px" }}>
                         <div>
-                            <div className='flex'>
-                                {showBuffering ? (
-                                    <div className='flex space-x-2 justify-center items-center'>
-                                        <div className="w-4 h-4 rounded-full mt-60 animate-pulse dark:bg-violet-600"></div>
-                                        <div className="w-4 h-4 rounded-full mt-60 animate-pulse dark:bg-violet-600"></div>
-                                        <div className="w-4 h-4 rounded-full mt-60 animate-pulse dark:bg-violet-600"></div>
-                                    </div>
-                                ) : (
-                                    <div>
-                                        <svg onClick={rewindHandler} xmlns="http://www.w3.org/2000/svg" className='absolute z-[100] ml-[300px] mt-48' height="80px" viewBox="0 -960 960 960" width="80px" fill="#e8eaed"><path d="M860-240 500-480l360-240v480Zm-400 0L100-480l360-240v480Z" /></svg>
-                                        {isplaying ? (
-                                            <svg onClick={() => setIsPlaying(false)} className='absolute z-[100] ml-[450px] mt-48' xmlns="http://www.w3.org/2000/svg" height="80px" viewBox="0 -960 960 960" width="80px" fill="#e8eaed"><path d="M560-200v-560h160v560H560Zm-320 0v-560h160v560H240Z" /></svg>
-                                        ) : (
-                                            <svg onClick={() => setIsPlaying(true)} className='absolute z-[100] ml-[450px] mt-48' xmlns="http://www.w3.org/2000/svg" height="80px" viewBox="0 -960 960 960" width="80px" fill="#e8eaed"><path d="m380-300 280-180-280-180v360ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Z" /></svg>
-                                        )}
-                                        <svg onClick={() => forwordHandler()} className='absolute z-[100] ml-[600px] mt-48' xmlns="http://www.w3.org/2000/svg" height="80px" viewBox="0 -960 960 960" width="80px" fill="#e8eaed"><path d="M100-240v-480l360 240-360 240Zm400 0v-480l360 240-360 240Z" /></svg>
-                                    </div>
-                                )}
-                            </div>
-                            <Slider
-                                size="sm"
-                                step={0.01}
-                                maxValue={1}
-                                minValue={0}
-                                aria-label="Temperature"
-                                defaultValue={0.2}
-                                className="w-[950px] absolute bottom-36 z-[100]"
-                            />
-                            <div id='video-controls' className='absolute z-[100] bottom-28 m-1 flex opacity-100'>
-                                <ul className='flex cursor-pointer space-x-3 w-[300px]'>
-                                    <li>
-                                        <svg onClick={() => handlePlayPrevVideo()} xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M220-240v-480h80v480h-80Zm520 0L380-480l360-240v480Z" /></svg>
-                                    </li>
-                                    <li>{isplaying ? (
-                                        <svg onClick={() => setIsPlaying(!isplaying)} xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M560-200v-560h160v560H560Zm-320 0v-560h160v560H240Z" /></svg>
+                            {showControls ? (
+                                <div onMouseEnter={() => setShowControls(true)}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" className='absolute z-[100] ml-[200px] mt-48' height="80px" viewBox="0 -960 960 960" width="80px" fill="#e8eaed"><path d="M220-240v-480h80v480h-80Zm520 0L380-480l360-240v480Z" /></svg>
+                                    <svg onClick={rewindHandler} xmlns="http://www.w3.org/2000/svg" className='absolute z-[100] ml-[300px] mt-48' height="80px" viewBox="0 -960 960 960" width="80px" fill="#e8eaed"><path d="M860-240 500-480l360-240v480Zm-400 0L100-480l360-240v480Z" /></svg>
+                                    {isPlaying ? (
+                                        <svg onClick={() => handlePlayVideo()} className='absolute z-[100] ml-[450px] mt-48' xmlns="http://www.w3.org/2000/svg" height="80px" viewBox="0 -960 960 960" width="80px" fill="#e8eaed"><path d="M560-200v-560h160v560H560Zm-320 0v-560h160v560H240Z" /></svg>
                                     ) : (
-                                        <svg onClick={() => setIsPlaying(!isplaying)} xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M320-200v-560l440 280-440 280Z" /></svg>
+                                        <svg onClick={() => handlePauseVideo()} className='absolute z-[100] ml-[450px] mt-48' xmlns="http://www.w3.org/2000/svg" height="80px" viewBox="0 -960 960 960" width="80px" fill="#e8eaed"><path d="m380-300 280-180-280-180v360ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Z" /></svg>
                                     )}
-                                    </li>
-                                    <li>
-                                        <svg onClick={() => handlePlayNextVideo()} xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M660-240v-480h80v480h-80Zm-440 0v-480l360 240-360 240Z" /></svg>
+                                    <svg onClick={() => forwordHandler()} className='absolute z-[100] ml-[600px] mt-48' xmlns="http://www.w3.org/2000/svg" height="80px" viewBox="0 -960 960 960" width="80px" fill="#e8eaed"><path d="M100-240v-480l360 240-360 240Zm400 0v-480l360 240-360 240Z" /></svg>
+                                    <svg className='absolute z-[100] ml-[700px] mt-48' xmlns="http://www.w3.org/2000/svg" height="80px" viewBox="0 -960 960 960" width="80px" fill="#e8eaed"><path d="M660-240v-480h80v480h-80Zm-440 0v-480l360 240-360 240Z" /></svg>
+                                </div>
+                            ) : (
+                                null
+                            )}
 
-                                    </li>
-                                    <li onMouseEnter={() => setShowSoundSlider(true)}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M560-131v-82q90-26 145-100t55-168q0-94-55-168T560-749v-82q124 28 202 125.5T840-481q0 127-78 224.5T560-131ZM120-360v-240h160l200-200v640L280-360H120Zm440 40v-322q47 22 73.5 66t26.5 96q0 51-26.5 94.5T560-320Z" /></svg>
-                                    </li>
-                                    {showSoundSlider &&
-                                        <li onMouseLeave={() => setShowSoundSlider(false)} >
-                                            <Slider
-                                                size="sm"
-                                                step={0.01}
-                                                maxValue={1}
-                                                minValue={0}
-                                                color="warning"
-                                                showOutline={true}
-                                                aria-label="Temperature"
-                                                defaultValue={0.5}
-                                                className="w-20"
-                                            />
-                                        </li>
-                                    }
-                                    <li className='flex space-x-1 cursor-default'>
-                                        <span>0:00</span>
-                                        <span>/</span>
-                                        <span>11:09</span>
-                                    </li>
-                                </ul>
-                                <ul className='flex space-x-5 ml-[460px] cursor-pointer'>
-                                    <li>
-                                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M280-80 120-240l160-160 56 58-62 62h406v-160h80v240H274l62 62-56 58Zm-80-440v-240h486l-62-62 56-58 160 160-160 160-56-58 62-62H280v160h-80Z" /></svg>
-                                    </li>
-                                    <li>
-                                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M400-280h360v-240H400v240ZM160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Z" /></svg>
-                                    </li>
-                                    <li>
-                                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M440-120v-240h80v80h320v80H520v80h-80Zm-320-80v-80h240v80H120Zm160-160v-80H120v-80h160v-80h80v240h-80Zm160-80v-80h400v80H440Zm160-160v-240h80v80h160v80H680v80h-80Zm-480-80v-80h400v80H120Z" /></svg>
-                                    </li>
-                                    <li>
-                                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M120-120v-200h80v120h120v80H120Zm520 0v-80h120v-120h80v200H640ZM120-640v-200h200v80H200v120h-80Zm640 0v-120H640v-80h200v200h-80Z" /></svg>
-                                    </li>
-                                </ul>
-                            </div>
-                            <ReactPlayer
-                                onEnded={() => handlePlayNextVideo()}
-                                ref={videoPlayerRef}
-                                onBuffer={() => setShowBuffering(true)}
-                                onBufferEnd={() => setShowBuffering(false)}
-                                playing={isplaying}
-                                width={960}
-                                height={550}
-                                url={videoUrl}
+                            <video
+                                onMouseEnter={() => setShowControls(true)}
+                                onMouseLeave={() => {
+                                    setTimeout(() => {
+                                        setShowControls(false);
+                                    }, 3000);
+                                }}
+                                controls
+                                muted={false}
+                                id='video-player'
                                 onPlay={startWatchTime}
-                                onPause={stopWatchTime} />
+                                onPause={stopWatchTime}
+                                autoPlay
+                                ref={videoPlayerRef}
+                                width={960}
+                                height={570}
+                                src={videoUrl}>
+                            </video>
                         </div>
                         <div>
                             <h1 className={`text-xl font-bold mt-3 ${isDarkMode ? "text-black" : "text-white"} mb-5`}>{videoTitle}</h1>

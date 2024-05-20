@@ -1,10 +1,10 @@
 {
   "pages": {
-    "/page": [
+    "/video/[id]/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/css/css-node_modules_react-toastify_dist_ReactToastify_css-node_modules_next_font_google_target_css.css",
-      "static/chunks/app/page.js"
+      "static/chunks/app/video/[id]/page.js"
     ],
     "/layout": [
       "static/chunks/webpack.js",
@@ -17,17 +17,6 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/loading.js"
-    ],
-    "/video/[id]/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/css-node_modules_react-toastify_dist_ReactToastify_css-node_modules_next_font_google_target_css.css",
-      "static/chunks/app/video/[id]/page.js"
-    ],
-    "/error/502/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/error/502/page.js"
     ]
   }
 }
