@@ -227,7 +227,7 @@ const Home: React.FC = () => {
                 <Button color="danger" variant="light" onPress={onClose}>
                   Close
                 </Button>
-                <Button className="bg-[#6f4ef2] shadow-lg shadow-indigo-500/20" onPress={() => router.push("")}>
+                <Button  className="bg-[#6f4ef2] shadow-lg shadow-indigo-500/20" onPress={() => router.push(`payment/`)}>
                   Purchase
                 </Button>
               </ModalFooter>
