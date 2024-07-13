@@ -13,6 +13,7 @@
 # production
 /build
 
+/.next
 
 # server
 /server/node_modules

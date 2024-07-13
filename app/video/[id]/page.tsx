@@ -2,10 +2,9 @@
 import dynamic from 'next/dynamic'
 import Navbar from "@/components/navbar";
 import { useRouter } from 'next/navigation';
-import { User, Progress } from "@nextui-org/react"
+import { User } from "@nextui-org/react"
 import { Button, ButtonGroup } from "@nextui-org/button";
 import { Accordion, AccordionItem } from "@nextui-org/react";
-import { Slider } from "@nextui-org/react";
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Input } from "@nextui-org/react";
 import { Tooltip } from "@nextui-org/tooltip";
@@ -87,11 +86,9 @@ const VideoPage: React.FC<Props> = ({ params }) => {
     const intervalRef = useRef(null)
 
     const [isPlaying, setIsPlaying] = useState<boolean>(true);
-    const [isMuted, setIsMuted] = useState<boolean>(false);
-    const [isloop, setIsLoop] = useState<boolean>(false);
+
     const [currentTime, setCurrentTime] = useState(0);
     const [videoLoaded, setVideoLoaded] = useState<boolean>(false);
-    const [sliderValue, setSliderValue] = useState(0);
     const [duration, setDuration] = useState(0);
     const [showSoundSlider, setShowSoundSlider] = useState<boolean>(false);
     const [nextVideoId, setNextVideoId] = useState<string>("");
