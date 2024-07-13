@@ -1,0 +1,42 @@
+{
+  "app\\channel\\[id]\\page.tsx -> lottie-react": {
+    "id": 43393,
+    "files": []
+  },
+  "app\\creator\\dashboard\\page.tsx -> lottie-react": {
+    "id": 43393,
+    "files": [
+      "static/chunks/dc112a36-dd72e56818520f67.js",
+      "static/chunks/3393-b0ea39d8aefcf88f.js"
+    ]
+  },
+  "app\\page.tsx -> lottie-react": {
+    "id": 43393,
+    "files": []
+  },
+  "app\\payment\\[courseId]\\page.tsx -> lottie-react": {
+    "id": 43393,
+    "files": [
+      "static/chunks/dc112a36-dd72e56818520f67.js",
+      "static/chunks/3393-b0ea39d8aefcf88f.js"
+    ]
+  },
+  "app\\payment\\failed\\page.tsx -> lottie-react": {
+    "id": 43393,
+    "files": [
+      "static/chunks/dc112a36-dd72e56818520f67.js",
+      "static/chunks/3393-b0ea39d8aefcf88f.js"
+    ]
+  },
+  "app\\payment\\success\\page.tsx -> lottie-react": {
+    "id": 43393,
+    "files": [
+      "static/chunks/dc112a36-dd72e56818520f67.js",
+      "static/chunks/3393-b0ea39d8aefcf88f.js"
+    ]
+  },
+  "app\\video\\[id]\\page.tsx -> lottie-react": {
+    "id": 43393,
+    "files": []
+  }
+}

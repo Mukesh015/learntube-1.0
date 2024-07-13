@@ -31,6 +31,7 @@ const HOMEPAGE_DETAILS = gql`
       views
       courseFees
       courseId
+      channelId
     }
   }
 `;
@@ -90,11 +91,12 @@ const Home: React.FC = () => {
         router.push(`/video/${videoId}`);
       } else {
         onOpen();
+        setPurchaseItem(courseId)
       }
     } catch (enrollError) {
       console.error("Failed to fetch enrollment status:", enrollError);
     }
-  }, [email]);
+  }, [email,setPurchaseItem]);
 
   useEffect(() => {
 
@@ -227,7 +229,7 @@ const Home: React.FC = () => {
                 <Button color="danger" variant="light" onPress={onClose}>
                   Close
                 </Button>
-                <Button  className="bg-[#6f4ef2] shadow-lg shadow-indigo-500/20" onPress={() => router.push(`payment/`)}>
+                <Button className="bg-[#6f4ef2] shadow-lg shadow-indigo-500/20" onPress={() => router.push(`/payment/${purchaseItem}`)}>
                   Purchase
                 </Button>
               </ModalFooter>
