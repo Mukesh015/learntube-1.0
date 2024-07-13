@@ -89,9 +89,9 @@ const PaymentPage: React.FC<Props> = ({ params }) => {
             console.log("User")
         }
         if (data) {
-            console.log(data)
-            setCourseName(data.getPaymentDetails.courseName)
-            setCourseFees(data.getPaymentDetails.courseFees)
+            console.log(data.getPaymentDetails[0].courseName)
+            setCourseName(data.getPaymentDetails[0].courseName)
+            setCourseFees(data.getPaymentDetails[0].courseFees)
             setPaymentDetails(data.getPaymentDetails)
         }
     }, [setPaymentDetails, data, setCourseFees, setCourseName,user,setEmail,setuserName])
@@ -116,20 +116,16 @@ const PaymentPage: React.FC<Props> = ({ params }) => {
                                     </p>
                                     <p className="space-x-44 mb-3">
                                         <span>Total video</span>
-                                        <span>10(HC)</span>
+                                        <span>10</span>
                                     </p>
                                     <p className="mb-3">
                                         <span>Price</span>
                                         <span className="ml-[220px]">{courseFees}</span>
                                     </p>
-                                    <p className="space-x-48 mb-3">
-                                        <span>Discount</span>
-                                        <span>{courseDiscount}</span>
-                                    </p>
                                     <div className="border border-gray-500 border-dotted"></div>
                                     <p className="space-x-44 mt-3">
                                         <span>Total price</span>
-                                        <span>{courseFees - courseDiscount}</span>
+                                        <span>{courseFees}</span>
                                     </p>
                                 </div>
                             )}
